@@ -1,7 +1,7 @@
 #include "input.cpp"
 void CBoard::MoveDown()
 {
-    if(!ColisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-1))
+    if(!CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-1))
     {
         Piece.Position[1]--;
         RenderPiece(0);
@@ -9,7 +9,7 @@ void CBoard::MoveDown()
 }
 void CBoard::MoveLeft()
 {
-    if(!ColisionLeft(Piece.Block, Piece.Position[0]-1, Piece.Position[1]))
+    if(!CollisionLeft(Piece.Block, Piece.Position[0]-1, Piece.Position[1]))
     {
         Piece.Position[0]--;
         RenderShadow(0);
@@ -18,7 +18,7 @@ void CBoard::MoveLeft()
 }
 void CBoard::MoveRight()
 {
-    if(!ColisionRight(Piece.Block, Piece.Position[0]+1, Piece.Position[1]))
+    if(!CollisionRight(Piece.Block, Piece.Position[0]+1, Piece.Position[1]))
     {
         ++Piece.Position[0];
         RenderShadow(0);
@@ -30,7 +30,7 @@ void CBoard::HardDrop()
     int8 i = 0;
     while(++i)
     {
-        if(ColisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
+        if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
         {
             break;
         }
@@ -175,32 +175,32 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
     }
-    if(!ColisionFull(TempBlock, Piece.Position[0], Piece.Position[1]))
-    {} else
-    if(!ColisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][0][0],
+    if(!CollisionFull(TempBlock, Piece.Position[0], Piece.Position[1]))
+    {}else
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][0][0],
     Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][0][1]))
     {
         Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][0][0];
         Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][0][1];
-    } else
-    if(!ColisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][1][0],
+    }else
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][1][0],
     Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][1][1]))
     {
         Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][1][0];
         Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][1][1];
-    } else
-    if(!ColisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][2][0],
+    }else
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][2][0],
     Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][2][1]))
     {
         Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][2][0];
         Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][2][1];
-    } else
-    if(!ColisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][3][0],
+    }else
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][3][0],
     Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][3][1]))
     {
         Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][3][0];
         Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][3][1];
-    } else {return 1;}
+    }else {return 1;}
     Piece.Block = TempBlock;
     Piece.Rotation = TempRotation;
     RenderShadow(0);
@@ -244,7 +244,7 @@ void CBoard::ClearLines()
             }
         }}
     }
-    Sleep(200);
+    Sleep(100);
     RenderMatrix();
 }
 int8 CBoard::SpawnPiece()
@@ -264,18 +264,48 @@ int8 CBoard::SpawnPiece()
     {
         NextPointer += 1;
     }
+    if(!CanHold){CanHold = true;}
     RenderNext();
-    if(ColisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
+    RenderShadow(1);
+    RenderPiece(1);
+    if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
     {
         return 1;
     }
-    RenderPiece(1);
-    RenderShadow(1);
+    AutoLock(1);
     return 0;
 }
-void StartGame()
+void CBoard::Hold()
 {
-    Player.RenderMatrix();
-    Player.SpawnPiece();
+    RenderMatrix();
+    if(HeldPiece)
+    {
+        int8 Temp;
+        Temp = HeldPiece;
+        HeldPiece = Piece.Type;
+        RenderHold();
+        Piece = CPiece(Temp);
+        RenderShadow(1);
+        RenderPiece(1);
+        if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
+        {
+            return;
+        }
+        AutoLock(1);
+        CanHold = false;
+    }else
+    {
+        HeldPiece = Piece.Type;
+        RenderHold();
+        SpawnPiece();
+        CanHold = false;
+    }
+}
+void CPlayer::StartGame()
+{
+    Board.GenBag(0);
+    Board.GenBag(1);
+    Board.RenderMatrix();
+    Board.SpawnPiece();
     Input();
 }

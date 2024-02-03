@@ -1,53 +1,141 @@
 #include "render.cpp"
 
-void Delay(int Time, bool *Key)
+void CPlayer::Input()
 {
-    *Key = false;
-    Sleep(Time);
-    *Key = true;
-}
-void Input()
-{
-    bool Down = true, Left = true, Right = true, Drop = true, RCW = true, RCCW = true, AutoDrop = true; DAS = true;
+    bool Left = true, Right = true, HDrop = true, RCW = true, RCCW = true, Drop = true;
+    bool LDAS = false, RDAS = false;
+    bool LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
+    int DropSpeed = 1000;//Auto-drop interval in milliseconds
+    time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
+
+    HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
+    LARGE_INTEGER DueTime;
+    DueTime.QuadPart = -160000;
+    SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
     while(1)
     {
-        if(GetAsyncKeyState(VK_DOWN) && Down)
+        CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
+        if(GetAsyncKeyState(VK_LEFT))
         {
-            Player.MoveDown();
-            std::thread (Delay, 50, &Down).detach();
+            if(CanLeft)
+            {
+                if(!LeftHeld)
+                {
+                    LeftHeld = true;
+                    if(RightHeld)
+                    {
+                        CanRight = false;
+                    }
+                }
+                if(Left)
+                {
+                    Board.MoveLeft();
+                    Left = false;
+                    DASDelay = CurrentTickTime;
+                }else
+                {
+                    if(!LDAS)
+                    {
+                        if(DASDelay + (milliseconds) 150 <= CurrentTickTime)
+                        {
+                            LDAS = true;
+                            Left = true;
+                        }
+                    }else
+                    {
+                        if(DASDelay + (milliseconds) 30 <= CurrentTickTime)
+                        {
+                            Left = true;
+                        }
+                    }
+                }
+            }
         }else
-        if(AutoDrop)
         {
-            Player.MoveDown();
-            std::thread (Delay, 1000, &AutoDrop).detach();
+            Left = true;
+            LDAS = false;
+            LeftHeld = false;
+            CanRight = true;
+            CanLeft = true;
         }
-        /*if(GetAsyncKeyState(VK_LEFT) && Left && Right)
+        if(GetAsyncKeyState(VK_RIGHT))
         {
-            Player.MoveLeft();
-            std::thread (Delay, 200, &Left).detach();
+            if(CanRight)
+            {
+                if(!RightHeld)
+                {
+                    RightHeld = true;
+                    if(LeftHeld)
+                    {
+                        CanLeft = false;
+                    }
+                }
+                if(Right)
+                {
+                    Board.MoveRight();
+                    Right = false;
+                    DASDelay = CurrentTickTime;
+                }else
+                {
+                    if(!RDAS)
+                    {
+                        if(DASDelay + (milliseconds) 150 <= CurrentTickTime)
+                        {
+                            RDAS = true;
+                            Right = true;
+                        }
+                    }else
+                    {
+                        if(DASDelay + (milliseconds) 30 <= CurrentTickTime)
+                        {
+                            Right = true;
+                        }
+                    }
+                }
+            }
+        }else
+        {
+            Right = true;
+            RDAS = false;
+            RightHeld = false;
+            CanLeft = true;
+            CanRight = true;
         }
-        if(GetAsyncKeyState(VK_RIGHT) && Right && Left)
+        if(Drop)
         {
-            Player.MoveRight();
-            std::thread (Delay, 200, &Right).detach();
-        }*/
+            Board.MoveDown();
+            Drop = false;
+            DropDelay = CurrentTickTime;
+        }else
+        {
+            if(DropDelay + (milliseconds) DropSpeed / (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1) 
+            <= CurrentTickTime)
+            {
+                Drop = true;
+            }
+        }
+        Board.AutoLock(0);
         if(GetAsyncKeyState(VK_SPACE))
         {
-            if(Drop)
+            if(HDrop)
             {
-                Player.HardDrop();
-                Drop = false;
+                Board.HardDrop();
+                HDrop = false;
             }
         }
         else
         {
-            Drop = true;
+            HDrop = true;
+        }
+        if(GetAsyncKeyState(VK_C) && Board.CanHold)
+        {
+            Board.Hold();
         }
         if(GetAsyncKeyState(VK_UP))
         {
             if(RCW)
             {
-                Player.RotatePiece(0);
+                Board.RotatePiece(0);
                 RCW = false;
             }
         }
@@ -59,7 +147,7 @@ void Input()
         {
             if(RCCW)
             {
-                Player.RotatePiece(1);
+                Board.RotatePiece(1);
                 RCCW = false;
             }    
         }
@@ -67,6 +155,8 @@ void Input()
         {
             RCCW = true;
         }
-        Sleep(20);
+        WaitForSingleObject(Timer, INFINITE);
     }
+    CancelWaitableTimer(Timer);
+    CloseHandle(Timer);
 }

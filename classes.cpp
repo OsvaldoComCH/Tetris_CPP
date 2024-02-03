@@ -9,6 +9,7 @@
 #include <thread>
 #include "./VirtualKeyCodes.h"
 using namespace std;
+using namespace std::chrono;
 
 typedef signed char int8;
 typedef struct SBlock
@@ -110,16 +111,18 @@ class CBoard
     int8 Matrix[10][40];
     int8 NextPieces[14];
     int8 NextPointer = 0;
+    int8 HeldPiece = 0;
+    bool CanHold;
     CPiece Piece;
 
     int8 SpawnPiece();
+    void Hold();
     void GetMatrixPos()
     {
         RECT r;
         GetWindowRect(Ghwnd, &r);
         Pos.x = (r.right - r.left)/2;
         Pos.y = (r.bottom - r.top)/2;
-        //std::cout << Pos.x << "\t" << Pos.y;
     }
     void GenBag(bool Bag)
     {
@@ -138,7 +141,7 @@ class CBoard
             } 
         }
     }
-    int8 ColisionFull(SBlock& Blk, int8 XPos, int8 YPos)
+    bool CollisionFull(SBlock& Blk, int8 XPos, int8 YPos)
     {
         for(int8 i = 0; i < 4; ++i)
         {
@@ -151,7 +154,7 @@ class CBoard
         }
         return 0;
     }
-    int8 ColisionDown(SBlock& Blk, int8 XPos, int8 YPos)
+    bool CollisionDown(SBlock& Blk, int8 XPos, int8 YPos)
     {
         for(int8 i = 0; i < 4; ++i)
         {
@@ -163,7 +166,7 @@ class CBoard
         }
         return 0;
     }
-    int8 ColisionLeft(SBlock& Blk, int8 XPos, int8 YPos)
+    bool CollisionLeft(SBlock& Blk, int8 XPos, int8 YPos)
     {
         for(int8 i = 0; i < 4; ++i)
         {
@@ -175,7 +178,7 @@ class CBoard
         }
         return 0;
     }
-    int8 ColisionRight(SBlock& Blk, int8 XPos, int8 YPos)
+    bool CollisionRight(SBlock& Blk, int8 XPos, int8 YPos)
     {
         for(int8 i = 0; i < 4; ++i)
         {
@@ -195,6 +198,60 @@ class CBoard
     void LockPiece();
     void ClearLines();
 
+    void AutoLock(bool Spawn)
+    {
+        static int8 X, Y, R, MoveCount, TimerSet;
+        static time_point<system_clock, milliseconds> Timer;
+        if(Spawn)
+        {
+            X = Piece.Position[0];
+            Y = Piece.Position[1];
+            R = Piece.Rotation;
+            MoveCount = 15;
+            TimerSet = 0;
+            return;
+        }
+        if(Y > Piece.Position[1])
+        {
+            MoveCount = 15;
+            Y = Piece.Position[1];
+            TimerSet = 0;
+        }
+        if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-1))
+        {
+            if(!TimerSet)
+            {
+                Timer = time_point_cast<milliseconds>(system_clock::now());
+                TimerSet = 1;
+            }
+            if(X != Piece.Position[0] || R != Piece.Rotation)
+            {
+                X = Piece.Position[0];
+                R = Piece.Rotation;
+                if(MoveCount)
+                {
+                    --MoveCount;
+                    Timer = time_point_cast<milliseconds>(system_clock::now());
+                }else
+                {
+                    LockPiece();
+                }
+            }else
+            if(Timer + (milliseconds) 500 <= time_point_cast<milliseconds>(system_clock::now()))
+            {
+                LockPiece();
+            }
+        }else
+        {
+            if(X != Piece.Position[0] || R != Piece.Rotation)
+            {
+                X = Piece.Position[0];
+                R = Piece.Rotation;
+            }
+            if(TimerSet){TimerSet = 0;}
+        }
+    }
+
     void RenderMatrix();
     void RenderBkgd(HDC hdc);
     void RenderPiece(bool Spawn);
@@ -202,14 +259,13 @@ class CBoard
     void RenderNext();
     void FlashLine(int8 Line);
     void RenderShadow(bool Spawn);
+    void RenderHold();
 
     CBoard()
     {
         time_t t;
-        GetMatrixPos();
         srand((unsigned) time(&t));
-        GenBag(0);
-        GenBag(1);
+        GetMatrixPos();
         for(int8 i = 39; i >= 0; i--)
         {
             for(int8 j = 0; j < 10; ++j)
@@ -219,4 +275,12 @@ class CBoard
         }
     };
 };
-CBoard Player;
+class CPlayer
+{
+    public:
+    CBoard Board;
+    void Input();
+    void StartGame();
+};
+
+CPlayer Player1;
