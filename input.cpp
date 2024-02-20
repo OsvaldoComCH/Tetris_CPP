@@ -4,7 +4,7 @@ void CBoard::Input()
 {
     int DropMult;
     time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
-    int DASLag = 0, DropLag = 0, CycleCount = 0;
+    int DASLag = 0, DropLag = 0;
     bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
     bool Left = true, Right = true;
 
@@ -120,6 +120,7 @@ void CBoard::Input()
             {
                 DropLag = (CurrentTickTime - DropDelay).count() - (Phys.DropSpeed / DropMult) + DropLag;
                 if(DropLag > (Phys.DropSpeed / DropMult)){DropLag = (Phys.DropSpeed / DropMult);}
+                if(DropLag < 0){DropLag = 0;}
                 Phys.Drop = true;
             }
         }
