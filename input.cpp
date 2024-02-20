@@ -1,17 +1,18 @@
 #include "render.cpp"
 
-void CPlayer::Input()
+void CBoard::Input()
 {
-    bool Left = true, Right = true, HDrop = true, RCW = true, RCCW = true, Drop = true;
-    bool LDAS = false, RDAS = false;
-    bool LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
-    int DropSpeed = 1000;//Auto-drop interval in milliseconds
+    int DropMult;
     time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
+    int DASLag = 0, DropLag = 0, CycleCount = 0;
+    bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
+    bool Left = true, Right = true;
 
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
     DueTime.QuadPart = -160000;
     SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
+
     while(1)
     {
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
@@ -26,25 +27,28 @@ void CPlayer::Input()
                     {
                         CanRight = false;
                     }
+                    DASLag = 0;
                 }
                 if(Left)
                 {
-                    Board.MoveLeft();
+                    MoveLeft();
                     Left = false;
                     DASDelay = CurrentTickTime;
                 }else
                 {
                     if(!LDAS)
                     {
-                        if(DASDelay + (milliseconds) 150 <= CurrentTickTime)
+                        if((CurrentTickTime - DASDelay).count() >= 150 - DASLag)
                         {
+                            DASLag = (CurrentTickTime - DASDelay).count() - 150 + DASLag;
                             LDAS = true;
                             Left = true;
                         }
                     }else
                     {
-                        if(DASDelay + (milliseconds) 30 <= CurrentTickTime)
+                        if((CurrentTickTime - DASDelay).count() >= 30 - DASLag)
                         {
+                            DASLag = (CurrentTickTime - DASDelay).count() - 30 + DASLag;
                             Left = true;
                         }
                     }
@@ -69,25 +73,28 @@ void CPlayer::Input()
                     {
                         CanLeft = false;
                     }
+                    DASLag = 0;
                 }
                 if(Right)
                 {
-                    Board.MoveRight();
+                    MoveRight();
                     Right = false;
                     DASDelay = CurrentTickTime;
                 }else
                 {
                     if(!RDAS)
                     {
-                        if(DASDelay + (milliseconds) 150 <= CurrentTickTime)
+                        if((CurrentTickTime - DASDelay).count() >= 150 - DASLag)
                         {
+                            DASLag = (CurrentTickTime - DASDelay).count() - 150 + DASLag;
                             RDAS = true;
                             Right = true;
                         }
                     }else
                     {
-                        if(DASDelay + (milliseconds) 30 <= CurrentTickTime)
+                        if((CurrentTickTime - DASDelay).count() >= 30 - DASLag)
                         {
+                            DASLag = (CurrentTickTime - DASDelay).count() - 30 + DASLag;
                             Right = true;
                         }
                     }
@@ -101,59 +108,61 @@ void CPlayer::Input()
             CanLeft = true;
             CanRight = true;
         }
-        if(Drop)
+        if(Phys.Drop)
         {
-            Board.MoveDown();
-            Drop = false;
+            MoveDown();
+            Phys.Drop = false;
             DropDelay = CurrentTickTime;
         }else
         {
-            if(DropDelay + (milliseconds) DropSpeed / (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1) 
-            <= CurrentTickTime)
+            DropMult = (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1);
+            if((CurrentTickTime - DropDelay).count() >= (Phys.DropSpeed / DropMult) - DropLag)
             {
-                Drop = true;
+                DropLag = (CurrentTickTime - DropDelay).count() - (Phys.DropSpeed / DropMult) + DropLag;
+                if(DropLag > (Phys.DropSpeed / DropMult)){DropLag = (Phys.DropSpeed / DropMult);}
+                Phys.Drop = true;
             }
         }
-        Board.AutoLock(0);
+        AutoLock(0);
         if(GetAsyncKeyState(VK_SPACE))
         {
-            if(HDrop)
+            if(Phys.HDrop)
             {
-                Board.HardDrop();
-                HDrop = false;
+                HardDrop();
+                Phys.HDrop = false;
             }
         }
         else
         {
-            HDrop = true;
+            Phys.HDrop = true;
         }
-        if(GetAsyncKeyState(VK_C) && Board.CanHold)
+        if(GetAsyncKeyState(VK_C) && CanHold)
         {
-            Board.Hold();
+            Hold();
         }
         if(GetAsyncKeyState(VK_UP))
         {
-            if(RCW)
+            if(Phys.RCW)
             {
-                Board.RotatePiece(0);
-                RCW = false;
+                RotatePiece(0);
+                Phys.RCW = false;
             }
         }
         else
         {
-            RCW = true;
+            Phys.RCW = true;
         }
         if(GetAsyncKeyState(VK_X))
         {
-            if(RCCW)
+            if(Phys.RCCW)
             {
-                Board.RotatePiece(1);
-                RCCW = false;
+                RotatePiece(1);
+                Phys.RCCW = false;
             }    
         }
         else
         {
-            RCCW = true;
+            Phys.RCCW = true;
         }
         WaitForSingleObject(Timer, INFINITE);
     }

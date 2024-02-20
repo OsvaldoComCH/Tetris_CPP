@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <chrono>
-#include <ctime>
+#include <random>
 #include <thread>
 #include "./VirtualKeyCodes.h"
 using namespace std;
@@ -17,6 +17,7 @@ typedef struct SBlock
     int8 Pos[4][2];
 } SBlock;
 
+std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
 
 class CPiece
@@ -114,6 +115,12 @@ class CBoard
     int8 HeldPiece = 0;
     bool CanHold;
     CPiece Piece;
+    struct Phys
+    { 
+        bool HDrop, RCW, RCCW, Drop;
+        int DropSpeed;
+    } Phys;
+    
 
     int8 SpawnPiece();
     void Hold();
@@ -131,7 +138,7 @@ class CBoard
         {
             while(true)
             {
-                next = (unsigned) (int8) rand() % 7;
+                next = (unsigned) (int8) RNG() % 7;
                 if(!((ptypes >> next) & 1))
                 {
                     ptypes += 1 << next;
@@ -252,6 +259,9 @@ class CBoard
         }
     }
 
+    void Input();
+    void StartGame();
+
     void RenderMatrix();
     void RenderBkgd(HDC hdc);
     void RenderPiece(bool Spawn);
@@ -263,8 +273,6 @@ class CBoard
 
     CBoard()
     {
-        time_t t;
-        srand((unsigned) time(&t));
         GetMatrixPos();
         for(int8 i = 39; i >= 0; i--)
         {
@@ -275,12 +283,5 @@ class CBoard
         }
     };
 };
-class CPlayer
-{
-    public:
-    CBoard Board;
-    void Input();
-    void StartGame();
-};
 
-CPlayer Player1;
+CBoard Player1;

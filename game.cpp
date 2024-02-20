@@ -265,6 +265,13 @@ int8 CBoard::SpawnPiece()
         NextPointer += 1;
     }
     if(!CanHold){CanHold = true;}
+
+    Phys.HDrop = false;
+    Phys.RCW = false;
+    Phys.RCCW = false;
+    Phys.Drop = true;
+    Phys.DropSpeed = 1000;
+
     RenderNext();
     RenderShadow(1);
     RenderPiece(1);
@@ -301,11 +308,11 @@ void CBoard::Hold()
         CanHold = false;
     }
 }
-void CPlayer::StartGame()
+void CBoard::StartGame()
 {
-    Board.GenBag(0);
-    Board.GenBag(1);
-    Board.RenderMatrix();
-    Board.SpawnPiece();
+    GenBag(0);
+    GenBag(1);
+    RenderMatrix();
+    SpawnPiece();
     Input();
 }

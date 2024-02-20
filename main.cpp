@@ -11,7 +11,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
-            Player1.Board.RenderBkgd(hdc);
+            Player1.RenderBkgd(hdc);
             EndPaint(hwnd, &PS);
         }
         break;
@@ -25,7 +25,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             Ghwnd = hwnd;
             InvalidateRect(hwnd, NULL, 1);
-            Player1.Board.GetMatrixPos();
+            Player1.GetMatrixPos();
         }
         break;
         default:
@@ -66,8 +66,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
-
-    std::thread TetrisGame(CPlayer::StartGame, &Player1);
+    
+    std::thread TetrisGame(CBoard::StartGame, &Player1);
 
     while(GetMessage(&Msg, NULL, 0, 0))
     {
