@@ -117,7 +117,7 @@ void CBoard::RenderPiece(bool Spawn)
     PrevBlock = Piece.Block;
     XPos = Piece.Position[0];
     YPos = Piece.Position[1];
-
+    RenderShadow(Spawn);
     SelectObject(hdc, Pens[0]);
     SetDCBrushColor(hdc, Colors[Piece.Type]);
     for(int8 i = 0; i < 4; ++i)
@@ -333,12 +333,16 @@ void CBoard::RenderShadow(bool Spawn)
 {
     HDC hdc = GetDC(Ghwnd);
     static SBlock Shadow;
-    static int8 XPos, YPos;
+    static int8 XPos, YPos, Rotation;
     SelectObject(hdc, GetStockObject(DC_BRUSH));
-    SetDCBrushColor(hdc, Colors[0]);
     //erase the previous shadow
     if(!Spawn)
     {
+        if(XPos == Piece.Position[0] && Rotation == Piece.Rotation)
+        {
+            return;
+        }
+        SetDCBrushColor(hdc, Colors[0]);
         SelectObject(hdc, Pens[1]);
         for(int8 i = 0; i < 4; ++i)
         {
@@ -351,9 +355,11 @@ void CBoard::RenderShadow(bool Spawn)
                 Pos.y+295-((YPos + Shadow.Pos[i][1])*30)
             );
         }
+        Rotation = Piece.Rotation;
         Shadow = Piece.Block;
     }else
     {
+        Rotation = Piece.Rotation;
         Shadow = Piece.Block;
     }
     int8 i = 0;

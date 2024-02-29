@@ -3,7 +3,6 @@
 #endif
 #include <windows.h>
 #include <iostream>
-#include <cstdlib>
 #include <chrono>
 #include <random>
 #include <thread>
@@ -24,8 +23,8 @@ class CPiece
 {
     public:
     int8 Type;//1=I, 2=T, 3=O, 4=L, 5=J, 6=Z, 7=S
-    int8 Rotation;//0-up, 1-right, 2-down, 3-left
-    int8 Position[2];//X, Y
+    unsigned Rotation :2;//0-up, 1-right, 2-down, 3-left
+    int8 Position[2];//[X, Y]
     SBlock Block;
     struct Kick
     {

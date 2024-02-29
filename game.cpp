@@ -12,7 +12,6 @@ void CBoard::MoveLeft()
     if(!CollisionLeft(Piece.Block, Piece.Position[0]-1, Piece.Position[1]))
     {
         Piece.Position[0]--;
-        RenderShadow(0);
         RenderPiece(0);
     }
 }
@@ -21,7 +20,6 @@ void CBoard::MoveRight()
     if(!CollisionRight(Piece.Block, Piece.Position[0]+1, Piece.Position[1]))
     {
         ++Piece.Position[0];
-        RenderShadow(0);
         RenderPiece(0);
     }
 }
@@ -42,21 +40,21 @@ void CBoard::HardDrop()
 int8 CBoard::RotatePiece(bool Dir)
 {
     SBlock TempBlock;
-    int8 TempRotation;
+    int8 OldRotation;
     if(!Dir)
     {
-        TempRotation = Piece.Rotation + 1;
-        if(TempRotation > 3){TempRotation = 0;}
+        OldRotation = Piece.Rotation;
+        ++Piece.Rotation;
     }
     else
     {
-        TempRotation = Piece.Rotation - 1;
-        if(TempRotation < 0){TempRotation = 3;}
+        OldRotation = Piece.Rotation;
+        --Piece.Rotation;
     }
     switch(Piece.Type)
     {
         case 1://I
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,2},{1,2},{2,2},{3,2}}};
@@ -73,7 +71,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 2://T
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,2},{1,2},{2,2},{1,3}}};
@@ -90,7 +88,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 3://O
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{1,3},{2,3},{2,2},{1,2}}};
@@ -107,7 +105,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 4://L
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,2},{1,2},{2,2},{2,3}}};
@@ -124,7 +122,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 5://J
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,3},{0,2},{1,2},{2,2}}};
@@ -141,7 +139,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 6://Z
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,3},{1,3},{1,2},{2,2}}};
@@ -158,7 +156,7 @@ int8 CBoard::RotatePiece(bool Dir)
             }
         break;
         case 7://S
-            switch(TempRotation)
+            switch(Piece.Rotation)
             {
                 case 0:
                     TempBlock = {{{0,2},{1,2},{1,3},{2,3}}};
@@ -177,33 +175,35 @@ int8 CBoard::RotatePiece(bool Dir)
     }
     if(!CollisionFull(TempBlock, Piece.Position[0], Piece.Position[1]))
     {}else
-    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][0][0],
-    Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][0][1]))
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[OldRotation][Dir][0][0],
+    Piece.Position[1] + Piece.Kick.Data[OldRotation][Dir][0][1]))
     {
-        Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][0][0];
-        Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][0][1];
+        Piece.Position[0] += Piece.Kick.Data[OldRotation][Dir][0][0];
+        Piece.Position[1] += Piece.Kick.Data[OldRotation][Dir][0][1];
     }else
-    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][1][0],
-    Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][1][1]))
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[OldRotation][Dir][1][0],
+    Piece.Position[1] + Piece.Kick.Data[OldRotation][Dir][1][1]))
     {
-        Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][1][0];
-        Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][1][1];
+        Piece.Position[0] += Piece.Kick.Data[OldRotation][Dir][1][0];
+        Piece.Position[1] += Piece.Kick.Data[OldRotation][Dir][1][1];
     }else
-    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][2][0],
-    Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][2][1]))
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[OldRotation][Dir][2][0],
+    Piece.Position[1] + Piece.Kick.Data[OldRotation][Dir][2][1]))
     {
-        Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][2][0];
-        Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][2][1];
+        Piece.Position[0] += Piece.Kick.Data[OldRotation][Dir][2][0];
+        Piece.Position[1] += Piece.Kick.Data[OldRotation][Dir][2][1];
     }else
-    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[Piece.Rotation][Dir][3][0],
-    Piece.Position[1] + Piece.Kick.Data[Piece.Rotation][Dir][3][1]))
+    if(!CollisionFull(TempBlock, Piece.Position[0] + Piece.Kick.Data[OldRotation][Dir][3][0],
+    Piece.Position[1] + Piece.Kick.Data[OldRotation][Dir][3][1]))
     {
-        Piece.Position[0] += Piece.Kick.Data[Piece.Rotation][Dir][3][0];
-        Piece.Position[1] += Piece.Kick.Data[Piece.Rotation][Dir][3][1];
-    }else {return 1;}
+        Piece.Position[0] += Piece.Kick.Data[OldRotation][Dir][3][0];
+        Piece.Position[1] += Piece.Kick.Data[OldRotation][Dir][3][1];
+    }else
+    {
+        Piece.Rotation = OldRotation;
+        return 1;
+    }
     Piece.Block = TempBlock;
-    Piece.Rotation = TempRotation;
-    RenderShadow(0);
     RenderPiece(0);
     return 0;
 }
@@ -273,7 +273,6 @@ int8 CBoard::SpawnPiece()
     Phys.DropSpeed = 1000;
 
     RenderNext();
-    RenderShadow(1);
     RenderPiece(1);
     if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
     {
@@ -292,7 +291,6 @@ void CBoard::Hold()
         HeldPiece = Piece.Type;
         RenderHold();
         Piece = CPiece(Temp);
-        RenderShadow(1);
         RenderPiece(1);
         if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
         {
