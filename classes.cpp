@@ -6,6 +6,7 @@
 #include <chrono>
 #include <random>
 #include <thread>
+#include <string>
 #include "./VirtualKeyCodes.h"
 using namespace std;
 using namespace std::chrono;
@@ -108,9 +109,10 @@ class CBoard
 {
     public:
     POINT Pos;
-    int8 Matrix[10][40];
+    int8 Matrix[40][10];
     int8 NextPieces[14];
     int8 NextPointer = 0;
+    int Lines = 0;
     int8 HeldPiece = 0;
     bool CanHold;
     CPiece Piece;
@@ -151,7 +153,7 @@ class CBoard
     {
         for(int8 i = 0; i < 4; ++i)
         {
-            if(this->Matrix[XPos+Blk.Pos[i][0]][YPos+Blk.Pos[i][1]]
+            if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || (unsigned) (XPos+Blk.Pos[i][0]) > 9
             || YPos+Blk.Pos[i][1] & 0x80)
             {
@@ -164,7 +166,7 @@ class CBoard
     {
         for(int8 i = 0; i < 4; ++i)
         {
-            if(this->Matrix[XPos+Blk.Pos[i][0]][YPos+Blk.Pos[i][1]]
+            if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || YPos+Blk.Pos[i][1] & 0x80)
             {
                 return 1;
@@ -176,7 +178,7 @@ class CBoard
     {
         for(int8 i = 0; i < 4; ++i)
         {
-            if(this->Matrix[XPos+Blk.Pos[i][0]][YPos+Blk.Pos[i][1]]
+            if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || XPos+Blk.Pos[i][0] & 0x80)
             {
                 return 1;
@@ -188,7 +190,7 @@ class CBoard
     {
         for(int8 i = 0; i < 4; ++i)
         {
-            if(this->Matrix[XPos+Blk.Pos[i][0]][YPos+Blk.Pos[i][1]]
+            if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || XPos+Blk.Pos[i][0] > 9)
             {
                 return 1;
@@ -262,6 +264,7 @@ class CBoard
     void StartGame();
 
     void RenderMatrix();
+    void RenderLines();
     void RenderBkgd(HDC hdc);
     void RenderPiece(bool Spawn);
     void FlashPiece();
@@ -277,7 +280,7 @@ class CBoard
         {
             for(int8 j = 0; j < 10; ++j)
             {
-                this->Matrix[j][i] = 0;
+                this->Matrix[i][j] = 0;
             }
         }
     };

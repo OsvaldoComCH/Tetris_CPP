@@ -12,6 +12,8 @@ const HPEN Pens[9] = {
     CreatePen(PS_SOLID, 2, RGB(0,255,0))
 };
 const HFONT Font = CreateFont(28, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL),
+Font2 = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
 OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 const COLORREF Colors[10] = {
     RGB(64,64,64),
@@ -69,11 +71,28 @@ void CBoard::RenderBkgd(HDC hdc)
     TextOut(hdc, Pos.x + 180, Pos.y + 170, L"POINTS", 6);
     TextOut(hdc, Pos.x - 280, Pos.y, L"LEVEL", 5);
     TextOut(hdc, Pos.x - 280, Pos.y + 100, L"LINES", 5);
+    SelectObject(hdc, Font2);
+    SetTextAlign(hdc, TA_RIGHT);
+    SetBkColor(hdc, RGB(48,48,48));
+    SetTextColor(hdc, Colors[9]);
+    wstring WLines = std::to_wstring(Lines);
+    TextOut(hdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
     
     RenderMatrix();
     RenderNext();
     RenderShadow(0);
     RenderPiece(0);
+}
+void CBoard::RenderLines()
+{
+    HDC hdc = GetDC(Ghwnd);
+    SelectObject(hdc, Font2);
+    SetTextAlign(hdc, TA_RIGHT);
+    SetBkColor(hdc, RGB(48,48,48));
+    SetTextColor(hdc, Colors[9]);
+    wstring WLines = std::to_wstring(Lines);
+    TextOut(hdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
+    ReleaseDC(Ghwnd, hdc);
 }
 void CBoard::RenderMatrix()
 {
@@ -83,9 +102,9 @@ void CBoard::RenderMatrix()
     {
         for(int8 x = 0; x < 10; ++x)
         {
-            if(Matrix[x][y]){SelectObject(hdc, Pens[0]);}
+            if(Matrix[y][x]){SelectObject(hdc, Pens[0]);}
             else{SelectObject(hdc, Pens[1]);}
-            SetDCBrushColor(hdc, Colors[Matrix[x][y]]);
+            SetDCBrushColor(hdc, Colors[Matrix[y][x]]);
             Rectangle(hdc, Pos.x-149+(x*30), Pos.y+266-(y*30), Pos.x-120+(x*30), Pos.y+295-(y*30));
         }
     }

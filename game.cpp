@@ -212,7 +212,7 @@ void CBoard::LockPiece()
     FlashPiece();
     for(int8 i = 0; i < 4; ++i)
     {
-        Matrix[Piece.Position[0]+Piece.Block.Pos[i][0]][Piece.Position[1]+Piece.Block.Pos[i][1]]=Piece.Type;
+        Matrix[Piece.Position[1]+Piece.Block.Pos[i][1]][Piece.Position[0]+Piece.Block.Pos[i][0]]=Piece.Type;
     }
     Piece.Type = 0;
     ClearLines();
@@ -223,28 +223,31 @@ void CBoard::ClearLines()
     for(int8 x = 3; x >= 0; x--)
     {
         if((Piece.Position[1] + x) >= 0){
-        if(
-        Matrix[0][Piece.Position[1] + x] && Matrix[1][Piece.Position[1] + x] &&
-        Matrix[2][Piece.Position[1] + x] && Matrix[3][Piece.Position[1] + x] &&
-        Matrix[4][Piece.Position[1] + x] && Matrix[5][Piece.Position[1] + x] &&
-        Matrix[6][Piece.Position[1] + x] && Matrix[7][Piece.Position[1] + x] &&
-        Matrix[8][Piece.Position[1] + x] && Matrix[9][Piece.Position[1] + x])
-        {
-            FlashLine(Piece.Position[1] + x);
-            for(int8 i = (Piece.Position[1] + x); i < 39; ++i)
+            if(
+            Matrix[Piece.Position[1] + x][0] && Matrix[Piece.Position[1] + x][1] &&
+            Matrix[Piece.Position[1] + x][2] && Matrix[Piece.Position[1] + x][3] &&
+            Matrix[Piece.Position[1] + x][4] && Matrix[Piece.Position[1] + x][5] &&
+            Matrix[Piece.Position[1] + x][6] && Matrix[Piece.Position[1] + x][7] &&
+            Matrix[Piece.Position[1] + x][8] && Matrix[Piece.Position[1] + x][9])
             {
+                ++Lines;
+                FlashLine(Piece.Position[1] + x);
+                for(int8 i = (Piece.Position[1] + x); i < 39; ++i)
+                {
+                    for(int8 j = 0; j < 10; ++j)
+                    {
+                        Matrix[i][j] = Matrix[i+1][j];
+                    }
+                }
                 for(int8 j = 0; j < 10; ++j)
                 {
-                    Matrix[j][i] = Matrix[j][i+1];
+                    Matrix[39][j] = 0;
                 }
             }
-            for(int8 j = 0; j < 10; ++j)
-            {
-                Matrix[j][39] = 0;
-            }
-        }}
+        }
     }
     Sleep(100);
+    RenderLines();
     RenderMatrix();
 }
 int8 CBoard::SpawnPiece()
