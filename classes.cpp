@@ -27,42 +27,51 @@ class CPiece
     unsigned Rotation :2;//0-up, 1-right, 2-down, 3-left
     int8 Position[2];//[X, Y]
     SBlock Block;
-    struct Kick
+    struct Kick //Alternative positions for rotation
     {
-        int8 Data[4][2][4][2];//Rotation - Direction(0-CW,1-CCW) - Kicks - (X, Y)
+        int8 Data[4][2][4][2];//Rotation - Direction(CW, CCW) - Kicks - Offset(X, Y)
     } Kick;
-    CPiece(){};
+    CPiece(){};//Default constructor
+    int8 LastType = 0;//Store Type of the last piece to avoid putting the same values on Kick
     void GetKickData()
     {
-        switch(Type)
+        //Type is never < 1. We start LastType as 0 so it always gets Kick values on the first piece
+        if(Type == 1)//I has different kicks than other pieces because it's 4 blocks wide
         {
-            case 1:
-                Kick =
-                {{
-                    {{{-2,0},{1,0},{-2,-1},{1,2}},//0 >> 1
-                    {{-1,0},{2,0},{-1,2},{2,-1}}},//0 >> 3
-                    {{{-1,0},{2,0},{-1,2},{2,-1}},//1 >> 2
-                    {{2,0},{-1,0},{2,1},{-1,-2}}},//1 >> 0
-                    {{{2,0},{-1,0},{2,1},{-1,-2}},//2 >> 3
-                    {{1,0},{-2,0},{1,-2},{-2,1}}},//2 >> 1
-                    {{{1,0},{-2,0},{1,-2},{-2,1}},//3 >> 0
-                    {{-2,0},{1,0},{-2,-1},{1,2}}} //3 >> 2
-                }};
-            break;
-            default:
-                Kick =
-                {{
-                    {{{-1,0},{-1,1},{0,-2},{-1,-2}},//0 >> 1
-                    {{1,0},{1,1},{0,-2},{1,-2}}},//0 >> 3
-                    {{{1,0},{1,-1},{0,2},{1,2}},//1 >> 2
-                    {{1,0},{1,-1},{0,2},{1,2}}},//1 >> 0
-                    {{{1,0},{1,1},{0,-2},{1,-2}},//2 >> 3
-                    {{-1,0},{-1,1},{0,-2},{-1,-2}}},//2 >> 1
-                    {{{-1,0},{-1,-1},{0,2},{-1,2}},//3 >> 0
-                    {{-1,0},{-1,-1},{0,2},{-1,2}}} //3 >> 2
-                }};
-            break;
+            if(LastType == 1)
+            {
+                return;
+            }
+            Kick =
+            {{
+                {{{-2,0},{1,0},{-2,-1},{1,2}},//0 >> 1
+                {{-1,0},{2,0},{-1,2},{2,-1}}},//0 >> 3
+                {{{-1,0},{2,0},{-1,2},{2,-1}},//1 >> 2
+                {{2,0},{-1,0},{2,1},{-1,-2}}},//1 >> 0
+                {{{2,0},{-1,0},{2,1},{-1,-2}},//2 >> 3
+                {{1,0},{-2,0},{1,-2},{-2,1}}},//2 >> 1
+                {{{1,0},{-2,0},{1,-2},{-2,1}},//3 >> 0
+                {{-2,0},{1,0},{-2,-1},{1,2}}} //3 >> 2
+            }};
+        }else//O technically doesn't rotate, but it still has kick data
+        {
+            if(LastType > 1)
+            {
+                return;
+            }
+            Kick =
+            {{
+                {{{-1,0},{-1,1},{0,-2},{-1,-2}},//0 >> 1
+                {{1,0},{1,1},{0,-2},{1,-2}}},//0 >> 3
+                {{{1,0},{1,-1},{0,2},{1,2}},//1 >> 2
+                {{1,0},{1,-1},{0,2},{1,2}}},//1 >> 0
+                {{{1,0},{1,1},{0,-2},{1,-2}},//2 >> 3
+                {{-1,0},{-1,1},{0,-2},{-1,-2}}},//2 >> 1
+                {{{-1,0},{-1,-1},{0,2},{-1,2}},//3 >> 0
+                {{-1,0},{-1,-1},{0,2},{-1,2}}} //3 >> 2
+            }};
         }
+        LastType = Type;
     }
     SBlock SpawnBlocks()
     {
@@ -206,10 +215,10 @@ class CBoard
     void LockPiece();
     void ClearLines();
 
+    int8 X, Y, R, MoveCount, TimerSet;
+    time_point<system_clock, milliseconds> Timer;
     void AutoLock(bool Spawn)
     {
-        static int8 X, Y, R, MoveCount, TimerSet;
-        static time_point<system_clock, milliseconds> Timer;
         if(Spawn)
         {
             X = Piece.Position[0];
@@ -266,11 +275,13 @@ class CBoard
     void RenderMatrix();
     void RenderLines();
     void RenderBkgd(HDC hdc);
+    SBlock RenderBlock;
+    int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
+    //void RenderShadow(bool Spawn);
     void FlashPiece();
     void RenderNext();
     void FlashLine(int8 Line);
-    void RenderShadow(bool Spawn);
     void RenderHold();
 
     CBoard()
