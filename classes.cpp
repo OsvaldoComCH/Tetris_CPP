@@ -19,6 +19,7 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
+HDC Ghdc;
 
 class CPiece
 {
@@ -27,16 +28,15 @@ class CPiece
     unsigned Rotation :2;//0-up, 1-right, 2-down, 3-left
     int8 Position[2];//[X, Y]
     SBlock Block;
-    struct Kick //Alternative positions for rotation
+    struct Kick
     {
         int8 Data[4][2][4][2];//Rotation - Direction(CW, CCW) - Kicks - Offset(X, Y)
     } Kick;
-    CPiece(){};//Default constructor
-    int8 LastType = 0;//Store Type of the last piece to avoid putting the same values on Kick
+    CPiece(){};
+    int8 LastType = 0;
     void GetKickData()
     {
-        //Type is never < 1. We start LastType as 0 so it always gets Kick values on the first piece
-        if(Type == 1)//I has different kicks than other pieces because it's 4 blocks wide
+        if(Type == 1)
         {
             if(LastType == 1)
             {
@@ -53,7 +53,7 @@ class CPiece
                 {{{1,0},{-2,0},{1,-2},{-2,1}},//3 >> 0
                 {{-2,0},{1,0},{-2,-1},{1,2}}} //3 >> 2
             }};
-        }else//O technically doesn't rotate, but it still has kick data
+        }else
         {
             if(LastType > 1)
             {
@@ -73,33 +73,33 @@ class CPiece
         }
         LastType = Type;
     }
-    SBlock SpawnBlocks()
+    void SpawnBlocks()
     {
         switch (Type)
         {
             case 1:
-                return {{{0,2},{1,2},{2,2},{3,2}}};
+                Block = {{{0,2},{1,2},{2,2},{3,2}}};
             break;
             case 2:
-                return {{{0,2},{1,2},{2,2},{1,3}}};
+                Block = {{{0,2},{1,2},{2,2},{1,3}}};
             break;
             case 3:
-                return {{{1,3},{2,3},{2,2},{1,2}}};
+                Block = {{{1,3},{2,3},{2,2},{1,2}}};
             break;
             case 4:
-                return {{{0,2},{1,2},{2,2},{2,3}}};
+                Block = {{{0,2},{1,2},{2,2},{2,3}}};
             break;
             case 5:
-                return {{{0,3},{0,2},{1,2},{2,2}}};
+                Block = {{{0,3},{0,2},{1,2},{2,2}}};
             break;
             case 6:
-                return {{{0,3},{1,3},{1,2},{2,2}}};
+                Block = {{{0,3},{1,3},{1,2},{2,2}}};
             break;
             case 7:
-                return {{{0,2},{1,2},{1,3},{2,3}}};
+                Block = {{{0,2},{1,2},{1,3},{2,3}}};
             break;
             default:
-                return {{{0,2},{1,2},{2,2},{1,3}}};
+                Block = {{{0,2},{1,2},{2,2},{1,3}}};
             break;
         }
     }
@@ -110,7 +110,7 @@ class CPiece
         this->Position[0] = 3;
         this->Position[1] = 18;
         GetKickData();
-        this->Block = SpawnBlocks();
+        SpawnBlocks();
     }
 };
 
