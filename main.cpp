@@ -1,5 +1,5 @@
 /* Compile:
-g++ main.cpp -l gdi32 -o Tetris.exe -pthread -std=c++11 -O2
+g++ main.cpp -l gdi32 -o Tetris.exe -pthread -std=c++11 -O2 -staticlibgcc
 */
 #include "game.cpp"
 
@@ -24,7 +24,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_SIZE:
         {
             Ghwnd = hwnd;
-            InvalidateRect(hwnd, NULL, 1);
+            InvalidateRect(hwnd, NULL, 1);//forces message WM_PAINT
             Player1.GetMatrixPos();
         }
         break;
@@ -36,6 +36,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+    //Default code for creating a window
     const wchar_t WClassName[]  = L"WindowClass";
     MSG Msg;
     WNDCLASS Window = {};
