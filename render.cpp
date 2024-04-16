@@ -113,45 +113,138 @@ void CBoard::RenderMatrix()
 void CBoard::RenderPiece(bool Spawn)
 {
     HDC hdc = GetDC(Ghwnd);
-    static SBlock PrevBlock;
-    static int8 XPos, YPos;
     SelectObject(hdc, GetStockObject(DC_BRUSH));
-
+    bool ShadowFlag;
     if(!Spawn)
     {
         SetDCBrushColor(hdc, Colors[0]);
         SelectObject(hdc, Pens[1]);
         for(int8 i = 0; i < 4; ++i)
         {
-            if(YPos + PrevBlock.Pos[i][1] > 20){continue;}
+            if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
             Rectangle(
                 hdc,
-                Pos.x-149+((XPos + PrevBlock.Pos[i][0])*30),
-                Pos.y+266-((YPos + PrevBlock.Pos[i][1])*30),
-                Pos.x-120+((XPos + PrevBlock.Pos[i][0])*30),
-                Pos.y+295-((YPos + PrevBlock.Pos[i][1])*30)
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
+            );
+        }
+        ShadowFlag = (RenderX != Piece.Position[0] && RenderR != Piece.Rotation);
+        if(ShadowFlag)
+        {
+            for(int8 i = 0; i < 4; ++i)
+            {
+                if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+                Rectangle(
+                    hdc,
+                    Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                    Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                    Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                    Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
+                );
+            }
+        }
+    }else{ShadowFlag = 1;}
+
+    RenderBlock = Piece.Block;
+    RenderX = Piece.Position[0];
+    RenderY = Piece.Position[1];
+    RenderR = Piece.Rotation;
+    
+    if(ShadowFlag)
+    {
+        int8 i = 0;
+        while(++i)
+        {
+            if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
+            {
+                break;
+            }
+        }
+        ShadowY = Piece.Position[1] - i + 1;
+        SelectObject(hdc, Pens[Piece.Type + 1]);
+        SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
+        for(int8 i = 0; i < 4; ++i)
+        {
+            if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+            Rectangle(
+                hdc,
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
             );
         }
     }
-    PrevBlock = Piece.Block;
-    XPos = Piece.Position[0];
-    YPos = Piece.Position[1];
-    RenderShadow(Spawn);
     SelectObject(hdc, Pens[0]);
     SetDCBrushColor(hdc, Colors[Piece.Type]);
     for(int8 i = 0; i < 4; ++i)
     {
-        if(YPos + PrevBlock.Pos[i][1] > 20){continue;}
+        if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
         Rectangle(
             hdc,
-            Pos.x-149+((XPos + PrevBlock.Pos[i][0])*30),
-            Pos.y+266-((YPos + PrevBlock.Pos[i][1])*30),
-            Pos.x-120+((XPos + PrevBlock.Pos[i][0])*30),
-            Pos.y+295-((YPos + PrevBlock.Pos[i][1])*30)
+            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
+            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
         );
     }
     ReleaseDC(Ghwnd, hdc);
 }
+/*void CBoard::RenderShadow(bool Spawn)
+{
+    HDC hdc = GetDC(Ghwnd);
+    SelectObject(hdc, GetStockObject(DC_BRUSH));
+    if(!Spawn)
+    {
+        if(RenderX == Piece.Position[0] && RenderR == Piece.Rotation)
+        {
+            return;
+        }
+        SetDCBrushColor(hdc, Colors[0]);
+        SelectObject(hdc, Pens[1]);
+        for(int8 i = 0; i < 4; ++i)
+        {
+            if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+            Rectangle(
+                hdc,
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
+            );
+        }
+    }
+    RenderBlock = Piece.Block;
+    RenderX = Piece.Position[0];
+    RenderY = Piece.Position[1];
+    RenderR = Piece.Rotation;
+    RenderBlock = Piece.Block;
+    int8 i = 0;
+    while(++i)
+    {
+        if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
+        {
+            break;
+        }
+    }
+    ShadowY = Piece.Position[1] - i + 1;
+    SelectObject(hdc, Pens[Piece.Type + 1]);
+    SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
+    for(int8 i = 0; i < 4; ++i)
+    {
+        if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+        Rectangle(
+            hdc,
+            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
+        );
+    }
+    ReleaseDC(Ghwnd, hdc);
+}*/
 void CBoard::FlashPiece()
 {
     HDC hdc = GetDC(Ghwnd);
@@ -341,68 +434,9 @@ void CBoard::FlashLine(int8 Line)
     HDC hdc = GetDC(Ghwnd);
     for(int8 x = 0; x < 10; ++x)
     {
-        //Pos = {480, 360}
         SelectObject(hdc, Pens[0]);
         SetDCBrushColor(hdc, Colors[9]);
         Rectangle(hdc, Pos.x-149+(x*30), Pos.y+266-(Line*30), Pos.x-120+(x*30), Pos.y+295-(Line*30));
-    }
-    ReleaseDC(Ghwnd, hdc);
-}
-void CBoard::RenderShadow(bool Spawn)
-{
-    HDC hdc = GetDC(Ghwnd);
-    static SBlock Shadow;
-    static int8 XPos, YPos, Rotation;
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-    //erase the previous shadow
-    if(!Spawn)
-    {
-        if(XPos == Piece.Position[0] && Rotation == Piece.Rotation)
-        {
-            return;
-        }
-        SetDCBrushColor(hdc, Colors[0]);
-        SelectObject(hdc, Pens[1]);
-        for(int8 i = 0; i < 4; ++i)
-        {
-            if(YPos + Shadow.Pos[i][1] > 20){continue;}
-            Rectangle(
-                hdc,
-                Pos.x-149+((XPos + Shadow.Pos[i][0])*30),
-                Pos.y+266-((YPos + Shadow.Pos[i][1])*30),
-                Pos.x-120+((XPos + Shadow.Pos[i][0])*30),
-                Pos.y+295-((YPos + Shadow.Pos[i][1])*30)
-            );
-        }
-        Rotation = Piece.Rotation;
-        Shadow = Piece.Block;
-    }else
-    {
-        Rotation = Piece.Rotation;
-        Shadow = Piece.Block;
-    }
-    int8 i = 0;
-    while(++i)
-    {
-        if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
-        {
-            break;
-        }
-    }
-    XPos = Piece.Position[0];
-    YPos = Piece.Position[1] - i + 1;
-    SelectObject(hdc, Pens[Piece.Type + 1]);
-    SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
-    for(int8 i = 0; i < 4; ++i)
-    {
-        if(YPos + Shadow.Pos[i][1] > 20){continue;}
-        Rectangle(
-            hdc,
-            Pos.x-149+((XPos + Shadow.Pos[i][0])*30),
-            Pos.y+266-((YPos + Shadow.Pos[i][1])*30),
-            Pos.x-120+((XPos + Shadow.Pos[i][0])*30),
-            Pos.y+295-((YPos + Shadow.Pos[i][1])*30)
-        );
     }
     ReleaseDC(Ghwnd, hdc);
 }
