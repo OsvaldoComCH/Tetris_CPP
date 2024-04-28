@@ -19,7 +19,7 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
-HDC Ghdc;
+HDC Ghdc; //Global handle to device context
 
 class CPiece
 {
@@ -164,7 +164,7 @@ class CBoard
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || (unsigned) (XPos+Blk.Pos[i][0]) > 9
-            || YPos+Blk.Pos[i][1] & 0x80)
+            || (YPos+Blk.Pos[i][1]) & 0x80)
             {
                 return 1;
             }
@@ -176,7 +176,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || YPos+Blk.Pos[i][1] & 0x80)
+            || (YPos+Blk.Pos[i][1]) & 0x80)
             {
                 return 1;
             }
@@ -188,7 +188,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || XPos+Blk.Pos[i][0] & 0x80)
+            || (XPos+Blk.Pos[i][0]) & 0x80)
             {
                 return 1;
             }
