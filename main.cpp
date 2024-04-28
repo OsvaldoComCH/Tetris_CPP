@@ -1,5 +1,5 @@
 /* Compile:
-g++ main.cpp -l gdi32 -o Tetris.exe -pthread -std=c++11 -O2
+g++ main.cpp -l gdi32 -o Tetris.exe -pthread -std=c++11 -O2 -static-libgcc
 */
 #include "game.cpp"
 
@@ -59,6 +59,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         NULL, NULL, hInstance, NULL
     );
     Ghwnd = hwnd;
+    Ghdc = GetDC(Ghwnd);
     if(hwnd == NULL)
     {
         MessageBox(NULL, L"Window Creation Failed", L"Error", MB_ICONERROR | MB_OK);

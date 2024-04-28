@@ -19,6 +19,7 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
+HDC Ghdc;
 
 class CPiece
 {
@@ -29,68 +30,76 @@ class CPiece
     SBlock Block;
     struct Kick
     {
-        int8 Data[4][2][4][2];//Rotation - Direction(0-CW,1-CCW) - Kicks - (X, Y)
+        int8 Data[4][2][4][2];//Rotation - Direction(CW, CCW) - Kicks - Offset(X, Y)
     } Kick;
     CPiece(){};
+    int8 LastType = 0;
     void GetKickData()
     {
-        switch(Type)
+        if(Type == 1)
         {
-            case 1:
-                Kick =
-                {{
-                    {{{-2,0},{1,0},{-2,-1},{1,2}},//0 >> 1
-                    {{-1,0},{2,0},{-1,2},{2,-1}}},//0 >> 3
-                    {{{-1,0},{2,0},{-1,2},{2,-1}},//1 >> 2
-                    {{2,0},{-1,0},{2,1},{-1,-2}}},//1 >> 0
-                    {{{2,0},{-1,0},{2,1},{-1,-2}},//2 >> 3
-                    {{1,0},{-2,0},{1,-2},{-2,1}}},//2 >> 1
-                    {{{1,0},{-2,0},{1,-2},{-2,1}},//3 >> 0
-                    {{-2,0},{1,0},{-2,-1},{1,2}}} //3 >> 2
-                }};
-            break;
-            default:
-                Kick =
-                {{
-                    {{{-1,0},{-1,1},{0,-2},{-1,-2}},//0 >> 1
-                    {{1,0},{1,1},{0,-2},{1,-2}}},//0 >> 3
-                    {{{1,0},{1,-1},{0,2},{1,2}},//1 >> 2
-                    {{1,0},{1,-1},{0,2},{1,2}}},//1 >> 0
-                    {{{1,0},{1,1},{0,-2},{1,-2}},//2 >> 3
-                    {{-1,0},{-1,1},{0,-2},{-1,-2}}},//2 >> 1
-                    {{{-1,0},{-1,-1},{0,2},{-1,2}},//3 >> 0
-                    {{-1,0},{-1,-1},{0,2},{-1,2}}} //3 >> 2
-                }};
-            break;
+            if(LastType == 1)
+            {
+                return;
+            }
+            Kick =
+            {{
+                {{{-2,0},{1,0},{-2,-1},{1,2}},//0 >> 1
+                {{-1,0},{2,0},{-1,2},{2,-1}}},//0 >> 3
+                {{{-1,0},{2,0},{-1,2},{2,-1}},//1 >> 2
+                {{2,0},{-1,0},{2,1},{-1,-2}}},//1 >> 0
+                {{{2,0},{-1,0},{2,1},{-1,-2}},//2 >> 3
+                {{1,0},{-2,0},{1,-2},{-2,1}}},//2 >> 1
+                {{{1,0},{-2,0},{1,-2},{-2,1}},//3 >> 0
+                {{-2,0},{1,0},{-2,-1},{1,2}}} //3 >> 2
+            }};
+        }else
+        {
+            if(LastType > 1)
+            {
+                return;
+            }
+            Kick =
+            {{
+                {{{-1,0},{-1,1},{0,-2},{-1,-2}},//0 >> 1
+                {{1,0},{1,1},{0,-2},{1,-2}}},//0 >> 3
+                {{{1,0},{1,-1},{0,2},{1,2}},//1 >> 2
+                {{1,0},{1,-1},{0,2},{1,2}}},//1 >> 0
+                {{{1,0},{1,1},{0,-2},{1,-2}},//2 >> 3
+                {{-1,0},{-1,1},{0,-2},{-1,-2}}},//2 >> 1
+                {{{-1,0},{-1,-1},{0,2},{-1,2}},//3 >> 0
+                {{-1,0},{-1,-1},{0,2},{-1,2}}} //3 >> 2
+            }};
         }
+        LastType = Type;
     }
-    SBlock SpawnBlocks()
+    void SpawnBlocks()
     {
         switch (Type)
         {
             case 1:
-                return {{{0,2},{1,2},{2,2},{3,2}}};
+                Block = {{{0,2},{1,2},{2,2},{3,2}}};
             break;
             case 2:
-                return {{{0,2},{1,2},{2,2},{1,3}}};
+                Block = {{{0,2},{1,2},{2,2},{1,3}}};
             break;
             case 3:
-                return {{{1,3},{2,3},{2,2},{1,2}}};
+                Block = {{{1,3},{2,3},{2,2},{1,2}}};
             break;
             case 4:
-                return {{{0,2},{1,2},{2,2},{2,3}}};
+                Block = {{{0,2},{1,2},{2,2},{2,3}}};
             break;
             case 5:
-                return {{{0,3},{0,2},{1,2},{2,2}}};
+                Block = {{{0,3},{0,2},{1,2},{2,2}}};
             break;
             case 6:
-                return {{{0,3},{1,3},{1,2},{2,2}}};
+                Block = {{{0,3},{1,3},{1,2},{2,2}}};
             break;
             case 7:
-                return {{{0,2},{1,2},{1,3},{2,3}}};
+                Block = {{{0,2},{1,2},{1,3},{2,3}}};
             break;
             default:
-                return {{{0,2},{1,2},{2,2},{1,3}}};
+                Block = {{{0,2},{1,2},{2,2},{1,3}}};
             break;
         }
     }
@@ -101,7 +110,7 @@ class CPiece
         this->Position[0] = 3;
         this->Position[1] = 18;
         GetKickData();
-        this->Block = SpawnBlocks();
+        SpawnBlocks();
     }
 };
 
@@ -206,10 +215,10 @@ class CBoard
     void LockPiece();
     void ClearLines();
 
+    int8 X, Y, R, MoveCount, TimerSet;
+    time_point<system_clock, milliseconds> Timer;
     void AutoLock(bool Spawn)
     {
-        static int8 X, Y, R, MoveCount, TimerSet;
-        static time_point<system_clock, milliseconds> Timer;
         if(Spawn)
         {
             X = Piece.Position[0];
@@ -266,11 +275,13 @@ class CBoard
     void RenderMatrix();
     void RenderLines();
     void RenderBkgd(HDC hdc);
+    SBlock RenderBlock;
+    int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
+    //void RenderShadow(bool Spawn);
     void FlashPiece();
     void RenderNext();
     void FlashLine(int8 Line);
-    void RenderShadow(bool Spawn);
     void RenderHold();
 
     CBoard()

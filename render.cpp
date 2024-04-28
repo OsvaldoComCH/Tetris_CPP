@@ -80,284 +80,124 @@ void CBoard::RenderBkgd(HDC hdc)
     
     RenderMatrix();
     RenderNext();
-    RenderShadow(0);
     RenderPiece(0);
 }
 void CBoard::RenderLines()
 {
-    HDC hdc = GetDC(Ghwnd);
-    SelectObject(hdc, Font2);
-    SetTextAlign(hdc, TA_RIGHT);
-    SetBkColor(hdc, RGB(48,48,48));
-    SetTextColor(hdc, Colors[9]);
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, Font2);
+    SetTextAlign(Ghdc, TA_RIGHT);
+    SetBkColor(Ghdc, RGB(48,48,48));
+    SetTextColor(Ghdc, Colors[9]);
     wstring WLines = std::to_wstring(Lines);
-    TextOut(hdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
-    ReleaseDC(Ghwnd, hdc);
+    TextOut(Ghdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
+    //ReleaseDC(Ghwnd, hdc);
 }
 void CBoard::RenderMatrix()
 {
-    HDC hdc = GetDC(Ghwnd);
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
     for(int8 y = 0; y < 21; ++y)
     {
         for(int8 x = 0; x < 10; ++x)
         {
-            if(Matrix[y][x]){SelectObject(hdc, Pens[0]);}
-            else{SelectObject(hdc, Pens[1]);}
-            SetDCBrushColor(hdc, Colors[Matrix[y][x]]);
-            Rectangle(hdc, Pos.x-149+(x*30), Pos.y+266-(y*30), Pos.x-120+(x*30), Pos.y+295-(y*30));
+            if(Matrix[y][x]){SelectObject(Ghdc, Pens[0]);}
+            else{SelectObject(Ghdc, Pens[1]);}
+            SetDCBrushColor(Ghdc, Colors[Matrix[y][x]]);
+            Rectangle(Ghdc, Pos.x-149+(x*30), Pos.y+266-(y*30), Pos.x-120+(x*30), Pos.y+295-(y*30));
         }
     }
-    ReleaseDC(Ghwnd, hdc);
+    //ReleaseDC(Ghwnd, hdc);
 }
 void CBoard::RenderPiece(bool Spawn)
 {
-    HDC hdc = GetDC(Ghwnd);
-    static SBlock PrevBlock;
-    static int8 XPos, YPos;
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    bool ShadowFlag;
     if(!Spawn)
     {
-        SetDCBrushColor(hdc, Colors[0]);
-        SelectObject(hdc, Pens[1]);
+        SetDCBrushColor(Ghdc, Colors[0]);
+        SelectObject(Ghdc, Pens[1]);
         for(int8 i = 0; i < 4; ++i)
         {
-            if(YPos + PrevBlock.Pos[i][1] > 20){continue;}
+            if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
             Rectangle(
-                hdc,
-                Pos.x-149+((XPos + PrevBlock.Pos[i][0])*30),
-                Pos.y+266-((YPos + PrevBlock.Pos[i][1])*30),
-                Pos.x-120+((XPos + PrevBlock.Pos[i][0])*30),
-                Pos.y+295-((YPos + PrevBlock.Pos[i][1])*30)
+                Ghdc,
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
+            );
+        }
+        ShadowFlag = (RenderX != Piece.Position[0] && RenderR != Piece.Rotation);
+        if(ShadowFlag)
+        {
+            for(int8 i = 0; i < 4; ++i)
+            {
+                if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+                Rectangle(
+                    Ghdc,
+                    Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                    Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                    Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                    Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
+                );
+            }
+        }
+    }else{ShadowFlag = 1;}
+
+    RenderBlock = Piece.Block;
+    RenderX = Piece.Position[0];
+    RenderY = Piece.Position[1];
+    RenderR = Piece.Rotation;
+    
+    if(ShadowFlag)
+    {
+        int8 i = 0;
+        while(++i)
+        {
+            if(CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-i))
+            {
+                break;
+            }
+        }
+        ShadowY = Piece.Position[1] - i + 1;
+        SelectObject(Ghdc, Pens[Piece.Type + 1]);
+        SetDCBrushColor(Ghdc, ShadowColors[Piece.Type - 1]);
+        for(int8 i = 0; i < 4; ++i)
+        {
+            if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
+            Rectangle(
+                Ghdc,
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
             );
         }
     }
-    PrevBlock = Piece.Block;
-    XPos = Piece.Position[0];
-    YPos = Piece.Position[1];
-    RenderShadow(Spawn);
-    SelectObject(hdc, Pens[0]);
-    SetDCBrushColor(hdc, Colors[Piece.Type]);
+    SelectObject(Ghdc, Pens[0]);
+    SetDCBrushColor(Ghdc, Colors[Piece.Type]);
     for(int8 i = 0; i < 4; ++i)
     {
-        if(YPos + PrevBlock.Pos[i][1] > 20){continue;}
+        if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
         Rectangle(
-            hdc,
-            Pos.x-149+((XPos + PrevBlock.Pos[i][0])*30),
-            Pos.y+266-((YPos + PrevBlock.Pos[i][1])*30),
-            Pos.x-120+((XPos + PrevBlock.Pos[i][0])*30),
-            Pos.y+295-((YPos + PrevBlock.Pos[i][1])*30)
+            Ghdc,
+            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
+            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
         );
     }
-    ReleaseDC(Ghwnd, hdc);
+    //ReleaseDC(Ghwnd, hdc);
 }
-void CBoard::FlashPiece()
+/*void CBoard::RenderShadow(bool Spawn)
 {
     HDC hdc = GetDC(Ghwnd);
     SelectObject(hdc, GetStockObject(DC_BRUSH));
-    SelectObject(hdc, Pens[0]);
-    SetDCBrushColor(hdc, Colors[9]);
-    for(int8 i = 0; i < 4; ++i)
-    {
-        if(Piece.Position[1] + Piece.Block.Pos[i][1] < 21)
-        {
-            Rectangle(
-                hdc,
-                Pos.x -149 +((Piece.Position[0] + Piece.Block.Pos[i][0])*30),
-                Pos.y +266 -((Piece.Position[1] + Piece.Block.Pos[i][1])*30),
-                Pos.x -120 +((Piece.Position[0] + Piece.Block.Pos[i][0])*30),
-                Pos.y +295 -((Piece.Position[1] + Piece.Block.Pos[i][1])*30)
-            );
-        }
-    }
-    ReleaseDC(Ghwnd, hdc);
-}
-void CBoard::RenderNext()
-{
-    HDC hdc = GetDC(Ghwnd);
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-    SetDCBrushColor(hdc, RGB(48,48,48));
-    Rectangle(hdc, Pos.x + 179, Pos.y - 291, Pos.x + 281, Pos.y - 189);
-    Rectangle(hdc, Pos.x + 189, Pos.y - 171, Pos.x + 271, Pos.y + 149);
-    SetDCBrushColor(hdc, Colors[NextPieces[NextPointer]]);
-    SelectObject(hdc, Pens[0]);
-    switch(NextPieces[NextPointer])
-    {
-        case 1:
-            Rectangle(hdc, Pos.x + 180, Pos.y - 253, Pos.x + 205, Pos.y - 228);
-            Rectangle(hdc, Pos.x + 205, Pos.y - 253, Pos.x + 230, Pos.y - 228);
-            Rectangle(hdc, Pos.x + 230, Pos.y - 253, Pos.x + 255, Pos.y - 228);
-            Rectangle(hdc, Pos.x + 255, Pos.y - 253, Pos.x + 280, Pos.y - 228);
-        break;
-        case 2:
-            Rectangle(hdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
-        break;
-        case 3:
-            Rectangle(hdc, Pos.x + 205, Pos.y - 240, Pos.x + 230, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 230, Pos.y - 240, Pos.x + 255, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 205, Pos.y - 265, Pos.x + 230, Pos.y - 240);
-            Rectangle(hdc, Pos.x + 230, Pos.y - 265, Pos.x + 255, Pos.y - 240);
-        break;
-        case 4:
-            Rectangle(hdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, Pos.y - 240);
-        break;
-        case 5:
-            Rectangle(hdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, Pos.y - 240);
-        break;
-        case 6:
-            Rectangle(hdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, Pos.y - 240);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
-        break;
-        case 7:
-            Rectangle(hdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, Pos.y - 240);
-            Rectangle(hdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
-        break;
-    }
-    int8 TempType;
-    SelectObject(hdc, GetStockObject(DC_PEN));
-    for(int8 x = 0; x < 4; ++x)
-    {
-        //Pos = {480, 360}
-        TempType = NextPieces[(NextPointer + 1 + x) % 14];
-        SetDCBrushColor(hdc, Colors[TempType]);
-        switch(TempType)
-        {
-            case 1:
-                Rectangle(hdc, Pos.x + 190, Pos.y - 140 + (x*80), Pos.x + 210, Pos.y - 120 + (x*80));
-                Rectangle(hdc, Pos.x + 210, Pos.y - 140 + (x*80), Pos.x + 230, Pos.y - 120 + (x*80));
-                Rectangle(hdc, Pos.x + 230, Pos.y - 140 + (x*80), Pos.x + 250, Pos.y - 120 + (x*80));
-                Rectangle(hdc, Pos.x + 250, Pos.y - 140 + (x*80), Pos.x + 270, Pos.y - 120 + (x*80));
-            break;
-            case 2:
-                Rectangle(hdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
-            break;
-            case 3:
-                Rectangle(hdc, Pos.x + 210, Pos.y - 150 + (x*80), Pos.x + 230, Pos.y - 130 + (x*80));
-                Rectangle(hdc, Pos.x + 230, Pos.y - 150 + (x*80), Pos.x + 250, Pos.y - 130 + (x*80));
-                Rectangle(hdc, Pos.x + 210, Pos.y - 130 + (x*80), Pos.x + 230, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 230, Pos.y - 130 + (x*80), Pos.x + 250, Pos.y - 110 + (x*80));
-            break;
-            case 4:
-                Rectangle(hdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
-            break;
-            case 5:
-                Rectangle(hdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
-            break;
-            case 6:
-                Rectangle(hdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
-            break;
-            case 7:
-                Rectangle(hdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(hdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
-                Rectangle(hdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
-            break;
-        }
-    }
-    ReleaseDC(Ghwnd, hdc);
-}
-void CBoard::RenderHold()
-{
-    HDC hdc = GetDC(Ghwnd);
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-    SetDCBrushColor(hdc, RGB(48,48,48));
-    Rectangle(hdc, Pos.x - 179, Pos.y - 291, Pos.x - 281, Pos.y - 189);
-    SetDCBrushColor(hdc, Colors[HeldPiece]);
-    SelectObject(hdc, Pens[0]);
-    switch(HeldPiece)
-    {
-        case 1:
-            Rectangle(hdc, Pos.x - 180, Pos.y - 253, Pos.x - 205, Pos.y - 228);
-            Rectangle(hdc, Pos.x - 205, Pos.y - 253, Pos.x - 230, Pos.y - 228);
-            Rectangle(hdc, Pos.x - 230, Pos.y - 253, Pos.x - 255, Pos.y - 228);
-            Rectangle(hdc, Pos.x - 255, Pos.y - 253, Pos.x - 280, Pos.y - 228);
-        break;
-        case 2:
-            Rectangle(hdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
-        break;
-        case 3:
-            Rectangle(hdc, Pos.x - 205, Pos.y - 240, Pos.x - 230, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 230, Pos.y - 240, Pos.x - 255, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 205, Pos.y - 265, Pos.x - 230, Pos.y - 240);
-            Rectangle(hdc, Pos.x - 230, Pos.y - 265, Pos.x - 255, Pos.y - 240);
-        break;
-        case 4:
-            Rectangle(hdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, Pos.y - 240);
-        break;
-        case 5:
-            Rectangle(hdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, Pos.y - 240);
-        break;
-        case 6:
-            Rectangle(hdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, Pos.y - 240);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
-        break;
-        case 7:
-            Rectangle(hdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, Pos.y - 240);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
-            Rectangle(hdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
-        break;
-    }
-}
-void CBoard::FlashLine(int8 Line)
-{
-    HDC hdc = GetDC(Ghwnd);
-    for(int8 x = 0; x < 10; ++x)
-    {
-        //Pos = {480, 360}
-        SelectObject(hdc, Pens[0]);
-        SetDCBrushColor(hdc, Colors[9]);
-        Rectangle(hdc, Pos.x-149+(x*30), Pos.y+266-(Line*30), Pos.x-120+(x*30), Pos.y+295-(Line*30));
-    }
-    ReleaseDC(Ghwnd, hdc);
-}
-void CBoard::RenderShadow(bool Spawn)
-{
-    HDC hdc = GetDC(Ghwnd);
-    static SBlock Shadow;
-    static int8 XPos, YPos, Rotation;
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-    //erase the previous shadow
     if(!Spawn)
     {
-        if(XPos == Piece.Position[0] && Rotation == Piece.Rotation)
+        if(RenderX == Piece.Position[0] && RenderR == Piece.Rotation)
         {
             return;
         }
@@ -365,22 +205,21 @@ void CBoard::RenderShadow(bool Spawn)
         SelectObject(hdc, Pens[1]);
         for(int8 i = 0; i < 4; ++i)
         {
-            if(YPos + Shadow.Pos[i][1] > 20){continue;}
+            if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
             Rectangle(
                 hdc,
-                Pos.x-149+((XPos + Shadow.Pos[i][0])*30),
-                Pos.y+266-((YPos + Shadow.Pos[i][1])*30),
-                Pos.x-120+((XPos + Shadow.Pos[i][0])*30),
-                Pos.y+295-((YPos + Shadow.Pos[i][1])*30)
+                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+                Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
             );
         }
-        Rotation = Piece.Rotation;
-        Shadow = Piece.Block;
-    }else
-    {
-        Rotation = Piece.Rotation;
-        Shadow = Piece.Block;
     }
+    RenderBlock = Piece.Block;
+    RenderX = Piece.Position[0];
+    RenderY = Piece.Position[1];
+    RenderR = Piece.Rotation;
+    RenderBlock = Piece.Block;
     int8 i = 0;
     while(++i)
     {
@@ -389,20 +228,214 @@ void CBoard::RenderShadow(bool Spawn)
             break;
         }
     }
-    XPos = Piece.Position[0];
-    YPos = Piece.Position[1] - i + 1;
+    ShadowY = Piece.Position[1] - i + 1;
     SelectObject(hdc, Pens[Piece.Type + 1]);
     SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
     for(int8 i = 0; i < 4; ++i)
     {
-        if(YPos + Shadow.Pos[i][1] > 20){continue;}
+        if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
         Rectangle(
             hdc,
-            Pos.x-149+((XPos + Shadow.Pos[i][0])*30),
-            Pos.y+266-((YPos + Shadow.Pos[i][1])*30),
-            Pos.x-120+((XPos + Shadow.Pos[i][0])*30),
-            Pos.y+295-((YPos + Shadow.Pos[i][1])*30)
+            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
+            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
+            Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
         );
     }
     ReleaseDC(Ghwnd, hdc);
+}*/
+void CBoard::FlashPiece()
+{
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SelectObject(Ghdc, Pens[0]);
+    SetDCBrushColor(Ghdc, Colors[9]);
+    for(int8 i = 0; i < 4; ++i)
+    {
+        if(Piece.Position[1] + Piece.Block.Pos[i][1] < 21)
+        {
+            Rectangle(
+                Ghdc,
+                Pos.x -149 +((Piece.Position[0] + Piece.Block.Pos[i][0])*30),
+                Pos.y +266 -((Piece.Position[1] + Piece.Block.Pos[i][1])*30),
+                Pos.x -120 +((Piece.Position[0] + Piece.Block.Pos[i][0])*30),
+                Pos.y +295 -((Piece.Position[1] + Piece.Block.Pos[i][1])*30)
+            );
+        }
+    }
+    //ReleaseDC(Ghwnd, hdc);
+}
+void CBoard::RenderNext()
+{
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(Ghdc, RGB(48,48,48));
+    Rectangle(Ghdc, Pos.x + 179, Pos.y - 291, Pos.x + 281, Pos.y - 189);
+    Rectangle(Ghdc, Pos.x + 189, Pos.y - 171, Pos.x + 271, Pos.y + 149);
+    SetDCBrushColor(Ghdc, Colors[NextPieces[NextPointer]]);
+    SelectObject(Ghdc, Pens[0]);
+    switch(NextPieces[NextPointer])
+    {
+        case 1:
+            Rectangle(Ghdc, Pos.x + 180, Pos.y - 253, Pos.x + 205, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x + 205, Pos.y - 253, Pos.x + 230, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x + 230, Pos.y - 253, Pos.x + 255, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x + 255, Pos.y - 253, Pos.x + 280, Pos.y - 228);
+        break;
+        case 2:
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
+        break;
+        case 3:
+            Rectangle(Ghdc, Pos.x + 205, Pos.y - 240, Pos.x + 230, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 230, Pos.y - 240, Pos.x + 255, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 205, Pos.y - 265, Pos.x + 230, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x + 230, Pos.y - 265, Pos.x + 255, Pos.y - 240);
+        break;
+        case 4:
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, Pos.y - 240);
+        break;
+        case 5:
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, Pos.y - 240);
+        break;
+        case 6:
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 240, Pos.x + 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
+        break;
+        case 7:
+            Rectangle(Ghdc, Pos.x + 193, Pos.y - 240, Pos.x + 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 240, Pos.x + 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, Pos.y - 240);
+        break;
+    }
+    int8 TempType;
+    SelectObject(Ghdc, GetStockObject(DC_PEN));
+    for(int8 x = 0; x < 4; ++x)
+    {
+        //Pos = {480, 360}
+        TempType = NextPieces[(NextPointer + 1 + x) % 14];
+        SetDCBrushColor(Ghdc, Colors[TempType]);
+        switch(TempType)
+        {
+            case 1:
+                Rectangle(Ghdc, Pos.x + 190, Pos.y - 140 + (x*80), Pos.x + 210, Pos.y - 120 + (x*80));
+                Rectangle(Ghdc, Pos.x + 210, Pos.y - 140 + (x*80), Pos.x + 230, Pos.y - 120 + (x*80));
+                Rectangle(Ghdc, Pos.x + 230, Pos.y - 140 + (x*80), Pos.x + 250, Pos.y - 120 + (x*80));
+                Rectangle(Ghdc, Pos.x + 250, Pos.y - 140 + (x*80), Pos.x + 270, Pos.y - 120 + (x*80));
+            break;
+            case 2:
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+            break;
+            case 3:
+                Rectangle(Ghdc, Pos.x + 210, Pos.y - 150 + (x*80), Pos.x + 230, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, Pos.x + 230, Pos.y - 150 + (x*80), Pos.x + 250, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, Pos.x + 210, Pos.y - 130 + (x*80), Pos.x + 230, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 230, Pos.y - 130 + (x*80), Pos.x + 250, Pos.y - 110 + (x*80));
+            break;
+            case 4:
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
+            break;
+            case 5:
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
+            break;
+            case 6:
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+            break;
+            case 7:
+                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+            break;
+        }
+    }
+    //ReleaseDC(Ghwnd, hdc);
+}
+void CBoard::RenderHold()
+{
+    //HDC hdc = GetDC(Ghwnd);
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(Ghdc, RGB(48,48,48));
+    Rectangle(Ghdc, Pos.x - 179, Pos.y - 291, Pos.x - 281, Pos.y - 189);
+    SetDCBrushColor(Ghdc, Colors[HeldPiece]);
+    SelectObject(Ghdc, Pens[0]);
+    switch(HeldPiece)
+    {
+        case 1:
+            Rectangle(Ghdc, Pos.x - 180, Pos.y - 253, Pos.x - 205, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x - 205, Pos.y - 253, Pos.x - 230, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x - 230, Pos.y - 253, Pos.x - 255, Pos.y - 228);
+            Rectangle(Ghdc, Pos.x - 255, Pos.y - 253, Pos.x - 280, Pos.y - 228);
+        break;
+        case 2:
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
+        break;
+        case 3:
+            Rectangle(Ghdc, Pos.x - 205, Pos.y - 240, Pos.x - 230, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 230, Pos.y - 240, Pos.x - 255, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 205, Pos.y - 265, Pos.x - 230, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x - 230, Pos.y - 265, Pos.x - 255, Pos.y - 240);
+        break;
+        case 4:
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, Pos.y - 240);
+        break;
+        case 5:
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, Pos.y - 240);
+        break;
+        case 6:
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 240, Pos.x - 218, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
+        break;
+        case 7:
+            Rectangle(Ghdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, Pos.y - 240);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 240, Pos.x - 243, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 243, Pos.y - 240, Pos.x - 268, Pos.y - 215);
+            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, Pos.y - 240);
+        break;
+    }
+}
+void CBoard::FlashLine(int8 Line)
+{
+    //HDC hdc = GetDC(Ghwnd);
+    for(int8 x = 0; x < 10; ++x)
+    {
+        SelectObject(Ghdc, Pens[0]);
+        SetDCBrushColor(Ghdc, Colors[9]);
+        Rectangle(Ghdc, Pos.x-149+(x*30), Pos.y+266-(Line*30), Pos.x-120+(x*30), Pos.y+295-(Line*30));
+    }
+    //ReleaseDC(Ghwnd, hdc);
 }
