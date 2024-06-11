@@ -1,5 +1,5 @@
 /* Compile:
-g++ main.cpp -l gdi32 -o Tetris.exe -pthread -std=c++11 -O2 -static-libgcc
+g++ main.cpp -o "Tetris CPP.exe" -static -lpthread -std=c++11 -O2 -l gdi32 -static-libgcc -static-libstdc++
 */
 #include "game.cpp"
 
