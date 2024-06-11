@@ -5,6 +5,7 @@ void CBoard::Input()
     int DropMult;
     time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
     int DASLag = 0, DropLag = 0;
+    int8 Flags = 15; // LDAS, RDAS, LeftHeld, RightHeld, CanLeft, CanRight, Left, Right
     bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
     bool Left = true, Right = true;
 
@@ -18,49 +19,49 @@ void CBoard::Input()
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
         if(GetAsyncKeyState(VK_LEFT))
         {
-            if(CanLeft)
+            if(Flags & 8)//CanLeft
             {
-                if(!LeftHeld)
+                if(~Flags & 32)//!LeftHeld
                 {
-                    LeftHeld = true;
-                    if(RightHeld)
+                    Flags |= 32;//LeftHeld = true
+                    if(Flags & 16)//RightHeld
                     {
-                        CanRight = false;
+                        Flags &= ~4;//CanRight = true
                     }
                     DASLag = 0;
                 }
-                if(Left)
+                if(Flags & 2)//Left
                 {
                     MoveLeft();
-                    Left = false;
+                    Flags &= ~2;//Left = false
                     DASDelay = CurrentTickTime;
                 }else
                 {
-                    if(!LDAS)
+                    if(~Flags & 128)//!LDAS
                     {
                         if((CurrentTickTime - DASDelay).count() >= 150 - DASLag)
                         {
                             DASLag = (CurrentTickTime - DASDelay).count() - 150 + DASLag;
-                            LDAS = true;
-                            Left = true;
+                            Flags |= 128;//LDAS = true
+                            Flags |= 2;//Left = true
                         }
                     }else
                     {
                         if((CurrentTickTime - DASDelay).count() >= 30 - DASLag)
                         {
                             DASLag = (CurrentTickTime - DASDelay).count() - 30 + DASLag;
-                            Left = true;
+                            Flags |= 2;//Left = true
                         }
                     }
-                }
+                } 
             }
         }else
         {
-            Left = true;
-            LDAS = false;
-            LeftHeld = false;
-            CanRight = true;
-            CanLeft = true;
+            Flags |= 2;//Left = true
+            Flags &= ~128;//LDAS = false
+            Flags &= ~32;//LeftHeld = false
+            Flags |= 4;//CanRight = true
+            Flags |= 8;//CanLeft = true
         }
         if(GetAsyncKeyState(VK_RIGHT))
         {
