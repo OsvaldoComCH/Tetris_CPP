@@ -7,6 +7,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
+        case WM_KILLFOCUS:
+            //Mode = 0;
+        break;
         case WM_PAINT:
         {
             PAINTSTRUCT PS;

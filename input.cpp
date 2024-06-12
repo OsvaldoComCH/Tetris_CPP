@@ -2,112 +2,107 @@
 
 void CBoard::Input()
 {
-    int DropMult;
+    Mode = 1;
     time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
-    int DASLag = 0, DropLag = 0;
-    int8 Flags = 15; // LDAS, RDAS, LeftHeld, RightHeld, CanLeft, CanRight, Left, Right
-    bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
-    bool Left = true, Right = true;
-
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
     DueTime.QuadPart = -160000;
     SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
 
-    while(1)
+    while(Mode == 1)
     {
-        CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
+        Phys.CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
         if(GetAsyncKeyState(VK_LEFT))
         {
-            if(Flags & 8)//CanLeft
+            if(Phys.LRFlags & 8)//CanLeft
             {
-                if(~Flags & 32)//!LeftHeld
+                if(~Phys.LRFlags & 32)//!LeftHeld
                 {
-                    Flags |= 32;//LeftHeld = true
-                    if(Flags & 16)//RightHeld
+                    Phys.LRFlags |= 32;//LeftHeld = true
+                    if(Phys.LRFlags & 16)//RightHeld
                     {
-                        Flags &= ~4;//CanRight = true
+                        Phys.LRFlags &= ~4;//CanRight = true
                     }
-                    DASLag = 0;
+                    Phys.DASLag = 0;
                 }
-                if(Flags & 2)//Left
+                if(Phys.LRFlags & 2)//Left
                 {
                     MoveLeft();
-                    Flags &= ~2;//Left = false
+                    Phys.LRFlags &= ~2;//Left = false
                     DASDelay = CurrentTickTime;
                 }else
                 {
-                    if(~Flags & 128)//!LDAS
+                    if(~Phys.LRFlags & 128)//!LDAS
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 150 - DASLag)
+                        if((CurrentTickTime - DASDelay).count() >= 150 - Phys.DASLag)
                         {
-                            DASLag = (CurrentTickTime - DASDelay).count() - 150 + DASLag;
-                            Flags |= 128;//LDAS = true
-                            Flags |= 2;//Left = true
+                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 150 + Phys.DASLag;
+                            Phys.LRFlags |= 128;//LDAS = true
+                            Phys.LRFlags |= 2;//Left = true
                         }
                     }else
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 30 - DASLag)
+                        if((CurrentTickTime - DASDelay).count() >= 30 - Phys.DASLag)
                         {
-                            DASLag = (CurrentTickTime - DASDelay).count() - 30 + DASLag;
-                            Flags |= 2;//Left = true
+                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 30 + Phys.DASLag;
+                            Phys.LRFlags |= 2;//Left = true
                         }
                     }
                 } 
             }
         }else
         {
-            Flags |= 2;//Left = true
-            Flags &= ~128;//LDAS = false
-            Flags &= ~32;//LeftHeld = false
-            Flags |= 4;//CanRight = true
-            Flags |= 8;//CanLeft = true
+            Phys.LRFlags |= 2;//Left = true
+            Phys.LRFlags &= ~128;//LDAS = false
+            Phys.LRFlags &= ~32;//LeftHeld = false
+            Phys.LRFlags |= 4;//CanRight = true
+            Phys.LRFlags |= 8;//CanLeft = true
         }
         if(GetAsyncKeyState(VK_RIGHT))
         {
-            if(CanRight)
+            if(Phys.LRFlags & 4)//CanRight
             {
-                if(!RightHeld)
+                if(~Phys.LRFlags & 16)//!RightHeld
                 {
-                    RightHeld = true;
-                    if(LeftHeld)
+                    Phys.LRFlags |= 16;//RightHeld = true
+                    if(Phys.LRFlags & 32)//LeftHeld
                     {
-                        CanLeft = false;
+                        Phys.LRFlags &= ~8;//CanLeft = false
                     }
-                    DASLag = 0;
+                    Phys.DASLag = 0;
                 }
-                if(Right)
+                if(Phys.LRFlags & 1)//Right
                 {
                     MoveRight();
-                    Right = false;
+                    Phys.LRFlags &= ~1;//Right = false
                     DASDelay = CurrentTickTime;
                 }else
                 {
-                    if(!RDAS)
+                    if(~Phys.LRFlags & 64)//!RDAS
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 150 - DASLag)
+                        if((CurrentTickTime - DASDelay).count() >= 150 - Phys.DASLag)
                         {
-                            DASLag = (CurrentTickTime - DASDelay).count() - 150 + DASLag;
-                            RDAS = true;
-                            Right = true;
+                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 150 + Phys.DASLag;
+                            Phys.LRFlags |= 64;//RDAS = true
+                            Phys.LRFlags |= 1;//Right = true
                         }
                     }else
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 30 - DASLag)
+                        if((CurrentTickTime - DASDelay).count() >= 30 - Phys.DASLag)
                         {
-                            DASLag = (CurrentTickTime - DASDelay).count() - 30 + DASLag;
-                            Right = true;
+                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 30 + Phys.DASLag;
+                            Phys.LRFlags |= 1;//Right = true
                         }
                     }
                 }
             }
         }else
         {
-            Right = true;
-            RDAS = false;
-            RightHeld = false;
-            CanLeft = true;
-            CanRight = true;
+            Phys.LRFlags |= 1;//Right = true
+            Phys.LRFlags &= ~64;//RDAS = false
+            Phys.LRFlags &= 16;//RightHeld = false
+            Phys.LRFlags |= 8;//CanLeft = true
+            Phys.LRFlags |= 4;//CanRight = true
         }
         if(Phys.Drop)
         {
@@ -116,12 +111,12 @@ void CBoard::Input()
             DropDelay = CurrentTickTime;
         }else
         {
-            DropMult = (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1);
-            if((CurrentTickTime - DropDelay).count() >= (Phys.DropSpeed / DropMult) - DropLag)
+            Phys.DropMult = (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1);
+            if((CurrentTickTime - DropDelay).count() >= (Phys.DropSpeed / Phys.DropMult) - Phys.DropLag)
             {
-                DropLag = (CurrentTickTime - DropDelay).count() - (Phys.DropSpeed / DropMult) + DropLag;
-                if(DropLag > (Phys.DropSpeed / DropMult)){DropLag = (Phys.DropSpeed / DropMult);}
-                if(DropLag < 0){DropLag = 0;}
+                Phys.DropLag = (CurrentTickTime - DropDelay).count() - (Phys.DropSpeed / Phys.DropMult) + Phys.DropLag;
+                if(Phys.DropLag > (Phys.DropSpeed / Phys.DropMult)){Phys.DropLag = (Phys.DropSpeed / Phys.DropMult);}
+                if(Phys.DropLag < 0){Phys.DropLag = 0;}
                 Phys.Drop = true;
             }
         }

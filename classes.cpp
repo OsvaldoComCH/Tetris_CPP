@@ -125,11 +125,18 @@ class CBoard
     int8 HeldPiece = 0;
     bool CanHold;
     CPiece Piece;
+    int8 Mode = 0; //0-Menu, 1-Game, 2-Pause
     struct Phys
-    { 
+    {
         bool HDrop, RCW, RCCW, Drop;
         int DropSpeed;
+        int DropMult;
+        int DASLag, DropLag;
+        int8 LRFlags; // LDAS, RDAS, LeftHeld, RightHeld, CanLeft, CanRight, Left, Right
     } Phys;
+    Phys.DASLag = 0;
+    Phys.DropLag = 0;
+    Phys.LRFlags = 15;
     
 
     int8 SpawnPiece();
