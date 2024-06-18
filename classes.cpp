@@ -114,6 +114,41 @@ class CPiece
     }
 };
 
+class CMenu
+{
+    public:
+    static int8 StartLevel = 1;
+    static int8 MaxLevel = 25;
+    static inline void ChangeStartLevel()
+    {
+        if(StartLevel == 25)
+        {
+            StartLevel = 1;
+        }else
+        {
+            if(StartLevel == 1)
+            {
+                --StartLevel;
+            }
+            StartLevel += 5;
+        }
+        if(MaxLevel < StartLevel)
+        {
+            MaxLevel = StartLevel;
+        }
+    }
+    static inline void ChangeMaxLevel()
+    {
+        if(MaxLevel == 25)
+        {
+            MaxLevel = StartLevel;
+        }else
+        {
+            MaxLevel += 5;
+        }
+    }
+};
+
 class CBoard
 {
     public:
