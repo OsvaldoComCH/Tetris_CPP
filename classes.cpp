@@ -144,6 +144,10 @@ class CMenu
             MaxLevel = StartLevel;
         }else
         {
+            if(MaxLevel == 1)
+            {
+                --MaxLevel;
+            }
             MaxLevel += 5;
         }
     }
