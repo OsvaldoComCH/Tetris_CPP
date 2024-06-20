@@ -3,7 +3,7 @@
 void CBoard::Input()
 {
     Mode = 1;
-    time_point<system_clock, milliseconds> DASDelay, DropDelay, CurrentTickTime;
+    time_point<system_clock, milliseconds> CurrentTickTime;
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
     DueTime.QuadPart = -160000;
@@ -29,22 +29,22 @@ void CBoard::Input()
                 {
                     MoveLeft();
                     Phys.Left = false;
-                    DASDelay = CurrentTickTime;
+                    Phys.DASDelay = CurrentTickTime;
                 }else
                 {
                     if(!Phys.LDAS)
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 150 - Phys.DASLag)
+                        if((CurrentTickTime - Phys.DASDelay).count() >= 150 - Phys.DASLag)
                         {
-                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 150 + Phys.DASLag;
+                            Phys.DASLag = (CurrentTickTime - Phys.DASDelay).count() - 150 + Phys.DASLag;
                             Phys.LDAS = true;
                             Phys.Left = true;
                         }
                     }else
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 30 - Phys.DASLag)
+                        if((CurrentTickTime - Phys.DASDelay).count() >= 30 - Phys.DASLag)
                         {
-                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 30 + Phys.DASLag;
+                            Phys.DASLag = (CurrentTickTime - Phys.DASDelay).count() - 30 + Phys.DASLag;
                             Phys.Left = true;
                         }
                     }
@@ -75,22 +75,22 @@ void CBoard::Input()
                 {
                     MoveRight();
                     Phys.Right = false;
-                    DASDelay = CurrentTickTime;
+                    Phys.DASDelay = CurrentTickTime;
                 }else
                 {
                     if(!Phys.RDAS)
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 150 - Phys.DASLag)
+                        if((CurrentTickTime - Phys.DASDelay).count() >= 150 - Phys.DASLag)
                         {
-                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 150 + Phys.DASLag;
+                            Phys.DASLag = (CurrentTickTime - Phys.DASDelay).count() - 150 + Phys.DASLag;
                             Phys.RDAS = true;
                             Phys.Right = true;
                         }
                     }else
                     {
-                        if((CurrentTickTime - DASDelay).count() >= 30 - Phys.DASLag)
+                        if((CurrentTickTime - Phys.DASDelay).count() >= 30 - Phys.DASLag)
                         {
-                            Phys.DASLag = (CurrentTickTime - DASDelay).count() - 30 + Phys.DASLag;
+                            Phys.DASLag = (CurrentTickTime - Phys.DASDelay).count() - 30 + Phys.DASLag;
                             Phys.Right = true;
                         }
                     }
@@ -108,13 +108,13 @@ void CBoard::Input()
         {
             MoveDown();
             Phys.Drop = false;
-            DropDelay = CurrentTickTime;
+            Phys.DropDelay = CurrentTickTime;
         }else
         {
             Phys.DropMult = Phys.DropSpeed / (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1);
-            if((CurrentTickTime - DropDelay).count() >= Phys.DropMult - Phys.DropLag)
+            if((CurrentTickTime - Phys.DropDelay).count() >= Phys.DropMult - Phys.DropLag)
             {
-                Phys.DropLag = (CurrentTickTime - DropDelay).count() - Phys.DropMult + Phys.DropLag;
+                Phys.DropLag = (CurrentTickTime - Phys.DropDelay).count() - Phys.DropMult + Phys.DropLag;
                 if(Phys.DropLag > Phys.DropMult)
                 {
                     Phys.DropLag = Phys.DropMult;

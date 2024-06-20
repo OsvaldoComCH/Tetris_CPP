@@ -167,14 +167,24 @@ class CBoard
     int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
     struct Phys
     {
-        bool HDrop, RCW, RCCW, Drop;
-        bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false, CanLeft = true, CanRight = true;
-        bool Left = true, Right = true;
+        time_point<system_clock, milliseconds> DASDelay, DropDelay;
         int DropSpeed;
         int DropMult;
         int DASLag = 0, DropLag = 0;
+        bool HDrop, RCW, RCCW, Drop;
+        bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
+        bool CanLeft = true, CanRight = true, Left = true, Right = true;
     } Phys;
-    
+    time_point<system_clock, milliseconds> PauseTime = 0;
+
+    void Pause()
+    {
+        PauseTime = time_point_cast<milliseconds>(system_clock::now());
+    }
+    void Resume()
+    {
+        int Diference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime).count();
+    }
 
     int8 SpawnPiece();
     void Hold();
