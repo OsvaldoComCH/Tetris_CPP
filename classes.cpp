@@ -117,9 +117,9 @@ class CPiece
 class CMenu
 {
     public:
-    static int8 StartLevel = 1;
-    static int8 MaxLevel = 25;
-    static inline void ChangeStartLevel()
+    int8 StartLevel = 1;
+    int8 MaxLevel = 25;
+    inline void ChangeStartLevel()
     {
         if(StartLevel == 25)
         {
@@ -137,7 +137,7 @@ class CMenu
             MaxLevel = StartLevel;
         }
     }
-    static inline void ChangeMaxLevel()
+    inline void ChangeMaxLevel()
     {
         if(MaxLevel == 25)
         {
@@ -183,7 +183,9 @@ class CBoard
     }
     void Resume()
     {
-        int Diference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime).count();
+        time_point<system_clock, milliseconds> Diference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
+        Phys.DASDelay += Difference;
+        Phys.DropDelay += Difference;
     }
 
     int8 SpawnPiece();

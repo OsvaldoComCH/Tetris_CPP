@@ -8,10 +8,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
     switch(Msg)
     {
         case WM_KILLFOCUS:
-            Player1.Mode = 0;
+            CBoard::Mode = 0;
         break;
         case WM_SETFOCUS:
-            if(!Player1.Mode)
+            if(!CBoard::Mode)
             {
                 std::thread (CBoard::Input, &Player1).detach();
             }
@@ -25,6 +25,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
         case WM_CLOSE:
+            ReleaseDC(Ghdc);
             DestroyWindow(hwnd);
         break;
         case WM_DESTROY:
