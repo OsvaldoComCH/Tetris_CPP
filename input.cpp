@@ -12,6 +12,7 @@ void CBoard::Input()
     while(Mode == 1)
     {
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
+
         if(GetAsyncKeyState(VK_LEFT))
         {
             if(Phys.CanLeft)
@@ -58,6 +59,7 @@ void CBoard::Input()
             Phys.CanRight = true;
             Phys.CanLeft = true;
         }
+
         if(GetAsyncKeyState(VK_RIGHT))
         {
             if(Phys.CanRight)
@@ -104,18 +106,30 @@ void CBoard::Input()
             Phys.CanLeft = true;
             Phys.CanRight = true;
         }
+
         if(Phys.Drop)
         {
             MoveDown();
+            while(Phys.DropLag >= Phys.DropMult)
+            {
+                MoveDown();
+                Phys.DropLag -= Phys.DropMult;
+            }
             Phys.Drop = false;
             Phys.DropDelay = CurrentTickTime;
         }else
         {
-            Phys.DropMult = Phys.DropSpeed / (19 * (bool) GetAsyncKeyState(VK_DOWN) + 1);
+            if(GetAsyncKeyState(VK_DOWN))
+            {
+                Phys.DropMult = Phys.DropSpeed / 20;
+            }else
+            {
+                Phys.DropMult = Phys.DropSpeed;
+            }
             if((CurrentTickTime - Phys.DropDelay).count() >= Phys.DropMult - Phys.DropLag)
             {
                 Phys.DropLag = (CurrentTickTime - Phys.DropDelay).count() - Phys.DropMult + Phys.DropLag;
-                if(Phys.DropLag > Phys.DropMult)
+                if(Phys.DropLag > Phys.DropMult)//Isso aqui é problema
                 {
                     Phys.DropLag = Phys.DropMult;
                 }
@@ -123,7 +137,9 @@ void CBoard::Input()
                 Phys.Drop = true;
             }
         }
+
         AutoLock(0);
+
         if(GetAsyncKeyState(VK_SPACE))
         {
             if(Phys.HDrop)
@@ -136,10 +152,12 @@ void CBoard::Input()
         {
             Phys.HDrop = true;
         }
+
         if(GetAsyncKeyState(VK_C) && CanHold)
         {
             Hold();
         }
+
         if(GetAsyncKeyState(VK_UP))
         {
             if(Phys.RCW)
@@ -152,6 +170,7 @@ void CBoard::Input()
         {
             Phys.RCW = true;
         }
+
         if(GetAsyncKeyState(VK_X))
         {
             if(Phys.RCCW)
@@ -164,6 +183,7 @@ void CBoard::Input()
         {
             Phys.RCCW = true;
         }
+        
         WaitForSingleObject(Timer, INFINITE);
     }
     CancelWaitableTimer(Timer);
