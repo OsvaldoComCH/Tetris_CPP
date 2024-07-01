@@ -179,11 +179,13 @@ class CBoard
 
     void Pause()
     {
+        Mode = 2;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
     }
     void Resume()
     {
-        time_point<system_clock, milliseconds> Diference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
+        Mode = 1;
+        time_point<system_clock, milliseconds> Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         Phys.DASDelay += Difference;
         Phys.DropDelay += Difference;
     }
