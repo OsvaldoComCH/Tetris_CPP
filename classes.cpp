@@ -175,7 +175,7 @@ class CBoard
         bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
         bool CanLeft = true, CanRight = true, Left = true, Right = true;
     } Phys;
-    time_point<system_clock, milliseconds> PauseTime = 0;
+    time_point<system_clock, milliseconds> PauseTime;
 
     void Pause()
     {
@@ -185,7 +185,7 @@ class CBoard
     void Resume()
     {
         Mode = 1;
-        time_point<system_clock, milliseconds> Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
+        milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         Phys.DASDelay += Difference;
         Phys.DropDelay += Difference;
     }

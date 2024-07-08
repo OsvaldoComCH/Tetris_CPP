@@ -7,16 +7,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
-        case WM_KILLFOCUS:
+        /*case WM_KILLFOCUS:
             Player1.Pause();
         break;
         case WM_SETFOCUS:
-            if(Player1.Mode)
+            if(Player1.Mode == 2)
             {
                 Player1.Resume();
                 std::thread (CBoard::Input, &Player1).detach();
             }
-        break;
+        break;*/
         case WM_PAINT:
         {
             PAINTSTRUCT PS;
@@ -26,7 +26,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
         case WM_CLOSE:
-            ReleaseDC(Ghdc);
+            ReleaseDC(hwnd, Ghdc);
             DestroyWindow(hwnd);
         break;
         case WM_DESTROY:
