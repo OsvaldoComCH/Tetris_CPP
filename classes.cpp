@@ -168,9 +168,9 @@ class CBoard
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
-        int DropSpeed;
-        int DropMult = 1;
-        int DASLag = 0, DropLag = 0;
+        unsigned int DropSpeed;
+        unsigned int DropMult = 1;
+        unsigned int DASLag = 0, DropLag = 0;
         bool HDrop, RCW, RCCW, Drop;
         bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
         bool CanLeft = true, CanRight = true, Left = true, Right = true;
