@@ -7,7 +7,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
-        /*case WM_KILLFOCUS:
+        case WM_KILLFOCUS:
             Player1.Pause();
         break;
         case WM_SETFOCUS:
@@ -16,7 +16,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                 Player1.Resume();
                 std::thread (CBoard::Input, &Player1).detach();
             }
-        break;*/
+        break;
         case WM_PAINT:
         {
             PAINTSTRUCT PS;
@@ -81,6 +81,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     
     std::thread TetrisGame(CBoard::StartGame, &Player1);
 
+    FreeConsole();
     while(GetMessage(&Msg, NULL, 0, 0))
     {
         TranslateMessage(&Msg);

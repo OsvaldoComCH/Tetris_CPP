@@ -169,7 +169,7 @@ class CBoard
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
         int DropSpeed;
-        int DropMult;
+        int DropMult = 1;
         int DASLag = 0, DropLag = 0;
         bool HDrop, RCW, RCCW, Drop;
         bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
