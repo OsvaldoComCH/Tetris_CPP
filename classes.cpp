@@ -19,7 +19,6 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
-HDC Ghdc; //Global handle to device context
 
 class CPiece
 {
@@ -329,14 +328,13 @@ class CBoard
 
     void Input();
     void StartGame();
-
+    HDC Ghdc;
     void RenderMatrix();
     void RenderLines();
     void RenderBkgd(HDC hdc);
     SBlock RenderBlock;
     int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
-    //void RenderShadow(bool Spawn);
     void FlashPiece();
     void RenderNext();
     void FlashLine(int8 Line);

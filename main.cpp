@@ -21,6 +21,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
+            Ghdc = CreateCompatibleDC(hdc);
+            HBITMAP DCBitmap;
             Player1.RenderBkgd(hdc);
             EndPaint(hwnd, &PS);
         }
@@ -70,7 +72,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         NULL, NULL, hInstance, NULL
     );
     Ghwnd = hwnd;
-    Ghdc = GetDC(Ghwnd);
     if(hwnd == NULL)
     {
         MessageBox(NULL, L"Window Creation Failed", L"Error", MB_ICONERROR | MB_OK);

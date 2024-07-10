@@ -36,47 +36,47 @@ const COLORREF ShadowColors[7] = {
     RGB(112,72,72),
     RGB(72,112,72)
 };
-void CBoard::RenderBkgd(HDC hdc)
+void CBoard::RenderBkgd()
 {
     RECT R;
     GetClientRect(Ghwnd, &R);
-    FillRect(hdc, &R, CreateSolidBrush(RGB(128, 128, 128)));
+    FillRect(Ghdc, &R, CreateSolidBrush(RGB(128, 128, 128)));
 
     //Exterior
-    Rectangle(hdc, Pos.x - 160, Pos.y - 345, Pos.x + 160, Pos.y + 305);//Matrix
-    Rectangle(hdc, Pos.x + 180, Pos.y - 300, Pos.x + 280, Pos.y + 160);//Next 5
-    Rectangle(hdc, Pos.x + 170, Pos.y - 300, Pos.x + 290, Pos.y - 180);//Next
-    Rectangle(hdc, Pos.x + 170, Pos.y + 200, Pos.x + 370, Pos.y + 270);//Points
-    Rectangle(hdc, Pos.x - 290, Pos.y - 300, Pos.x - 170, Pos.y - 180);//Hold
-    Rectangle(hdc, Pos.x - 290, Pos.y + 30, Pos.x - 170, Pos.y + 100);//Level
-    Rectangle(hdc, Pos.x - 290, Pos.y + 130, Pos.x - 170, Pos.y + 200);//Lines
+    Rectangle(Ghdc, Pos.x - 160, Pos.y - 345, Pos.x + 160, Pos.y + 305);//Matrix
+    Rectangle(Ghdc, Pos.x + 180, Pos.y - 300, Pos.x + 280, Pos.y + 160);//Next 5
+    Rectangle(Ghdc, Pos.x + 170, Pos.y - 300, Pos.x + 290, Pos.y - 180);//Next
+    Rectangle(Ghdc, Pos.x + 170, Pos.y + 200, Pos.x + 370, Pos.y + 270);//Points
+    Rectangle(Ghdc, Pos.x - 290, Pos.y - 300, Pos.x - 170, Pos.y - 180);//Hold
+    Rectangle(Ghdc, Pos.x - 290, Pos.y + 30, Pos.x - 170, Pos.y + 100);//Level
+    Rectangle(Ghdc, Pos.x - 290, Pos.y + 130, Pos.x - 170, Pos.y + 200);//Lines
 
     //Interior
-    SelectObject(hdc, GetStockObject(DC_BRUSH));
-    SetDCBrushColor(hdc, RGB(48,48,48));
-    Rectangle(hdc, Pos.x + 190, Pos.y - 170, Pos.x + 270, Pos.y + 150);//Next 5
-    Rectangle(hdc, Pos.x + 180, Pos.y - 290, Pos.x + 280, Pos.y - 190);//Next
-    Rectangle(hdc, Pos.x + 180, Pos.y + 210, Pos.x + 360, Pos.y + 260);//Points
-    Rectangle(hdc, Pos.x - 280, Pos.y - 290, Pos.x - 180, Pos.y - 190);//Hold
-    Rectangle(hdc, Pos.x - 280, Pos.y + 40, Pos.x - 180, Pos.y + 90);//Level
-    Rectangle(hdc, Pos.x - 280, Pos.y + 140, Pos.x - 180, Pos.y + 190);//Lines
-    SelectObject(hdc, CreatePen(PS_NULL, 1, 0x00000000));
-    Rectangle(hdc, Pos.x - 151, Pos.y - 336, Pos.x + 151, Pos.y + 296);//Matrix
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(Ghdc, RGB(48,48,48));
+    Rectangle(Ghdc, Pos.x + 190, Pos.y - 170, Pos.x + 270, Pos.y + 150);//Next 5
+    Rectangle(Ghdc, Pos.x + 180, Pos.y - 290, Pos.x + 280, Pos.y - 190);//Next
+    Rectangle(Ghdc, Pos.x + 180, Pos.y + 210, Pos.x + 360, Pos.y + 260);//Points
+    Rectangle(Ghdc, Pos.x - 280, Pos.y - 290, Pos.x - 180, Pos.y - 190);//Hold
+    Rectangle(Ghdc, Pos.x - 280, Pos.y + 40, Pos.x - 180, Pos.y + 90);//Level
+    Rectangle(Ghdc, Pos.x - 280, Pos.y + 140, Pos.x - 180, Pos.y + 190);//Lines
+    SelectObject(Ghdc, CreatePen(PS_NULL, 1, 0x00000000));
+    Rectangle(Ghdc, Pos.x - 151, Pos.y - 336, Pos.x + 151, Pos.y + 296);//Matrix
 
     //Text
-    SelectObject(hdc, Font);
-    SetBkColor(hdc, RGB(128, 128, 128));
-    TextOut(hdc, Pos.x + 198, Pos.y - 330, L"NEXT", 4);
-    TextOut(hdc, Pos.x - 262, Pos.y - 330, L"HOLD", 4);
-    TextOut(hdc, Pos.x + 180, Pos.y + 170, L"POINTS", 6);
-    TextOut(hdc, Pos.x - 280, Pos.y, L"LEVEL", 5);
-    TextOut(hdc, Pos.x - 280, Pos.y + 100, L"LINES", 5);
-    SelectObject(hdc, Font2);
-    SetTextAlign(hdc, TA_RIGHT);
-    SetBkColor(hdc, RGB(48,48,48));
-    SetTextColor(hdc, Colors[9]);
+    SelectObject(Ghdc, Font);
+    SetBkColor(Ghdc, RGB(128, 128, 128));
+    TextOut(Ghdc, Pos.x + 198, Pos.y - 330, L"NEXT", 4);
+    TextOut(Ghdc, Pos.x - 262, Pos.y - 330, L"HOLD", 4);
+    TextOut(Ghdc, Pos.x + 180, Pos.y + 170, L"POINTS", 6);
+    TextOut(Ghdc, Pos.x - 280, Pos.y, L"LEVEL", 5);
+    TextOut(Ghdc, Pos.x - 280, Pos.y + 100, L"LINES", 5);
+    SelectObject(Ghdc, Font2);
+    SetTextAlign(Ghdc, TA_RIGHT);
+    SetBkColor(Ghdc, RGB(48,48,48));
+    SetTextColor(Ghdc, Colors[9]);
     wstring WLines = std::to_wstring(Lines);
-    TextOut(hdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
+    TextOut(Ghdc, Pos.x - 190, Pos.y + 147, WLines.c_str(), WLines.length());
     
     RenderMatrix();
     RenderNext();

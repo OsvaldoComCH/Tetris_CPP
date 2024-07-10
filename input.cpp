@@ -11,6 +11,7 @@ void CBoard::Input()
 
     while(Mode == 1)
     {
+        HDC hdc = GetDC(Ghwnd);
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
 
         if(GetAsyncKeyState(VK_LEFT))
@@ -185,6 +186,8 @@ void CBoard::Input()
         }
         
         WaitForSingleObject(Timer, INFINITE);
+        
+        ReleaseDC(Ghwnd, hdc);
     }
     CancelWaitableTimer(Timer);
     CloseHandle(Timer);
