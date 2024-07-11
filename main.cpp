@@ -21,15 +21,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
-            Ghdc = CreateCompatibleDC(hdc);
-            HBITMAP DCBitmap;
+            Player1.Ghdc = CreateCompatibleDC(hdc);
+            Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
+            SelectObject(Player1.Ghdc, Player1.DCBitmap);
+            DeleteObject()
             Player1.RenderBkgd(hdc);
             EndPaint(hwnd, &PS);
         }
         break;
         case WM_CLOSE:
-            ReleaseDC(hwnd, Ghdc);
+        {
+            DeleteDC(Player1.Ghdc);
+            DeleteObject(Player1.DCBitmap);
+
+            DeleteObject(Font);
+            DeleteObject(Font2);
+            for(int i = 0; i < 9; ++i)
+            {
+                DeleteObject(Pens[i]);
+            }
             DestroyWindow(hwnd);
+        }
         break;
         case WM_DESTROY:
             PostQuitMessage(0);

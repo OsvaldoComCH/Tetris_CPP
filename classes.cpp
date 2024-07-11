@@ -329,9 +329,14 @@ class CBoard
     void Input();
     void StartGame();
     HDC Ghdc;
+    HBITMAP DCBitmap;
+    inline void DrawBlock(int x, int y)
+    {
+        Rectangle(Ghdc, 166+(x*30), 636-(y*30), 195+(x*30), 665-(y*30));
+    };
     void RenderMatrix();
     void RenderLines();
-    void RenderBkgd(HDC hdc);
+    void RenderBkgd();
     SBlock RenderBlock;
     int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
