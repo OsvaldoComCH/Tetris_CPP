@@ -7,6 +7,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
+        case WM_CREATE:
+            HDC hdc = GetDC(hwnd);
+            Player1.Ghdc = CreateCompatibleDC(hdc);
+            Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
+            SelectObject(Player1.Ghdc, Player1.DCBitmap);
+            ReleaseDC(hwnd, hdc);
+        break;
         case WM_KILLFOCUS:
             Player1.Pause();
         break;
@@ -21,11 +28,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
-            Player1.Ghdc = CreateCompatibleDC(hdc);
-            Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
-            SelectObject(Player1.Ghdc, Player1.DCBitmap);
-            DeleteObject()
-            Player1.RenderBkgd(hdc);
+            Player1.RenderBkgd();
+            HBRUSH hb = CreateSolidBrush(RGB(128,128,128));
+            FillRect(hdc, &PS.rcPaint, hb);
+            DeleteObject(hb);
             EndPaint(hwnd, &PS);
         }
         break;

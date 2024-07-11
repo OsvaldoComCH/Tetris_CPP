@@ -62,12 +62,12 @@ void CBoard::RenderBkgd()
     //Interior
     SetDCBrushColor(Ghdc, RGB(48,48,48));
     /*
-    Rectangle(Ghdc, Pos.x + 190, Pos.y - 170, Pos.x + 270, Pos.y + 150);//Next 5
+    Rectangle(Ghdc, 505, Pos.y - 170, 585, Pos.y + 150);//Next 5
     Rectangle(Ghdc, Pos.x + 180, Pos.y - 290, Pos.x + 280, Pos.y - 190);//Next
     Rectangle(Ghdc, Pos.x + 180, Pos.y + 210, Pos.x + 360, Pos.y + 260);//Points
-    Rectangle(Ghdc, Pos.x - 280, Pos.y - 290, Pos.x - 180, Pos.y - 190);//Hold
-    Rectangle(Ghdc, Pos.x - 280, Pos.y + 40, Pos.x - 180, Pos.y + 90);//Level
-    Rectangle(Ghdc, Pos.x - 280, Pos.y + 140, Pos.x - 180, Pos.y + 190);//Lines
+    Rectangle(Ghdc, Pos.x - 280, Pos.y - 290, 135, Pos.y - 190);//Hold
+    Rectangle(Ghdc, Pos.x - 280, Pos.y + 40, 135, Pos.y + 90);//Level
+    Rectangle(Ghdc, Pos.x - 280, Pos.y + 140, 135, Pos.y + 190);//Lines
     SelectObject(Ghdc, GetStockObject(NULL_PEN));
     Rectangle(Ghdc, Pos.x - 151, Pos.y - 336, Pos.x + 151, Pos.y + 296);//Matrix
     SelectObject(Ghdc, GetStockObject(DC_PEN));
@@ -229,40 +229,40 @@ void CBoard::RenderNext()
             Rectangle(Ghdc, 570, 117, 595, 142);
         break;
         case 2:
-            Rectangle(Ghdc, Pos.x + 193, 130, Pos.x + 218, 155);
-            Rectangle(Ghdc, Pos.x + 218, 130, Pos.x + 243, 155);
-            Rectangle(Ghdc, Pos.x + 243, 130, Pos.x + 268, 155);
-            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, 130);
+            Rectangle(Ghdc, 508, 130, 533, 155);
+            Rectangle(Ghdc, 533, 130, 558, 155);
+            Rectangle(Ghdc, 558, 130, 583, 155);
+            Rectangle(Ghdc, 533, 105, 558, 130);
         break;
         case 3:
-            Rectangle(Ghdc, Pos.x + 205, 130, Pos.x + 230, 155);
-            Rectangle(Ghdc, Pos.x + 230, 130, Pos.x + 255, 155);
-            Rectangle(Ghdc, Pos.x + 205, Pos.y - 265, Pos.x + 230, 130);
-            Rectangle(Ghdc, Pos.x + 230, Pos.y - 265, Pos.x + 255, 130);
+            Rectangle(Ghdc, 520, 130, 545, 155);
+            Rectangle(Ghdc, 545, 130, 570, 155);
+            Rectangle(Ghdc, 520, 105, 545, 130);
+            Rectangle(Ghdc, 545, 105, 570, 130);
         break;
         case 4:
-            Rectangle(Ghdc, Pos.x + 193, 130, Pos.x + 218, 155);
-            Rectangle(Ghdc, Pos.x + 218, 130, Pos.x + 243, 155);
-            Rectangle(Ghdc, Pos.x + 243, 130, Pos.x + 268, 155);
-            Rectangle(Ghdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, 130);
+            Rectangle(Ghdc, 508, 130, 533, 155);
+            Rectangle(Ghdc, 533, 130, 558, 155);
+            Rectangle(Ghdc, 558, 130, 583, 155);
+            Rectangle(Ghdc, 558, 105, 583, 130);
         break;
         case 5:
-            Rectangle(Ghdc, Pos.x + 193, 130, Pos.x + 218, 155);
-            Rectangle(Ghdc, Pos.x + 218, 130, Pos.x + 243, 155);
-            Rectangle(Ghdc, Pos.x + 243, 130, Pos.x + 268, 155);
-            Rectangle(Ghdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, 130);
+            Rectangle(Ghdc, 508, 130, 533, 155);
+            Rectangle(Ghdc, 533, 130, 558, 155);
+            Rectangle(Ghdc, 558, 130, 583, 155);
+            Rectangle(Ghdc, 508, 105, 533, 130);
         break;
         case 6:
-            Rectangle(Ghdc, Pos.x + 193, Pos.y - 265, Pos.x + 218, 130);
-            Rectangle(Ghdc, Pos.x + 218, 130, Pos.x + 243, 155);
-            Rectangle(Ghdc, Pos.x + 243, 130, Pos.x + 268, 155);
-            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, 130);
+            Rectangle(Ghdc, 508, 105, 533, 130);
+            Rectangle(Ghdc, 533, 130, 558, 155);
+            Rectangle(Ghdc, 558, 130, 583, 155);
+            Rectangle(Ghdc, 533, 105, 558, 130);
         break;
         case 7:
-            Rectangle(Ghdc, Pos.x + 193, 130, Pos.x + 218, 155);
-            Rectangle(Ghdc, Pos.x + 218, 130, Pos.x + 243, 155);
-            Rectangle(Ghdc, Pos.x + 243, Pos.y - 265, Pos.x + 268, 130);
-            Rectangle(Ghdc, Pos.x + 218, Pos.y - 265, Pos.x + 243, 130);
+            Rectangle(Ghdc, 508, 130, 533, 155);
+            Rectangle(Ghdc, 533, 130, 558, 155);
+            Rectangle(Ghdc, 558, 105, 583, 130);
+            Rectangle(Ghdc, 533, 105, 558, 130);
         break;
     }
     int8 TempType;
@@ -274,46 +274,46 @@ void CBoard::RenderNext()
         switch(TempType)
         {
             case 1:
-                Rectangle(Ghdc, Pos.x + 190, Pos.y - 140 + (x*80), Pos.x + 210, Pos.y - 120 + (x*80));
-                Rectangle(Ghdc, Pos.x + 210, Pos.y - 140 + (x*80), Pos.x + 230, Pos.y - 120 + (x*80));
-                Rectangle(Ghdc, Pos.x + 230, Pos.y - 140 + (x*80), Pos.x + 250, Pos.y - 120 + (x*80));
-                Rectangle(Ghdc, Pos.x + 250, Pos.y - 140 + (x*80), Pos.x + 270, Pos.y - 120 + (x*80));
+                Rectangle(Ghdc, 505, 230 + (x*80), 525, 250 + (x*80));
+                Rectangle(Ghdc, 525, 230 + (x*80), 545, 250 + (x*80));
+                Rectangle(Ghdc, 545, 230 + (x*80), 565, 250 + (x*80));
+                Rectangle(Ghdc, 565, 230 + (x*80), 585, 250 + (x*80));
             break;
             case 2:
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, 515, 240 + (x*80), 535, 260 + (x*80));
+                Rectangle(Ghdc, 535, 240 + (x*80), 555, 260 + (x*80));
+                Rectangle(Ghdc, 555, 240 + (x*80), 575, 260 + (x*80));
+                Rectangle(Ghdc, 535, 220 + (x*80), 555, 240 + (x*80));
             break;
             case 3:
-                Rectangle(Ghdc, Pos.x + 210, Pos.y - 150 + (x*80), Pos.x + 230, Pos.y - 130 + (x*80));
-                Rectangle(Ghdc, Pos.x + 230, Pos.y - 150 + (x*80), Pos.x + 250, Pos.y - 130 + (x*80));
-                Rectangle(Ghdc, Pos.x + 210, Pos.y - 130 + (x*80), Pos.x + 230, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 230, Pos.y - 130 + (x*80), Pos.x + 250, Pos.y - 110 + (x*80));
+                Rectangle(Ghdc, 525, 220 + (x*80), 545, 240 + (x*80));
+                Rectangle(Ghdc, 545, 220 + (x*80), 565, 240 + (x*80));
+                Rectangle(Ghdc, 525, 240 + (x*80), 545, 260 + (x*80));
+                Rectangle(Ghdc, 545, 240 + (x*80), 565, 260 + (x*80));
             break;
             case 4:
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, 515, 240 + (x*80), 535, 260 + (x*80));
+                Rectangle(Ghdc, 535, 240 + (x*80), 555, 260 + (x*80));
+                Rectangle(Ghdc, 555, 240 + (x*80), 575, 260 + (x*80));
+                Rectangle(Ghdc, 555, 220 + (x*80), 575, 240 + (x*80));
             break;
             case 5:
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, 515, 240 + (x*80), 535, 260 + (x*80));
+                Rectangle(Ghdc, 535, 240 + (x*80), 555, 260 + (x*80));
+                Rectangle(Ghdc, 555, 240 + (x*80), 575, 260 + (x*80));
+                Rectangle(Ghdc, 515, 220 + (x*80), 535, 240 + (x*80));
             break;
             case 6:
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 150 + (x*80), Pos.x + 220, Pos.y - 130 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 130 + (x*80), Pos.x + 260, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, 515, 220 + (x*80), 535, 240 + (x*80));
+                Rectangle(Ghdc, 535, 240 + (x*80), 555, 260 + (x*80));
+                Rectangle(Ghdc, 555, 240 + (x*80), 575, 260 + (x*80));
+                Rectangle(Ghdc, 535, 220 + (x*80), 555, 240 + (x*80));
             break;
             case 7:
-                Rectangle(Ghdc, Pos.x + 200, Pos.y - 130 + (x*80), Pos.x + 220, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 130 + (x*80), Pos.x + 240, Pos.y - 110 + (x*80));
-                Rectangle(Ghdc, Pos.x + 240, Pos.y - 150 + (x*80), Pos.x + 260, Pos.y - 130 + (x*80));
-                Rectangle(Ghdc, Pos.x + 220, Pos.y - 150 + (x*80), Pos.x + 240, Pos.y - 130 + (x*80));
+                Rectangle(Ghdc, 515, 240 + (x*80), 535, 260 + (x*80));
+                Rectangle(Ghdc, 535, 240 + (x*80), 555, 260 + (x*80));
+                Rectangle(Ghdc, 555, 220 + (x*80), 575, 240 + (x*80));
+                Rectangle(Ghdc, 535, 220 + (x*80), 555, 240 + (x*80));
             break;
         }
     }
@@ -322,52 +322,52 @@ void CBoard::RenderHold()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
     SetDCBrushColor(Ghdc, RGB(48,48,48));
-    Rectangle(Ghdc, Pos.x - 179, Pos.y - 291, Pos.x - 281, Pos.y - 189);
+    Rectangle(Ghdc, 35, 80, 135, 180);
     SetDCBrushColor(Ghdc, Colors[HeldPiece]);
     SelectObject(Ghdc, Pens[0]);
     switch(HeldPiece)
     {
         case 1:
-            Rectangle(Ghdc, Pos.x - 180, Pos.y - 253, Pos.x - 205, Pos.y - 228);
-            Rectangle(Ghdc, Pos.x - 205, Pos.y - 253, Pos.x - 230, Pos.y - 228);
-            Rectangle(Ghdc, Pos.x - 230, Pos.y - 253, Pos.x - 255, Pos.y - 228);
-            Rectangle(Ghdc, Pos.x - 255, Pos.y - 253, Pos.x - 280, Pos.y - 228);
+            Rectangle(Ghdc, 135, 117, 110, 132);
+            Rectangle(Ghdc, 110, 117, 85, 132);
+            Rectangle(Ghdc, 85, 117, 60, 132);
+            Rectangle(Ghdc, 60, 117, 35, 132);
         break;
         case 2:
-            Rectangle(Ghdc, Pos.x - 193, 130, Pos.x - 218, 155);
-            Rectangle(Ghdc, Pos.x - 218, 130, Pos.x - 243, 155);
-            Rectangle(Ghdc, Pos.x - 243, 130, Pos.x - 268, 155);
-            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, 130);
+            Rectangle(Ghdc, 122, 130, 97, 155);
+            Rectangle(Ghdc, 97, 130, 72, 155);
+            Rectangle(Ghdc, 72, 130, 47, 155);
+            Rectangle(Ghdc, 97, 105, 72, 130);
         break;
         case 3:
-            Rectangle(Ghdc, Pos.x - 205, 130, Pos.x - 230, 155);
-            Rectangle(Ghdc, Pos.x - 230, 130, Pos.x - 255, 155);
-            Rectangle(Ghdc, Pos.x - 205, Pos.y - 265, Pos.x - 230, 130);
-            Rectangle(Ghdc, Pos.x - 230, Pos.y - 265, Pos.x - 255, 130);
+            Rectangle(Ghdc, 110, 130, 85, 155);
+            Rectangle(Ghdc, 85, 130, 60, 155);
+            Rectangle(Ghdc, 110, 105, 85, 130);
+            Rectangle(Ghdc, 85, 105, 60, 130);
         break;
         case 4:
-            Rectangle(Ghdc, Pos.x - 193, 130, Pos.x - 218, 155);
-            Rectangle(Ghdc, Pos.x - 218, 130, Pos.x - 243, 155);
-            Rectangle(Ghdc, Pos.x - 243, 130, Pos.x - 268, 155);
-            Rectangle(Ghdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, 130);
+            Rectangle(Ghdc, 122, 130, 97, 155);
+            Rectangle(Ghdc, 97, 130, 72, 155);
+            Rectangle(Ghdc, 72, 130, 47, 155);
+            Rectangle(Ghdc, 122, 105, 97, 130);
         break;
         case 5:
-            Rectangle(Ghdc, Pos.x - 193, 130, Pos.x - 218, 155);
-            Rectangle(Ghdc, Pos.x - 218, 130, Pos.x - 243, 155);
-            Rectangle(Ghdc, Pos.x - 243, 130, Pos.x - 268, 155);
-            Rectangle(Ghdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, 130);
+            Rectangle(Ghdc, 122, 130, 97, 155);
+            Rectangle(Ghdc, 97, 130, 72, 155);
+            Rectangle(Ghdc, 72, 130, 47, 155);
+            Rectangle(Ghdc, 72, 105, 47, 130);
         break;
         case 6:
-            Rectangle(Ghdc, Pos.x - 193, 130, Pos.x - 218, 155);
-            Rectangle(Ghdc, Pos.x - 218, 130, Pos.x - 243, 155);
-            Rectangle(Ghdc, Pos.x - 243, Pos.y - 265, Pos.x - 268, 130);
-            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, 130);
+            Rectangle(Ghdc, 122, 130, 97, 155);
+            Rectangle(Ghdc, 97, 130, 72, 155);
+            Rectangle(Ghdc, 72, 105, 47, 130);
+            Rectangle(Ghdc, 97, 105, 72, 130);
         break;
         case 7:
-            Rectangle(Ghdc, Pos.x - 193, Pos.y - 265, Pos.x - 218, 130);
-            Rectangle(Ghdc, Pos.x - 218, 130, Pos.x - 243, 155);
-            Rectangle(Ghdc, Pos.x - 243, 130, Pos.x - 268, 155);
-            Rectangle(Ghdc, Pos.x - 218, Pos.y - 265, Pos.x - 243, 130);
+            Rectangle(Ghdc, 122, 105, 97, 130);
+            Rectangle(Ghdc, 97, 130, 72, 155);
+            Rectangle(Ghdc, 72, 130, 47, 155);
+            Rectangle(Ghdc, 97, 105, 72, 130);
         break;
     }
 }
@@ -377,6 +377,6 @@ void CBoard::FlashLine(int8 Line)
     {
         SelectObject(Ghdc, Pens[0]);
         SetDCBrushColor(Ghdc, Colors[9]);
-        Rectangle(Ghdc, Pos.x-149+(x*30), Pos.y+266-(Line*30), Pos.x-120+(x*30), Pos.y+295-(Line*30));
+        DrawBlock(x, Line);
     }
 }
