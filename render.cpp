@@ -380,3 +380,23 @@ void CBoard::FlashLine(int8 Line)
         DrawBlock(x, Line);
     }
 }
+
+void RenderScreen(HWND hwnd)
+{
+    HDC hdc = GetDC(hwnd);
+    RECT ScreenRect;
+    POINT ScreenCenter, DrawPos;
+    GetClientRect(hwnd, &ScreenRect);
+    ScreenCenter.x = (ScreenRect.right - ScreenRect.left) >> 1;
+    ScreenCenter.y = (ScreenRect.bottom - ScreenRect.top) >> 1;
+    float ScreenRatio = (ScreenRect.right - ScreenRect.left) / (ScreenRect.bottom - ScreenRect.top);
+    if(ScreenRatio >= 1)//Draw area ratio
+    {
+        DrawPos.y = 0;
+        DrawPos.x = 
+    }else
+    {
+
+    }
+    ReleaseDC(hwnd, hdc);
+}
