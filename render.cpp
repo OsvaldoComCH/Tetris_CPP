@@ -40,15 +40,14 @@ const COLORREF ShadowColors[7] = {
 };
 void CBoard::RenderBkgd()
 {
-    /*RECT R;
-    GetClientRect(Ghwnd, &R);
-    FillRect(Ghdc, &R, CreateSolidBrush(RGB(128, 128, 128)));*/
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
     SelectObject(Ghdc, GetStockObject(NULL_PEN));
     SetDCBrushColor(Ghdc, RGB(128,128,128));
     Rectangle(Ghdc, 0, 0, 700, 700);
     
     SelectObject(Ghdc, GetStockObject(DC_PEN));
+    
+    SetDCBrushColor(Ghdc, RGB(255,255,255));
 
     //Exterior
     Rectangle(Ghdc, 155, 25, 475, 675);//Matrix
@@ -61,32 +60,22 @@ void CBoard::RenderBkgd()
 
     //Interior
     SetDCBrushColor(Ghdc, RGB(48,48,48));
-    /*
-    Rectangle(Ghdc, 505, Pos.y - 170, 585, Pos.y + 150);//Next 5
-    Rectangle(Ghdc, Pos.x + 180, Pos.y - 290, Pos.x + 280, Pos.y - 190);//Next
-    Rectangle(Ghdc, Pos.x + 180, Pos.y + 210, Pos.x + 360, Pos.y + 260);//Points
-    Rectangle(Ghdc, Pos.x - 280, Pos.y - 290, 135, Pos.y - 190);//Hold
-    Rectangle(Ghdc, Pos.x - 280, Pos.y + 40, 135, Pos.y + 90);//Level
-    Rectangle(Ghdc, Pos.x - 280, Pos.y + 140, 135, Pos.y + 190);//Lines
-    SelectObject(Ghdc, GetStockObject(NULL_PEN));
-    Rectangle(Ghdc, Pos.x - 151, Pos.y - 336, Pos.x + 151, Pos.y + 296);//Matrix
-    SelectObject(Ghdc, GetStockObject(DC_PEN));
-    */
    
     SelectObject(Ghdc, GetStockObject(NULL_PEN));
     Rectangle(Ghdc, 164, 34, 466, 666);//Matrix
     SelectObject(Ghdc, GetStockObject(DC_PEN));
-    Rectangle(Ghdc, 495, 80, 595, 180);//Next
+    Rectangle(Ghdc, 494, 79, 596, 181);//Next
     Rectangle(Ghdc, 505, 200, 585, 520);//Next 5
     Rectangle(Ghdc, 495, 580, 665, 630);//Points
-    Rectangle(Ghdc, 35, 80, 135, 180);//Hold
+    Rectangle(Ghdc, 34, 79, 136, 181);//Hold
     Rectangle(Ghdc, 35, 410, 135, 460);//Level
     Rectangle(Ghdc, 35, 510, 135, 560);//Lines
 
-
     //Text
     SelectObject(Ghdc, Font);
+    SetTextAlign(Ghdc, TA_LEFT);
     SetBkColor(Ghdc, RGB(128, 128, 128));
+    SetTextColor(Ghdc, RGB(0,0,0));
     TextOut(Ghdc, 513, 40, L"NEXT", 4);
     TextOut(Ghdc, 53, 40, L"HOLD", 4);
     TextOut(Ghdc, 495, 540, L"POINTS", 6);
@@ -131,25 +120,11 @@ void CBoard::RenderPiece(bool Spawn)
         for(int8 i = 0; i < 4; ++i)
         {
             if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
-            /*Rectangle(
-                Ghdc,
-                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
-                Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
-                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
-                Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
-            );*/
             DrawBlock(RenderX + RenderBlock.Pos[i][0], RenderY + RenderBlock.Pos[i][1]);
         }
         for(int8 i = 0; i < 4; ++i)
         {
             if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
-            /*Rectangle(
-                Ghdc,
-                Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
-                Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
-                Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
-                Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
-            );*/
             DrawBlock(RenderX + RenderBlock.Pos[i][0], ShadowY + RenderBlock.Pos[i][1]);
         }
     }
@@ -172,13 +147,6 @@ void CBoard::RenderPiece(bool Spawn)
     for(int8 i = 0; i < 4; ++i)
     {
         if(ShadowY + RenderBlock.Pos[i][1] > 20){continue;}
-        /*Rectangle(
-            Ghdc,
-            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
-            Pos.y+266-((ShadowY + RenderBlock.Pos[i][1])*30),
-            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
-            Pos.y+295-((ShadowY + RenderBlock.Pos[i][1])*30)
-        );*/
         DrawBlock(RenderX + RenderBlock.Pos[i][0], ShadowY + RenderBlock.Pos[i][1]);
     }
     SelectObject(Ghdc, Pens[0]);
@@ -186,13 +154,6 @@ void CBoard::RenderPiece(bool Spawn)
     for(int8 i = 0; i < 4; ++i)
     {
         if(RenderY + RenderBlock.Pos[i][1] > 20){continue;}
-        /*Rectangle(
-            Ghdc,
-            Pos.x-149+((RenderX + RenderBlock.Pos[i][0])*30),
-            Pos.y+266-((RenderY + RenderBlock.Pos[i][1])*30),
-            Pos.x-120+((RenderX + RenderBlock.Pos[i][0])*30),
-            Pos.y+295-((RenderY + RenderBlock.Pos[i][1])*30)
-        );*/
         DrawBlock(RenderX + RenderBlock.Pos[i][0], RenderY + RenderBlock.Pos[i][1]);
     }
 }
@@ -215,8 +176,9 @@ void CBoard::FlashPiece()
 void CBoard::RenderNext()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SelectObject(Ghdc, GetStockObject(DC_PEN));
     SetDCBrushColor(Ghdc, RGB(48,48,48));
-    Rectangle(Ghdc, 495, 80, 595, 180);//Next
+    Rectangle(Ghdc, 494, 79, 596, 181);//Next
     Rectangle(Ghdc, 505, 200, 585, 520);//Next 5
     SetDCBrushColor(Ghdc, Colors[NextPieces[NextPointer]]);
     SelectObject(Ghdc, Pens[0]);
@@ -321,17 +283,18 @@ void CBoard::RenderNext()
 void CBoard::RenderHold()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SelectObject(Ghdc, GetStockObject(DC_PEN));
     SetDCBrushColor(Ghdc, RGB(48,48,48));
-    Rectangle(Ghdc, 35, 80, 135, 180);
+    Rectangle(Ghdc, 34, 79, 136, 181);
     SetDCBrushColor(Ghdc, Colors[HeldPiece]);
     SelectObject(Ghdc, Pens[0]);
     switch(HeldPiece)
     {
         case 1:
-            Rectangle(Ghdc, 135, 117, 110, 132);
-            Rectangle(Ghdc, 110, 117, 85, 132);
-            Rectangle(Ghdc, 85, 117, 60, 132);
-            Rectangle(Ghdc, 60, 117, 35, 132);
+            Rectangle(Ghdc, 135, 117, 110, 142);
+            Rectangle(Ghdc, 110, 117, 85, 142);
+            Rectangle(Ghdc, 85, 117, 60, 142);
+            Rectangle(Ghdc, 60, 117, 35, 142);
         break;
         case 2:
             Rectangle(Ghdc, 122, 130, 97, 155);
@@ -386,17 +349,27 @@ void RenderScreen(HWND hwnd)
     HDC hdc = GetDC(hwnd);
     RECT ScreenRect;
     POINT ScreenCenter, DrawPos;
+    SetStretchBltMode(hdc, HALFTONE);
     GetClientRect(hwnd, &ScreenRect);
-    ScreenCenter.x = (ScreenRect.right - ScreenRect.left) >> 1;
-    ScreenCenter.y = (ScreenRect.bottom - ScreenRect.top) >> 1;
-    float ScreenRatio = (ScreenRect.right - ScreenRect.left) / (ScreenRect.bottom - ScreenRect.top);
+    int Width = ScreenRect.right - ScreenRect.left;
+    int Height = ScreenRect.bottom - ScreenRect.top;
+    ScreenCenter.x = Width >> 1;
+    ScreenCenter.y = Height >> 1;
+    if(!Height){Height = 1;}
+    float ScreenRatio = Width / Height;
     if(ScreenRatio >= 1)//Draw area ratio
     {
         DrawPos.y = 0;
-        DrawPos.x = 
+        DrawPos.x = ScreenCenter.x - ScreenCenter.y;
+        StretchBlt(hdc, DrawPos.x, DrawPos.y, Height, Height,
+        Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }else
     {
-
+        DrawPos.x = 0;
+        DrawPos.y = ScreenCenter.y - ScreenCenter.x;
+        StretchBlt(hdc, DrawPos.x, DrawPos.y, Width, Width,
+        Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }
+
     ReleaseDC(hwnd, hdc);
 }

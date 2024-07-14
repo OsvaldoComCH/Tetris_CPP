@@ -184,7 +184,7 @@ void CBoard::Input()
         {
             Phys.RCCW = true;
         }
-        
+        RenderScreen(Ghwnd);
         WaitForSingleObject(Timer, INFINITE);
         
         ReleaseDC(Ghwnd, hdc);

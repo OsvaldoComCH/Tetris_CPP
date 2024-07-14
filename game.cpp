@@ -209,7 +209,7 @@ int8 CBoard::RotatePiece(bool Dir)
 }
 void CBoard::LockPiece()
 {
-    FlashPiece();
+    //FlashPiece();
     for(int8 i = 0; i < 4; ++i)
     {
         Matrix[Piece.Position[1]+Piece.Block.Pos[i][1]][Piece.Position[0]+Piece.Block.Pos[i][0]]=Piece.Type;
@@ -246,7 +246,7 @@ void CBoard::ClearLines()
             }
         }
     }
-    Sleep(100);
+    //Sleep(100);
     RenderLines();
     RenderMatrix();
 }
@@ -279,6 +279,7 @@ int8 CBoard::SpawnPiece()
     RenderPiece(1);
     if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
     {
+        SendMessage(Ghwnd, WM_CLOSE, 0, 0);
         return 1;
     }
     AutoLock(1);
