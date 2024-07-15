@@ -344,13 +344,13 @@ void CBoard::FlashLine(int8 Line)
     }
 }
 
-void RenderScreen(HWND hwnd)
+void RenderScreen()
 {
-    HDC hdc = GetDC(hwnd);
+    HDC hdc = GetDC(Ghwnd);
     RECT ScreenRect;
     POINT ScreenCenter, DrawPos;
     SetStretchBltMode(hdc, HALFTONE);
-    GetClientRect(hwnd, &ScreenRect);
+    GetClientRect(Ghwnd, &ScreenRect);
     int Width = ScreenRect.right - ScreenRect.left;
     int Height = ScreenRect.bottom - ScreenRect.top;
     ScreenCenter.x = Width >> 1;
@@ -371,5 +371,5 @@ void RenderScreen(HWND hwnd)
         Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }
 
-    ReleaseDC(hwnd, hdc);
+    ReleaseDC(Ghwnd, hdc);
 }

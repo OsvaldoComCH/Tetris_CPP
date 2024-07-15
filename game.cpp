@@ -312,6 +312,7 @@ void CBoard::Hold()
 }
 void CBoard::StartGame()
 {
+    InitMatrix();
     GenBag(0);
     GenBag(1);
     RenderMatrix();

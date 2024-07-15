@@ -155,7 +155,6 @@ class CMenu
 class CBoard
 {
     public:
-    POINT Pos;
     int8 Matrix[40][10];
     int8 NextPieces[14];
     int8 NextPointer = 0;
@@ -191,13 +190,6 @@ class CBoard
 
     int8 SpawnPiece();
     void Hold();
-    void GetMatrixPos()
-    {
-        RECT r;
-        GetWindowRect(Ghwnd, &r);
-        Pos.x = (r.right - r.left)/2;
-        Pos.y = (r.bottom - r.top)/2;
-    }
     void GenBag(bool Bag)
     {
         int8 ptypes = 0, next;
@@ -221,7 +213,7 @@ class CBoard
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || (unsigned) (XPos+Blk.Pos[i][0]) > 9
-            || (YPos+Blk.Pos[i][1]) & 0x80)
+            || (YPos+Blk.Pos[i][1]) < 0)
             {
                 return 1;
             }
@@ -233,7 +225,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || (YPos+Blk.Pos[i][1]) & 0x80)
+            || (YPos+Blk.Pos[i][1]) < 0)
             {
                 return 1;
             }
@@ -245,7 +237,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || (XPos+Blk.Pos[i][0]) & 0x80)
+            || (XPos+Blk.Pos[i][0]) < 0)
             {
                 return 1;
             }
@@ -345,9 +337,8 @@ class CBoard
     void FlashLine(int8 Line);
     void RenderHold();
 
-    CBoard()
+    void InitMatrix()
     {
-        GetMatrixPos();
         for(int8 i = 39; i >= 0; i--)
         {
             for(int8 j = 0; j < 10; ++j)
@@ -355,6 +346,10 @@ class CBoard
                 this->Matrix[i][j] = 0;
             }
         }
+    }
+    CBoard()
+    {
+        
     };
 };
 
