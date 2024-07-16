@@ -20,7 +20,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             Player1.Pause();
         break;
         case WM_SETFOCUS:
-            if(Player1.Mode == 2)
+            if(CBoard::Mode == 2)
             {
                 Player1.Resume();
                 std::thread (CBoard::Input, &Player1).detach();

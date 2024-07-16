@@ -38,6 +38,7 @@ const COLORREF ShadowColors[7] = {
     RGB(112,72,72),
     RGB(72,112,72)
 };
+
 void CBoard::RenderBkgd()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -87,6 +88,7 @@ void CBoard::RenderBkgd()
     RenderNext();
     RenderPiece(0);
 }
+
 void CBoard::RenderLines()
 {
     SelectObject(Ghdc, Font2);
@@ -96,6 +98,7 @@ void CBoard::RenderLines()
     wstring WLines = std::to_wstring(Lines);
     TextOut(Ghdc, 125, 517, WLines.c_str(), WLines.length());
 }
+
 void CBoard::RenderMatrix()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -110,6 +113,7 @@ void CBoard::RenderMatrix()
         }
     }
 }
+
 void CBoard::RenderPiece(bool Spawn)
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -157,6 +161,7 @@ void CBoard::RenderPiece(bool Spawn)
         DrawBlock(RenderX + RenderBlock.Pos[i][0], RenderY + RenderBlock.Pos[i][1]);
     }
 }
+
 void CBoard::FlashPiece()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -173,6 +178,7 @@ void CBoard::FlashPiece()
         }
     }
 }
+
 void CBoard::RenderNext()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -280,6 +286,7 @@ void CBoard::RenderNext()
         }
     }
 }
+
 void CBoard::RenderHold()
 {
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
@@ -334,6 +341,7 @@ void CBoard::RenderHold()
         break;
     }
 }
+
 void CBoard::FlashLine(int8 Line)
 {
     for(int8 x = 0; x < 10; ++x)
@@ -369,6 +377,18 @@ void RenderScreen()
         DrawPos.y = ScreenCenter.y - ScreenCenter.x;
         StretchBlt(hdc, DrawPos.x, DrawPos.y, Width, Width,
         Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
+    }
+
+    if(CBoard::Mode == 2)
+    {
+        HDC PauseDC = CreateCompatibleDC(hdc);
+        HBITMAP Bitmap = CreateCompatibleBitmap(hdc, 240, 320);
+        SelectObject(PauseDC, Bitmap);
+
+        RECT ScreenRect;
+        GetClientRect(Ghwnd, &ScreenRect);
+        DeleteObject(Bitmap);
+        DeleteDC(PauseDC);
     }
 
     ReleaseDC(Ghwnd, hdc);

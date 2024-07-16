@@ -162,7 +162,7 @@ class CBoard
     int8 HeldPiece = 0;
     bool CanHold;
     CPiece Piece;
-    int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
+    static int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
@@ -322,7 +322,7 @@ class CBoard
     void StartGame();
     HDC Ghdc;
     HBITMAP DCBitmap;
-    inline void DrawBlock(int x, int y)
+    static inline void DrawBlock(int x, int y)
     {
         Rectangle(Ghdc, 166+(x*30), 636-(y*30), 195+(x*30), 665-(y*30));
     };

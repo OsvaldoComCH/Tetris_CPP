@@ -231,7 +231,7 @@ void CBoard::ClearLines()
             Matrix[Piece.Position[1] + x][8] && Matrix[Piece.Position[1] + x][9])
             {
                 ++Lines;
-                FlashLine(Piece.Position[1] + x);
+                //FlashLine(Piece.Position[1] + x);
                 for(int8 i = (Piece.Position[1] + x); i < 39; ++i)
                 {
                     for(int8 j = 0; j < 10; ++j)
