@@ -312,9 +312,25 @@ void CBoard::Hold()
 }
 void CBoard::StartGame()
 {
+    NextPointer = 0;
+    Lines = 0;
+    Level = Menu.StartLevel;
+    HeldPiece = 0;
+    Phys.DropMult = 1;
+    Phys.DropLag = 0;
+    Phys.DASLag = 0;
+    Phys.LDAS = false;
+    Phys.RDAS = false;
+    Phys.LeftHeld = false;
+    Phys.RightHeld = false;
+    Phys.CanLeft = true;
+    Phys.CanRight = true;
+    Phys.Left = true;
+    Phys.Right = true;
     InitMatrix();
     GenBag(0);
     GenBag(1);
+
     RenderMatrix();
     SpawnPiece();
     Input();

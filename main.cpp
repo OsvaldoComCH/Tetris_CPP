@@ -17,13 +17,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
         case WM_KILLFOCUS:
-            Player1.Pause();
+            CMenu::Pause();
         break;
         case WM_SETFOCUS:
             if(CBoard::Mode == 2)
             {
-                Player1.Resume();
-                std::thread (CBoard::Input, &Player1).detach();
+                CMenu::Resume();
             }
         break;
         case WM_PAINT:

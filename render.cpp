@@ -379,17 +379,15 @@ void RenderScreen()
         Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }
 
-    if(CBoard::Mode == 2)
+    /*if(CBoard::Mode == 2)
     {
         HDC PauseDC = CreateCompatibleDC(hdc);
         HBITMAP Bitmap = CreateCompatibleBitmap(hdc, 240, 320);
         SelectObject(PauseDC, Bitmap);
 
-        RECT ScreenRect;
-        GetClientRect(Ghwnd, &ScreenRect);
         DeleteObject(Bitmap);
         DeleteDC(PauseDC);
-    }
+    }*/
 
     ReleaseDC(Ghwnd, hdc);
 }

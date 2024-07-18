@@ -116,8 +116,13 @@ class CPiece
 class CMenu
 {
     public:
-    int8 StartLevel = 1;
-    int8 MaxLevel = 25;
+    int8 StartLevel;
+    int8 MaxLevel;
+    CMenu()
+    {
+        StartLevel = 1;
+        MaxLevel = 25;
+    }
     inline void ChangeStartLevel()
     {
         if(StartLevel == 25)
@@ -150,6 +155,8 @@ class CMenu
             MaxLevel += 5;
         }
     }
+    static void Pause();
+    static void Resume();
 };
 
 class CBoard
@@ -157,32 +164,32 @@ class CBoard
     public:
     int8 Matrix[40][10];
     int8 NextPieces[14];
-    int8 NextPointer = 0;
-    int Lines = 0;
-    int8 HeldPiece = 0;
+    int8 NextPointer;
+    int Lines;
+    int8 Level;
+    int8 HeldPiece;
     bool CanHold;
     CPiece Piece;
+    CMenu Menu;
     static int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
         int DropSpeed;
-        int DropMult = 1;
-        int DASLag = 0, DropLag = 0;
+        int DropMult;
+        int DASLag, DropLag;
         bool HDrop, RCW, RCCW, Drop;
-        bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
-        bool CanLeft = true, CanRight = true, Left = true, Right = true;
+        bool LDAS, RDAS, LeftHeld, RightHeld;
+        bool CanLeft, CanRight, Left, Right;
     } Phys;
     time_point<system_clock, milliseconds> PauseTime;
 
     void Pause()
     {
-        Mode = 2;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
     }
     void Resume()
     {
-        Mode = 1;
         milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         Phys.DASDelay += Difference;
         Phys.DropDelay += Difference;
@@ -263,6 +270,16 @@ class CBoard
     void HardDrop();
     void LockPiece();
     void ClearLines();
+
+    void LevelUp()
+    {
+        if(Level == Menu.MaxLevel)
+        {
+            return;
+        }
+        ++Level;
+        
+    }
 
     int8 X, Y, R, MoveCount, TimerSet;
     time_point<system_clock, milliseconds> Timer;
@@ -354,3 +371,16 @@ class CBoard
 };
 
 CBoard Player1;
+
+
+static void CMenu::Pause()
+{
+    CBoard::Mode = 2;
+    Player1.Pause();
+}
+static void CMenu::Resume()
+{
+    CBoard::Mode = 1;
+    Player1.Resume();
+    std::thread (CBoard::Input, &Player1).detach();
+}
