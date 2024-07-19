@@ -107,20 +107,20 @@ void CBoard::Input()
             Phys.CanLeft = true;
             Phys.CanRight = true;
         }
-
+        /*
         if(Phys.Drop)
         {
             MoveDown();
             while(Phys.DropLag >= Phys.DropMult)
             {
-                MoveDown();
+                if(MoveDown()){break;}
                 Phys.DropLag -= Phys.DropMult;
             }
             Phys.Drop = false;
             Phys.DropDelay = CurrentTickTime;
         }else
         {
-            if(GetAsyncKeyState(VK_DOWN))
+            if(GetAsyncKeyState(VK_DOWN) && Level <= 20)
             {
                 Phys.DropMult = Phys.DropSpeed / 20;
             }else
@@ -135,6 +135,31 @@ void CBoard::Input()
                     Phys.DropLag = Phys.DropMult;
                 }
                 if(Phys.DropLag < 0){Phys.DropLag = 0;}
+                Phys.Drop = true;
+            }
+        }
+        */
+        if(Phys.Drop)
+        {
+            MoveDown();
+            while(Phys.DropLag >= Phys.DropSpeed)
+            {
+                if(MoveDown())
+                {
+                    Phys.DropLag %= Phys.DropSpeed;
+                    break;
+                }
+                Phys.DropLag -= Phys.DropSpeed;
+            }
+            Phys.Drop = false;
+            Phys.DropDelay = CurrentTickTime;
+        }else
+        {
+            if(duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
+            >= Phys.DropSpeed - Phys.DropLag)
+            {
+                Phys.DropLag = duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
+                - Phys.DropSpeed + Phys.DropLag;
                 Phys.Drop = true;
             }
         }
@@ -184,6 +209,7 @@ void CBoard::Input()
         {
             Phys.RCCW = true;
         }
+        Render();
         RenderScreen(Ghwnd);
         WaitForSingleObject(Timer, INFINITE);
         

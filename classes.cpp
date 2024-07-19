@@ -8,6 +8,16 @@
 #include <thread>
 #include <string>
 #include "./VirtualKeyCodes.h"
+
+#define RF_PIECESPAWN 1
+#define RF_PIECE 2
+#define RF_HOLD 4
+#define RF_NEXT 8
+#define RF_LINES 16
+#define RF_LEVEL 32
+#define RF_POINTS 64
+#define RF_MATRIX 128
+
 using namespace std;
 using namespace std::chrono;
 
@@ -175,7 +185,7 @@ class CBoard
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
-        int DropSpeed;
+        int DropSpeed;//Base interval between drops in microseconds
         int DropMult;
         int DASLag, DropLag;
         bool HDrop, RCW, RCCW, Drop;
@@ -264,36 +274,50 @@ class CBoard
         return 0;
     }
     int8 RotatePiece(bool Dir);//Direction: 0=CW, 1=CCW
-    void MoveDown();
+    bool MoveDown();
     void MoveLeft();
     void MoveRight();
     void HardDrop();
     void LockPiece();
     void ClearLines();
-
-    void LevelUp()
+    GetSpeed()
     {
-        if(Level == Menu.MaxLevel)
+        //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
+        static const SpeedTable[25] =
         {
-            return;
-        }
-        ++Level;
-        
+            1000000,
+            793000,
+            617796,
+            472729,
+            355197,
+            262004,
+            189677,
+            134735,
+            93882,
+            64152,
+            42976,
+            28218,
+            18153,
+            11439,
+            7059,
+            4264,
+            2520,
+            1457,
+            824,
+            455,
+            246,
+            130,
+            67,
+            34,
+            16
+        };
+        Phys.DropSpeed = SpeedTable[Level - 1];
     }
 
     int8 X, Y, R, MoveCount, TimerSet;
     time_point<system_clock, milliseconds> Timer;
-    void AutoLock(bool Spawn)
+    void AutoLock()
     {
-        if(Spawn)
-        {
-            X = Piece.Position[0];
-            Y = Piece.Position[1];
-            R = Piece.Rotation;
-            MoveCount = 15;
-            TimerSet = 0;
-            return;
-        }
         if(Y > Piece.Position[1])
         {
             MoveCount = 15;
@@ -346,6 +370,7 @@ class CBoard
     void RenderMatrix();
     void RenderLines();
     void RenderBkgd();
+    short RenderFlags;//Bkgd,Matrix,Points,Level,Lines,Next,Hold,Piece,PieceSpawn
     SBlock RenderBlock;
     int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
@@ -353,6 +378,8 @@ class CBoard
     void RenderNext();
     void FlashLine(int8 Line);
     void RenderHold();
+
+    void Render();
 
     void InitMatrix()
     {

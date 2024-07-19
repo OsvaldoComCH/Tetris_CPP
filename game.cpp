@@ -4,15 +4,17 @@ void CBoard::MoveDown()
     if(!CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-1))
     {
         Piece.Position[1]--;
-        RenderPiece(0);
+        RenderFlags |= RF_PIECE;
+        return 0;
     }
+    return 1;
 }
 void CBoard::MoveLeft()
 {
     if(!CollisionLeft(Piece.Block, Piece.Position[0]-1, Piece.Position[1]))
     {
         Piece.Position[0]--;
-        RenderPiece(0);
+        RenderFlags |= RF_PIECE;
     }
 }
 void CBoard::MoveRight()
@@ -20,7 +22,7 @@ void CBoard::MoveRight()
     if(!CollisionRight(Piece.Block, Piece.Position[0]+1, Piece.Position[1]))
     {
         ++Piece.Position[0];
-        RenderPiece(0);
+        RenderFlags |= RF_PIECE;
     }
 }
 void CBoard::HardDrop()
@@ -34,7 +36,7 @@ void CBoard::HardDrop()
         }
     }
     Piece.Position[1] -= i - 1;
-    RenderPiece(0);
+    RenderFlags |= RF_PIECE;
     LockPiece();
 }
 int8 CBoard::RotatePiece(bool Dir)
@@ -204,7 +206,7 @@ int8 CBoard::RotatePiece(bool Dir)
         return 1;
     }
     Piece.Block = TempBlock;
-    RenderPiece(0);
+    RenderFlags |= RF_PIECE;
     return 0;
 }
 void CBoard::LockPiece()
@@ -247,8 +249,13 @@ void CBoard::ClearLines()
         }
     }
     //Sleep(100);
-    RenderLines();
-    RenderMatrix();
+    RenderFlags |= RF_LINES;
+    RenderFlags |= RF_MATRIX;
+
+    if(Level < Menu.MaxLevel)
+    {
+        Level = Lines / 10 + Menu.StartLevel;
+    }
 }
 int8 CBoard::SpawnPiece()
 {
@@ -267,48 +274,56 @@ int8 CBoard::SpawnPiece()
     {
         NextPointer += 1;
     }
-    if(!CanHold){CanHold = true;}
+    CanHold = true;
 
     Phys.HDrop = false;
     Phys.RCW = false;
     Phys.RCCW = false;
     Phys.Drop = true;
-    Phys.DropSpeed = 1000;
 
-    RenderNext();
-    RenderPiece(1);
+    RenderFlags |= RF_NEXT;
+    RenderFlags |= RF_PIECESPAWN;
     if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
     {
         SendMessage(Ghwnd, WM_CLOSE, 0, 0);
         return 1;
     }
-    AutoLock(1);
+    X = Piece.Position[0];
+    Y = Piece.Position[1];
+    R = Piece.Rotation;
+    MoveCount = 15;
+    TimerSet = 0;
     return 0;
 }
-void CBoard::Hold()
+int8 CBoard::Hold()
 {
-    RenderMatrix();
+    RenderFlags |= RF_MATRIX;
     if(HeldPiece)
     {
         int8 Temp;
         Temp = HeldPiece;
         HeldPiece = Piece.Type;
-        RenderHold();
+        RenderFlags |= RF_HOLD;
         Piece = CPiece(Temp);
-        RenderPiece(1);
+        RenderFlags |= RF_PIECESPAWN;
         if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
         {
-            return;
+            return 1;
         }
-        AutoLock(1);
+        X = Piece.Position[0];
+        Y = Piece.Position[1];
+        R = Piece.Rotation;
+        MoveCount = 15;
+        TimerSet = 0;
         CanHold = false;
     }else
     {
         HeldPiece = Piece.Type;
-        RenderHold();
+        RenderFlags |= RF_HOLD;
         SpawnPiece();
         CanHold = false;
     }
+    return 0;
 }
 void CBoard::StartGame()
 {
@@ -327,11 +342,12 @@ void CBoard::StartGame()
     Phys.CanRight = true;
     Phys.Left = true;
     Phys.Right = true;
+    RenderFlags = 255;
     InitMatrix();
     GenBag(0);
     GenBag(1);
-
-    RenderMatrix();
+    GetSpeed();
     SpawnPiece();
+    Render();
     Input();
 }

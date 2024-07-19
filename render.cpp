@@ -352,6 +352,45 @@ void CBoard::FlashLine(int8 Line)
     }
 }
 
+void CBoard::Render()
+{
+    if(RenderFlags & RF_MATRIX)
+    {
+        RenderMatrix();
+    }
+    if(RenderFlags & RF_PIECESPAWN)
+    {
+        RenderPiece(1);
+    }
+    if(RenderFlags & RF_PIECE)
+    {
+        RenderPiece(0);
+    }
+    if(RenderFlags & RF_HOLD)
+    {
+        RenderHold();
+    }
+    if(RenderFlags & RF_NEXT)
+    {
+        RenderNext();
+    }
+    if(RenderFlags & RF_LINES)
+    {
+        RenderLines();
+    }
+    /*
+    if(RenderFlags & RF_LEVEL)
+    {
+        RenderLevel();
+    }
+    if(RenderFlags & RF_POINTS)
+    {
+        RenderPoints();
+    }
+    */
+    RenderFlags = 0;
+}
+
 void RenderScreen()
 {
     HDC hdc = GetDC(Ghwnd);
