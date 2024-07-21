@@ -44,7 +44,7 @@ void CBoard::RenderBkgd()
     SelectObject(Ghdc, GetStockObject(DC_BRUSH));
     SelectObject(Ghdc, GetStockObject(NULL_PEN));
     SetDCBrushColor(Ghdc, RGB(128,128,128));
-    Rectangle(Ghdc, 0, 0, 700, 700);
+    Rectangle(Ghdc, 0, 0, 701, 701);
     
     SelectObject(Ghdc, GetStockObject(DC_PEN));
     
@@ -84,6 +84,7 @@ void CBoard::RenderBkgd()
     TextOut(Ghdc, 35, 470, L"LINES", 5);
     
     RenderLines();
+    RenderLevel();
     RenderMatrix();
     RenderNext();
     RenderPiece(0);
@@ -97,6 +98,16 @@ void CBoard::RenderLines()
     SetTextColor(Ghdc, Colors[9]);
     wstring WLines = std::to_wstring(Lines);
     TextOut(Ghdc, 125, 517, WLines.c_str(), WLines.length());
+}
+
+void CBoard::RenderLevel()
+{
+    SelectObject(Ghdc, Font2);
+    SetTextAlign(Ghdc, TA_RIGHT);
+    SetBkColor(Ghdc, RGB(48,48,48));
+    SetTextColor(Ghdc, Colors[9]);
+    wstring WLevel = std::to_wstring(Level);
+    TextOut(Ghdc, 125, 417, WLevel.c_str(), WLevel.length());
 }
 
 void CBoard::RenderMatrix()
@@ -378,11 +389,11 @@ void CBoard::Render()
     {
         RenderLines();
     }
-    /*
     if(RenderFlags & RF_LEVEL)
     {
         RenderLevel();
     }
+    /*
     if(RenderFlags & RF_POINTS)
     {
         RenderPoints();

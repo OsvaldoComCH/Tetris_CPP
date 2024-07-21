@@ -17,12 +17,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
         case WM_KILLFOCUS:
-            CMenu::Pause();
+            Pause();
         break;
         case WM_SETFOCUS:
-            if(CBoard::Mode == 2)
+            if(Player1.GetMode() == 2)
             {
-                CMenu::Resume();
+                Resume();
             }
         break;
         case WM_PAINT:
@@ -34,7 +34,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             FillRect(hdc, &PS.rcPaint, hb);
             DeleteObject(hb);
             EndPaint(hwnd, &PS);
-            RenderScreen(hwnd);
+            RenderScreen();
         }
         break;
         case WM_CLOSE:
@@ -58,7 +58,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             Ghwnd = hwnd;
             InvalidateRect(hwnd, NULL, 1);
-            Player1.GetMatrixPos();
         }
         break;
         default:

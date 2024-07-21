@@ -1,5 +1,5 @@
 #include "input.cpp"
-void CBoard::MoveDown()
+bool CBoard::MoveDown()
 {
     if(!CollisionDown(Piece.Block, Piece.Position[0], Piece.Position[1]-1))
     {
@@ -255,7 +255,9 @@ void CBoard::ClearLines()
     if(Level < Menu.MaxLevel)
     {
         Level = Lines / 10 + Menu.StartLevel;
+        RenderFlags |= RF_LEVEL;
     }
+    GetSpeed();
 }
 int8 CBoard::SpawnPiece()
 {
@@ -327,6 +329,7 @@ int8 CBoard::Hold()
 }
 void CBoard::StartGame()
 {
+    Player1.SetMode(1);
     NextPointer = 0;
     Lines = 0;
     Level = Menu.StartLevel;

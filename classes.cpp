@@ -165,8 +165,8 @@ class CMenu
             MaxLevel += 5;
         }
     }
-    static void Pause();
-    static void Resume();
+    //void Pause();
+    //void Resume();
 };
 
 class CBoard
@@ -181,11 +181,13 @@ class CBoard
     bool CanHold;
     CPiece Piece;
     CMenu Menu;
-    static int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
+    int8 Mode; //0-Menu, 1-Game, 2-Pause
+    void SetMode(int8 M){Mode = M;}
+    int8 GetMode(){return Mode;}
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
-        int DropSpeed;//Base interval between drops in microseconds
+        int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
         int DropMult;
         int DASLag, DropLag;
         bool HDrop, RCW, RCCW, Drop;
@@ -206,7 +208,7 @@ class CBoard
     }
 
     int8 SpawnPiece();
-    void Hold();
+    int8 Hold();
     void GenBag(bool Bag)
     {
         int8 ptypes = 0, next;
@@ -280,10 +282,10 @@ class CBoard
     void HardDrop();
     void LockPiece();
     void ClearLines();
-    GetSpeed()
+    void GetSpeed()
     {
         //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
-        static const SpeedTable[25] =
+        static const int SpeedTable[25] =
         {
             1000000,
             793000,
@@ -311,7 +313,8 @@ class CBoard
             34,
             16
         };
-        Phys.DropSpeed = SpeedTable[Level - 1];
+        Phys.DropSpeed[0] = SpeedTable[Level - 1];
+        Phys.DropSpeed[1] = SpeedTable[Level - 1] / 20 + 1;
     }
 
     int8 X, Y, R, MoveCount, TimerSet;
@@ -363,12 +366,13 @@ class CBoard
     void StartGame();
     HDC Ghdc;
     HBITMAP DCBitmap;
-    static inline void DrawBlock(int x, int y)
+    inline void DrawBlock(int x, int y)
     {
         Rectangle(Ghdc, 166+(x*30), 636-(y*30), 195+(x*30), 665-(y*30));
     };
     void RenderMatrix();
     void RenderLines();
+    void RenderLevel();
     void RenderBkgd();
     short RenderFlags;//Bkgd,Matrix,Points,Level,Lines,Next,Hold,Piece,PieceSpawn
     SBlock RenderBlock;
@@ -400,14 +404,14 @@ class CBoard
 CBoard Player1;
 
 
-static void CMenu::Pause()
+static void Pause()
 {
-    CBoard::Mode = 2;
+    Player1.SetMode(2);
     Player1.Pause();
 }
-static void CMenu::Resume()
+static void Resume()
 {
-    CBoard::Mode = 1;
+    Player1.SetMode(1);
     Player1.Resume();
     std::thread (CBoard::Input, &Player1).detach();
 }
