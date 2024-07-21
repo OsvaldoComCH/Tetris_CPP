@@ -2,7 +2,7 @@
 
 void CBoard::Input()
 {
-    Mode = 1;
+    bool DownHeld = 0;
     time_point<system_clock, milliseconds> CurrentTickTime;
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
@@ -110,35 +110,35 @@ void CBoard::Input()
         if(Phys.Drop)
         {
             MoveDown();
-            while(Phys.DropLag >= Phys.DropMult)
+            while(Phys.DropLag >= Phys.DropSpeed[DownHeld])
             {
-                MoveDown();
-                Phys.DropLag -= Phys.DropMult;
+                if(MoveDown())
+                {
+                    Phys.DropLag %= Phys.DropSpeed[DownHeld];
+                    break;
+                }
+                Phys.DropLag -= Phys.DropSpeed[DownHeld];
             }
             Phys.Drop = false;
             Phys.DropDelay = CurrentTickTime;
         }else
         {
-            if(GetAsyncKeyState(VK_DOWN))
+            DownHeld = (bool)GetAsyncKeyState(VK_DOWN);
+            if(duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
+            >= Phys.DropSpeed[DownHeld] - Phys.DropLag)
             {
-                Phys.DropMult = Phys.DropSpeed / 20;
-            }else
-            {
-                Phys.DropMult = Phys.DropSpeed;
-            }
-            if((CurrentTickTime - Phys.DropDelay).count() >= Phys.DropMult - Phys.DropLag)
-            {
-                Phys.DropLag = (CurrentTickTime - Phys.DropDelay).count() - Phys.DropMult + Phys.DropLag;
-                if(Phys.DropLag > Phys.DropMult)//Isso aqui é problema
+                Phys.DropLag = duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
+                - Phys.DropSpeed[DownHeld] + Phys.DropLag;
+                Phys.Drop = true;
+                if(Phys.DropLag > Phys.DropSpeed[DownHeld])
                 {
-                    Phys.DropLag = Phys.DropMult;
+                    Phys.DropLag = Phys.DropSpeed[DownHeld];
                 }
                 if(Phys.DropLag < 0){Phys.DropLag = 0;}
-                Phys.Drop = true;
             }
         }
 
-        AutoLock(0);
+        AutoLock();
 
         if(GetAsyncKeyState(VK_SPACE))
         {
@@ -184,6 +184,8 @@ void CBoard::Input()
             Phys.RCCW = true;
         }
         
+        Render();
+        RenderScreen();
         WaitForSingleObject(Timer, INFINITE);
     }
     CancelWaitableTimer(Timer);

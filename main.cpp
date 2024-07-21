@@ -7,27 +7,49 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
+        case WM_CREATE:
+        {
+            HDC hdc = GetDC(hwnd);
+            Player1.Ghdc = CreateCompatibleDC(hdc);
+            Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
+            SelectObject(Player1.Ghdc, Player1.DCBitmap);
+            ReleaseDC(hwnd, hdc);
+        }
+        break;
         case WM_KILLFOCUS:
-            Player1.Pause();
+            Pause();
         break;
         case WM_SETFOCUS:
-            if(Player1.Mode == 2)
+            if(Player1.GetMode() == 2)
             {
-                Player1.Resume();
-                std::thread (CBoard::Input, &Player1).detach();
+                Resume();
             }
         break;
         case WM_PAINT:
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
-            Player1.RenderBkgd(hdc);
+            Player1.RenderBkgd();
+            HBRUSH hb = CreateSolidBrush(RGB(128,128,128));
+            FillRect(hdc, &PS.rcPaint, hb);
+            DeleteObject(hb);
             EndPaint(hwnd, &PS);
+            RenderScreen();
         }
         break;
         case WM_CLOSE:
-            ReleaseDC(hwnd, Ghdc);
+        {
+            DeleteDC(Player1.Ghdc);
+            DeleteObject(Player1.DCBitmap);
+
+            DeleteObject(Font);
+            DeleteObject(Font2);
+            for(int i = 0; i < 9; ++i)
+            {
+                DeleteObject(Pens[i]);
+            }
             DestroyWindow(hwnd);
+        }
         break;
         case WM_DESTROY:
             PostQuitMessage(0);
@@ -36,7 +58,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             Ghwnd = hwnd;
             InvalidateRect(hwnd, NULL, 1);
-            Player1.GetMatrixPos();
         }
         break;
         default:
@@ -66,11 +87,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         WClassName,
         L"Tetris",
         WS_OVERLAPPEDWINDOW,
-        200, 10, 960, 720,
+        200, 0, 960, 735,
         NULL, NULL, hInstance, NULL
     );
     Ghwnd = hwnd;
-    Ghdc = GetDC(Ghwnd);
     if(hwnd == NULL)
     {
         MessageBox(NULL, L"Window Creation Failed", L"Error", MB_ICONERROR | MB_OK);

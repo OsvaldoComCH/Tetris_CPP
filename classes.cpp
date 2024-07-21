@@ -8,6 +8,16 @@
 #include <thread>
 #include <string>
 #include "./VirtualKeyCodes.h"
+
+#define RF_PIECESPAWN 1
+#define RF_PIECE 2
+#define RF_HOLD 4
+#define RF_NEXT 8
+#define RF_LINES 16
+#define RF_LEVEL 32
+#define RF_POINTS 64
+#define RF_MATRIX 128
+
 using namespace std;
 using namespace std::chrono;
 
@@ -19,7 +29,6 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
-HDC Ghdc; //Global handle to device context
 
 class CPiece
 {
@@ -117,8 +126,13 @@ class CPiece
 class CMenu
 {
     public:
-    int8 StartLevel = 1;
-    int8 MaxLevel = 25;
+    int8 StartLevel;
+    int8 MaxLevel;
+    CMenu()
+    {
+        StartLevel = 1;
+        MaxLevel = 25;
+    }
     inline void ChangeStartLevel()
     {
         if(StartLevel == 25)
@@ -151,54 +165,50 @@ class CMenu
             MaxLevel += 5;
         }
     }
+    //void Pause();
+    //void Resume();
 };
 
 class CBoard
 {
     public:
-    POINT Pos;
     int8 Matrix[40][10];
     int8 NextPieces[14];
-    int8 NextPointer = 0;
-    int Lines = 0;
-    int8 HeldPiece = 0;
+    int8 NextPointer;
+    int Lines;
+    int8 Level;
+    int8 HeldPiece;
     bool CanHold;
     CPiece Piece;
-    int8 Mode = 1; //0-Menu, 1-Game, 2-Pause
+    CMenu Menu;
+    int8 Mode; //0-Menu, 1-Game, 2-Pause
+    void SetMode(int8 M){Mode = M;}
+    int8 GetMode(){return Mode;}
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
-        unsigned int DropSpeed;
-        unsigned int DropMult = 1;
-        unsigned int DASLag = 0, DropLag = 0;
+        int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
+        int DropMult;
+        int DASLag, DropLag;
         bool HDrop, RCW, RCCW, Drop;
-        bool LDAS = false, RDAS = false, LeftHeld = false, RightHeld = false;
-        bool CanLeft = true, CanRight = true, Left = true, Right = true;
+        bool LDAS, RDAS, LeftHeld, RightHeld;
+        bool CanLeft, CanRight, Left, Right;
     } Phys;
     time_point<system_clock, milliseconds> PauseTime;
 
     void Pause()
     {
-        Mode = 2;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
     }
     void Resume()
     {
-        Mode = 1;
         milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         Phys.DASDelay += Difference;
         Phys.DropDelay += Difference;
     }
 
     int8 SpawnPiece();
-    void Hold();
-    void GetMatrixPos()
-    {
-        RECT r;
-        GetWindowRect(Ghwnd, &r);
-        Pos.x = (r.right - r.left)/2;
-        Pos.y = (r.bottom - r.top)/2;
-    }
+    int8 Hold();
     void GenBag(bool Bag)
     {
         int8 ptypes = 0, next;
@@ -222,7 +232,7 @@ class CBoard
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
             || (unsigned) (XPos+Blk.Pos[i][0]) > 9
-            || (YPos+Blk.Pos[i][1]) & 0x80)
+            || (YPos+Blk.Pos[i][1]) < 0)
             {
                 return 1;
             }
@@ -234,7 +244,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || (YPos+Blk.Pos[i][1]) & 0x80)
+            || (YPos+Blk.Pos[i][1]) < 0)
             {
                 return 1;
             }
@@ -246,7 +256,7 @@ class CBoard
         for(int8 i = 0; i < 4; ++i)
         {
             if(this->Matrix[YPos+Blk.Pos[i][1]][XPos+Blk.Pos[i][0]]
-            || (XPos+Blk.Pos[i][0]) & 0x80)
+            || (XPos+Blk.Pos[i][0]) < 0)
             {
                 return 1;
             }
@@ -266,26 +276,51 @@ class CBoard
         return 0;
     }
     int8 RotatePiece(bool Dir);//Direction: 0=CW, 1=CCW
-    void MoveDown();
+    bool MoveDown();
     void MoveLeft();
     void MoveRight();
     void HardDrop();
     void LockPiece();
     void ClearLines();
+    void GetSpeed()
+    {
+        //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
+        static const int SpeedTable[25] =
+        {
+            1000000,
+            793000,
+            617796,
+            472729,
+            355197,
+            262004,
+            189677,
+            134735,
+            93882,
+            64152,
+            42976,
+            28218,
+            18153,
+            11439,
+            7059,
+            4264,
+            2520,
+            1457,
+            824,
+            455,
+            246,
+            130,
+            67,
+            34,
+            16
+        };
+        Phys.DropSpeed[0] = SpeedTable[Level - 1];
+        Phys.DropSpeed[1] = SpeedTable[Level - 1] / 20 + 1;
+    }
 
     int8 X, Y, R, MoveCount, TimerSet;
     time_point<system_clock, milliseconds> Timer;
-    void AutoLock(bool Spawn)
+    void AutoLock()
     {
-        if(Spawn)
-        {
-            X = Piece.Position[0];
-            Y = Piece.Position[1];
-            R = Piece.Rotation;
-            MoveCount = 15;
-            TimerSet = 0;
-            return;
-        }
         if(Y > Piece.Position[1])
         {
             MoveCount = 15;
@@ -329,22 +364,29 @@ class CBoard
 
     void Input();
     void StartGame();
-
+    HDC Ghdc;
+    HBITMAP DCBitmap;
+    inline void DrawBlock(int x, int y)
+    {
+        Rectangle(Ghdc, 166+(x*30), 636-(y*30), 195+(x*30), 665-(y*30));
+    };
     void RenderMatrix();
     void RenderLines();
-    void RenderBkgd(HDC hdc);
+    void RenderLevel();
+    void RenderBkgd();
+    short RenderFlags;//Bkgd,Matrix,Points,Level,Lines,Next,Hold,Piece,PieceSpawn
     SBlock RenderBlock;
     int8 RenderX, RenderY, RenderR, ShadowY;
     void RenderPiece(bool Spawn);
-    //void RenderShadow(bool Spawn);
     void FlashPiece();
     void RenderNext();
     void FlashLine(int8 Line);
     void RenderHold();
 
-    CBoard()
+    void Render();
+
+    void InitMatrix()
     {
-        GetMatrixPos();
         for(int8 i = 39; i >= 0; i--)
         {
             for(int8 j = 0; j < 10; ++j)
@@ -352,7 +394,24 @@ class CBoard
                 this->Matrix[i][j] = 0;
             }
         }
+    }
+    CBoard()
+    {
+        
     };
 };
 
 CBoard Player1;
+
+
+static void Pause()
+{
+    Player1.SetMode(2);
+    Player1.Pause();
+}
+static void Resume()
+{
+    Player1.SetMode(1);
+    Player1.Resume();
+    std::thread (CBoard::Input, &Player1).detach();
+}
