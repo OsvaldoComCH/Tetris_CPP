@@ -7,8 +7,7 @@ void CBoard::Input()
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
     DueTime.QuadPart = -160000;
-    SetWaitableTimer(Timer, &DueTime, 10, NULL, NULL, 0);
-    //SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
+    SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
 
     while(Mode == 1)
     {
