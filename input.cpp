@@ -130,10 +130,10 @@ void CBoard::Input()
                 Phys.DropLag = duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
                 - Phys.DropSpeed[DownHeld] + Phys.DropLag;
                 Phys.Drop = true;
-                if(Phys.DropLag > Phys.DropSpeed[DownHeld])
+                /*if(Phys.DropLag > Phys.DropSpeed[DownHeld])
                 {
                     Phys.DropLag = Phys.DropSpeed[DownHeld];
-                }
+                }*/
                 if(Phys.DropLag < 0){Phys.DropLag = 0;}
             }
         }
