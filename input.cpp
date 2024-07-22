@@ -7,7 +7,8 @@ void CBoard::Input()
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
     DueTime.QuadPart = -160000;
-    SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
+    SetWaitableTimer(Timer, &DueTime, 10, NULL, NULL, 0);
+    //SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
 
     while(Mode == 1)
     {
@@ -130,10 +131,10 @@ void CBoard::Input()
                 Phys.DropLag = duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
                 - Phys.DropSpeed[DownHeld] + Phys.DropLag;
                 Phys.Drop = true;
-                if(Phys.DropLag > Phys.DropSpeed[DownHeld])
+                /*if(Phys.DropLag > Phys.DropSpeed[DownHeld])
                 {
                     Phys.DropLag = Phys.DropSpeed[DownHeld];
-                }
+                }*/
                 if(Phys.DropLag < 0){Phys.DropLag = 0;}
             }
         }
