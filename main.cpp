@@ -14,26 +14,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
             SelectObject(Player1.Ghdc, Player1.DCBitmap);
             ReleaseDC(hwnd, hdc);
+            Player1.RenderBkgd();
         }
         break;
         case WM_KILLFOCUS:
-            Pause();
+        {
+            if(Player1.Mode == 1)
+            {
+                Pause();
+            }
+        }
         break;
         case WM_SETFOCUS:
-            if(Player1.GetMode() == 2)
-            {
-                Resume();
-            }
         break;
         case WM_PAINT:
         {
             PAINTSTRUCT PS;
             HDC hdc = BeginPaint(hwnd, &PS);
-            Player1.RenderBkgd();
             HBRUSH hb = CreateSolidBrush(RGB(128,128,128));
             FillRect(hdc, &PS.rcPaint, hb);
             DeleteObject(hb);
             EndPaint(hwnd, &PS);
+            Player1.RenderFlags = 255;
             RenderScreen();
         }
         break;
@@ -58,6 +60,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             Ghwnd = hwnd;
             InvalidateRect(hwnd, NULL, 1);
+        }
+        break;
+        case WM_SYSKEYDOWN:
+        {
+            if(wParam == VK_ESCAPE)
+            {
+                if(Player1.GetMode() == 1)
+                {
+                    Pause();
+                }else
+                if(Player1.GetMode() == 2)
+                {
+                    Resume();
+                }
+            }
         }
         break;
         default:

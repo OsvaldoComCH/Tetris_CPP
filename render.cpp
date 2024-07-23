@@ -83,11 +83,13 @@ void CBoard::RenderBkgd()
     TextOut(Ghdc, 35, 370, L"LEVEL", 5);
     TextOut(Ghdc, 35, 470, L"LINES", 5);
     
+    /*
     RenderLines();
     RenderLevel();
     RenderMatrix();
     RenderNext();
     RenderPiece(0);
+    */
 }
 
 void CBoard::RenderLines()
