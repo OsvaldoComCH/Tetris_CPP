@@ -2,7 +2,7 @@
 
 void CBoard::Input()
 {
-    bool DownHeld = 0;
+    bool DownHeld = 0, PrevDown = 0;
     time_point<system_clock, milliseconds> CurrentTickTime;
     HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
     LARGE_INTEGER DueTime;
@@ -124,16 +124,18 @@ void CBoard::Input()
         }else
         {
             DownHeld = (bool)GetAsyncKeyState(VK_DOWN);
+            if(DownHeld ^ PrevDown)
+            {
+                PrevDown = DownHeld;
+                Phys.DropLag = 0;
+                Phys.Drop = true;
+            }else
             if(duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
             >= Phys.DropSpeed[DownHeld] - Phys.DropLag)
             {
                 Phys.DropLag = duration_cast<microseconds>(CurrentTickTime - Phys.DropDelay).count()
                 - Phys.DropSpeed[DownHeld] + Phys.DropLag;
                 Phys.Drop = true;
-                /*if(Phys.DropLag > Phys.DropSpeed[DownHeld])
-                {
-                    Phys.DropLag = Phys.DropSpeed[DownHeld];
-                }*/
                 if(Phys.DropLag < 0){Phys.DropLag = 0;}
             }
         }
