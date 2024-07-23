@@ -62,7 +62,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             InvalidateRect(hwnd, NULL, 1);
         }
         break;
-        case WM_SYSKEYDOWN:
+        case WM_KEYDOWN:
         {
             if(wParam == VK_ESCAPE)
             {
