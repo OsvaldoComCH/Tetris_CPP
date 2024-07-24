@@ -35,7 +35,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             FillRect(hdc, &PS.rcPaint, hb);
             DeleteObject(hb);
             EndPaint(hwnd, &PS);
-            Player1.RenderFlags = 255;
+            //Player1.RenderFlags = 255;
             RenderScreen();
         }
         break;
@@ -66,14 +66,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             if(wParam == VK_ESCAPE)
             {
-                if(Player1.GetMode() == 1)
+                if(Player1.Mode == 1)
                 {
                     Pause();
                 }else
-                if(Player1.GetMode() == 2)
+                if(Player1.Mode == 2)
                 {
                     Resume();
                 }
+            }
+            if(wParam == VK_RETURN && Player1.Mode == 0)
+            {
+                
             }
         }
         break;

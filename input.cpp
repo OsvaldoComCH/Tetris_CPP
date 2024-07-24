@@ -13,7 +13,7 @@ void CBoard::Input()
     {
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
 
-        if(GetAsyncKeyState(VK_LEFT))
+        if(GetAsyncKeyState(VK_LEFT) & 0x8000)
         {
             if(Phys.CanLeft)
             {
@@ -60,7 +60,7 @@ void CBoard::Input()
             Phys.CanLeft = true;
         }
 
-        if(GetAsyncKeyState(VK_RIGHT))
+        if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
         {
             if(Phys.CanRight)
             {
@@ -123,7 +123,7 @@ void CBoard::Input()
             Phys.DropDelay = CurrentTickTime;
         }else
         {
-            DownHeld = (bool)GetAsyncKeyState(VK_DOWN);
+            DownHeld = (bool)(GetAsyncKeyState(VK_DOWN) & 0x8000);
             if(DownHeld ^ PrevDown)
             {
                 PrevDown = DownHeld;
@@ -142,7 +142,7 @@ void CBoard::Input()
 
         AutoLock();
 
-        if(GetAsyncKeyState(VK_SPACE))
+        if(GetAsyncKeyState(VK_SPACE) & 0x8000)
         {
             if(Phys.HDrop)
             {
@@ -155,12 +155,12 @@ void CBoard::Input()
             Phys.HDrop = true;
         }
 
-        if(GetAsyncKeyState(VK_C) && CanHold)
+        if(GetAsyncKeyState(VK_C) & 0x8000 && CanHold)
         {
             Hold();
         }
 
-        if(GetAsyncKeyState(VK_UP))
+        if(GetAsyncKeyState(VK_UP) & 0x8000)
         {
             if(Phys.RCW)
             {
@@ -173,7 +173,7 @@ void CBoard::Input()
             Phys.RCW = true;
         }
 
-        if(GetAsyncKeyState(VK_X))
+        if(GetAsyncKeyState(VK_X) & 0x8000)
         {
             if(Phys.RCCW)
             {

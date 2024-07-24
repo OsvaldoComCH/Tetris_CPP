@@ -287,7 +287,7 @@ int8 CBoard::SpawnPiece()
     RenderFlags |= RF_PIECESPAWN;
     if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
     {
-        Player1.SetMode(0);
+        Player1.Mode = 0;
         return 1;
     }
     X = Piece.Position[0];
@@ -310,7 +310,7 @@ int8 CBoard::Hold()
         RenderFlags |= RF_PIECESPAWN;
         if(CollisionFull(Piece.Block, Piece.Position[0], Piece.Position[1]))
         {
-            Player1.SetMode(0);
+            Player1.Mode = 0;
             return 1;
         }
         X = Piece.Position[0];
@@ -330,7 +330,7 @@ int8 CBoard::Hold()
 }
 void CBoard::StartGame()
 {
-    Player1.SetMode(1);
+    Player1.Mode = 1;
     NextPointer = 0;
     Lines = 0;
     Level = Menu.StartLevel;

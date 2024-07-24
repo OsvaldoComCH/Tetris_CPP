@@ -367,6 +367,7 @@ void CBoard::FlashLine(int8 Line)
 
 void CBoard::Render()
 {
+    RenderMutex.lock();
     if(RenderFlags & RF_MATRIX)
     {
         RenderMatrix();
@@ -402,6 +403,7 @@ void CBoard::Render()
     }
     */
     RenderFlags = 0;
+    RenderMutex.unlock();
 }
 
 void RenderScreen()

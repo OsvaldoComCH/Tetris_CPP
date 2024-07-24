@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 #include <string>
+#include <mutex>
 #include "./VirtualKeyCodes.h"
 
 #define RF_PIECESPAWN 1
@@ -29,6 +30,7 @@ typedef struct SBlock
 
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
+std::mutex RenderMutex;
 
 class CPiece
 {
@@ -182,8 +184,6 @@ class CBoard
     CPiece Piece;
     CMenu Menu;
     int8 Mode; //0-Menu, 1-Game, 2-Pause
-    void SetMode(int8 M){Mode = M;}
-    int8 GetMode(){return Mode;}
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
@@ -406,12 +406,12 @@ CBoard Player1;
 
 static void Pause()
 {
-    Player1.SetMode(2);
+    Player1.Mode = 2;
     Player1.Pause();
 }
 static void Resume()
 {
-    Player1.SetMode(1);
+    Player1.Mode = 1;
     Player1.Resume();
     std::thread (CBoard::Input, &Player1).detach();
 }
