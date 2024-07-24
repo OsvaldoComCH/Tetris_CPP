@@ -35,7 +35,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             FillRect(hdc, &PS.rcPaint, hb);
             DeleteObject(hb);
             EndPaint(hwnd, &PS);
-            //Player1.RenderFlags = 255;
+            Player1.RenderFlags = 255;
+            Player1.Render();
             RenderScreen();
         }
         break;
@@ -77,7 +78,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             }
             if(wParam == VK_RETURN && Player1.Mode == 0)
             {
-                std::thread (CBoard::StartGame, &Player1);
+                std::thread (CBoard::StartGame, &Player1).detach();
             }
         }
         break;
@@ -120,7 +121,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
     
-    std::thread (CBoard::StartGame, &Player1);
+    std::thread (CBoard::StartGame, &Player1).detach();
 
     FreeConsole();
     while(GetMessage(&Msg, NULL, 0, 0))

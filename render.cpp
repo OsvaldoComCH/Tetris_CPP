@@ -94,6 +94,10 @@ void CBoard::RenderBkgd()
 
 void CBoard::RenderLines()
 {
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(Ghdc, RGB(48,48,48));
+    SelectObject(Ghdc, GetStockObject(DC_PEN));
+    Rectangle(Ghdc, 35, 510, 135, 560);
     SelectObject(Ghdc, Font2);
     SetTextAlign(Ghdc, TA_RIGHT);
     SetBkColor(Ghdc, RGB(48,48,48));
@@ -104,6 +108,10 @@ void CBoard::RenderLines()
 
 void CBoard::RenderLevel()
 {
+    SelectObject(Ghdc, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(Ghdc, RGB(48,48,48));
+    SelectObject(Ghdc, GetStockObject(DC_PEN));
+    Rectangle(Ghdc, 35, 410, 135, 460);
     SelectObject(Ghdc, Font2);
     SetTextAlign(Ghdc, TA_RIGHT);
     SetBkColor(Ghdc, RGB(48,48,48));

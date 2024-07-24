@@ -330,7 +330,7 @@ int8 CBoard::Hold()
 }
 void CBoard::StartGame()
 {
-    Player1.Mode = 1;
+    Mode = 1;
     NextPointer = 0;
     Lines = 0;
     Level = Menu.StartLevel;
