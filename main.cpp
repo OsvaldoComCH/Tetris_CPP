@@ -77,7 +77,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             }
             if(wParam == VK_RETURN && Player1.Mode == 0)
             {
-                
+                std::thread (CBoard::StartGame, &Player1);
             }
         }
         break;
@@ -120,7 +120,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
     
-    std::thread TetrisGame(CBoard::StartGame, &Player1);
+    std::thread (CBoard::StartGame, &Player1);
 
     FreeConsole();
     while(GetMessage(&Msg, NULL, 0, 0))
