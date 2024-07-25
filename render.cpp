@@ -414,6 +414,16 @@ void CBoard::Render()
     RenderMutex.unlock();
 }
 
+void RenderPause(HDC hdc)
+{
+    //Box - 195, 155
+    //Button - 170/60
+    //Space - 35
+    HDC PauseDC = CreateCompatibleDC(hdc);
+    HBITMAP bmp = CreateCompatibleBitmap(hdc, 240, 390);
+    Rectangle(PauseDC, 1, 1, 240, 390);
+}
+
 void RenderScreen()
 {
     HDC hdc = GetDC(Ghwnd);
