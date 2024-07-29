@@ -167,8 +167,8 @@ class CMenu
             MaxLevel += 5;
         }
     }
-    //void Pause();
-    //void Resume();
+    static void Pause();
+    static void Resume();
 };
 
 class CBoard
@@ -183,7 +183,7 @@ class CBoard
     bool CanHold;
     CPiece Piece;
     CMenu Menu;
-    int8 Mode; //0-Menu, 1-Game, 2-Pause
+    static int8 Mode; //0-Menu, 1-Game, 2-Pause, 3-End
     struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
@@ -404,14 +404,14 @@ class CBoard
 CBoard Player1;
 
 
-static void Pause()
+void CMenu::Pause()
 {
-    Player1.Mode = 2;
+    CBoard::Mode = 2;
     Player1.Pause();
 }
-static void Resume()
+void CMenu::Resume()
 {
-    Player1.Mode = 1;
+    CBoard::Mode = 1;
     Player1.Resume();
     std::thread (CBoard::Input, &Player1).detach();
 }

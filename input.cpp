@@ -186,8 +186,6 @@ void CBoard::Input()
             Phys.RCCW = true;
         }
         
-        Render();
-        RenderScreen();
         WaitForSingleObject(Timer, INFINITE);
     }
     CancelWaitableTimer(Timer);

@@ -451,7 +451,7 @@ void RenderScreen()
         Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }
 
-    /*if(CBoard::Mode == 2)
+    if(CBoard::Mode == 2)
     {
         HDC PauseDC = CreateCompatibleDC(hdc);
         HBITMAP Bitmap = CreateCompatibleBitmap(hdc, 240, 320);
@@ -459,7 +459,33 @@ void RenderScreen()
 
         DeleteObject(Bitmap);
         DeleteDC(PauseDC);
-    }*/
+    }
 
     ReleaseDC(Ghwnd, hdc);
+}
+
+void RenderThread()
+{
+    HANDLE Timer = CreateWaitableTimer(NULL, false, NULL);
+    LARGE_INTEGER DueTime;
+    DueTime.QuadPart = -160000;
+    SetWaitableTimerEx(Timer, &DueTime, 10, NULL, NULL, NULL, 0);
+    while(1)
+    {
+        if(CBoard::Mode == 1)
+        {
+            if(Player1.RenderFlags)
+            {
+                Player1.Render();
+                RenderScreen();
+            }
+        }else
+        if(CBoard::Mode == 2)
+        {
+            
+        }
+        WaitForSingleObject(Timer, INFINITE);
+    }
+    CancelWaitableTimer(Timer);
+    CloseHandle(Timer);
 }

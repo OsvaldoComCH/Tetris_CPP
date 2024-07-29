@@ -19,7 +19,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         break;
         case WM_KILLFOCUS:
         {
-            if(Player1.Mode == 1)
+            if(CBoard::Mode == 1)
             {
                 Pause();
             }
@@ -67,17 +67,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             if(wParam == VK_ESCAPE)
             {
-                if(Player1.Mode == 1)
+                if(CBoard::Mode == 1)
                 {
                     Pause();
                 }else
-                if(Player1.Mode == 2)
+                if(CBoard::Mode == 2)
                 {
                     Resume();
                 }
             }
-            if(wParam == VK_RETURN && Player1.Mode == 0)
+            if(wParam == VK_RETURN && CBoard::Mode == 3)
             {
+                CBoard::Mode = 1;
                 std::thread (CBoard::StartGame, &Player1).detach();
             }
         }
@@ -121,7 +122,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
     
+    CBoard::Mode = 1;
     std::thread (CBoard::StartGame, &Player1).detach();
+    std::thread (RenderThread).detach();
 
     FreeConsole();
     while(GetMessage(&Msg, NULL, 0, 0))
