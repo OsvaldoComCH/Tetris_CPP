@@ -414,16 +414,6 @@ void CBoard::Render()
     RenderMutex.unlock();
 }
 
-void RenderPause(HDC hdc)
-{
-    //Box - 195, 155
-    //Button - 170/60
-    //Space - 35
-    HDC PauseDC = CreateCompatibleDC(hdc);
-    HBITMAP bmp = CreateCompatibleBitmap(hdc, 240, 390);
-    Rectangle(PauseDC, 1, 1, 240, 390);
-}
-
 void RenderScreen()
 {
     HDC hdc = GetDC(Ghwnd);
@@ -453,11 +443,27 @@ void RenderScreen()
 
     if(CBoard::Mode == 2)
     {
+        if(ScreenRatio >= 1)
+        {
+            CMenu::DrawArea.top = 0;
+            CMenu::DrawArea.left = ScreenCenter.x - ScreenCenter.y;
+            CMenu::DrawArea.bottom = Height;
+            CMenu::DrawArea.right = CMenu::DrawArea.left + Height;
+        }else
+        {
+            CMenu::DrawArea.left = 0;
+            CMenu::DrawArea.top = ScreenCenter.y - ScreenCenter.x;
+            CMenu::DrawArea.right = Width;
+            CMenu::DrawArea.bottom = CMenu::DrawArea.left + Width;
+        }
+        //Box - 195, 155
+        //Button - 170/60
+        //Space - 35
         HDC PauseDC = CreateCompatibleDC(hdc);
-        HBITMAP Bitmap = CreateCompatibleBitmap(hdc, 240, 320);
-        SelectObject(PauseDC, Bitmap);
+        HBITMAP bmp = CreateCompatibleBitmap(hdc, 240, 390);
+        Rectangle(PauseDC, 1, 1, 240, 390);
 
-        DeleteObject(Bitmap);
+        DeleteObject(bmp);
         DeleteDC(PauseDC);
     }
 

@@ -167,6 +167,7 @@ class CMenu
             MaxLevel += 5;
         }
     }
+    static RECT DrawArea;
     static void Pause();
     static void Resume();
 };
