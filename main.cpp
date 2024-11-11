@@ -1,5 +1,5 @@
 /* Compile:
-g++ main.cpp -o "Tetris_CPP.exe" -static -lpthread -std=c++11 -O2 -l gdi32 -static-libgcc -static-libstdc++
+g++ main.cpp -o "Tetris_CPP.exe" -static -lpthread -std=c++11 -O2 -lgdi32 -static-libgcc -static-libstdc++
 */
 #include "game.cpp"
 
@@ -21,7 +21,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             if(CBoard::Mode == 1)
             {
-                Pause();
+                CMenu::Pause();
             }
         }
         break;
@@ -69,11 +69,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             {
                 if(CBoard::Mode == 1)
                 {
-                    Pause();
+                    CMenu::Pause();
                 }else
                 if(CBoard::Mode == 2)
                 {
-                    Resume();
+                    CMenu::Resume();
                 }
             }
             if(wParam == VK_RETURN && CBoard::Mode == 3)
@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         WClassName,
         L"Tetris",
         WS_OVERLAPPEDWINDOW,
-        200, 0, 960, 735,
+        CW_USEDEFAULT, CW_USEDEFAULT, 960, 735,
         NULL, NULL, hInstance, NULL
     );
     Ghwnd = hwnd;
@@ -122,8 +122,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
     
-    CBoard::Mode = 1;
-    std::thread (CBoard::StartGame, &Player1).detach();
+    CBoard::Mode = 0;
+    //std::thread (CBoard::StartGame, &Player1).detach();
     std::thread (RenderThread).detach();
 
     FreeConsole();

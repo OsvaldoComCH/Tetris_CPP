@@ -28,6 +28,14 @@ typedef struct SBlock
     int8 Pos[4][2];
 } SBlock;
 
+typedef struct RenderObject
+{
+    int x;
+    int y;
+    int w;
+    int h;
+} RenderObject;
+
 std::minstd_rand RNG (system_clock::now().time_since_epoch().count());
 HWND Ghwnd; //Global handle to the window
 std::mutex RenderMutex;
@@ -167,10 +175,14 @@ class CMenu
             MaxLevel += 5;
         }
     }
+
+    static bool Redraw;
+    static COLORREF Color;
+
     static void Pause();
     static void Resume();
-
-    static void RenderMenu();
+    static RenderObject DrawArea;
+    static void RenderMenu(HDC hdc);
 };
 
 class CBoard
@@ -405,7 +417,10 @@ class CBoard
 };
 
 CBoard Player1;
-
+int8 CBoard::Mode;
+RenderObject CMenu::DrawArea;
+bool CMenu::Redraw = true;
+COLORREF CMenu::Color = RGB(255,0,0);
 
 void CMenu::Pause()
 {

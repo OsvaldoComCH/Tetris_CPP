@@ -427,36 +427,40 @@ void RenderScreen()
     ScreenCenter.y = Height >> 1;
     if(!Height){Height = 1;}
     float ScreenRatio = Width / Height;
-    if(ScreenRatio >= 1)//Draw area ratio
+    
+    if(CBoard::Mode == 1)
     {
-        DrawPos.y = 0;
-        DrawPos.x = ScreenCenter.x - ScreenCenter.y;
-        StretchBlt(hdc, DrawPos.x, DrawPos.y, Height, Height,
-        Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
+        if(ScreenRatio >= 1)//Draw area ratio
+        {
+            DrawPos.y = 0;
+            DrawPos.x = ScreenCenter.x - ScreenCenter.y;
+            StretchBlt(hdc, DrawPos.x, DrawPos.y, Height, Height,
+            Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
+        }else
+        {
+            DrawPos.x = 0;
+            DrawPos.y = ScreenCenter.y - ScreenCenter.x;
+            StretchBlt(hdc, DrawPos.x, DrawPos.y, Width, Width,
+            Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
+        }
     }else
-    {
-        DrawPos.x = 0;
-        DrawPos.y = ScreenCenter.y - ScreenCenter.x;
-        StretchBlt(hdc, DrawPos.x, DrawPos.y, Width, Width,
-        Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
-    }
-
-    /*
-    if(CBoard::Mode == 2)
+    if(CBoard::Mode == 0)
     {
         if(ScreenRatio >= 1)
         {
-            CMenu::DrawArea.top = 0;
-            CMenu::DrawArea.left = ScreenCenter.x - ScreenCenter.y;
-            CMenu::DrawArea.bottom = Height;
-            CMenu::DrawArea.right = CMenu::DrawArea.left + Height;
+            CMenu::DrawArea.y = 0;
+            CMenu::DrawArea.x = ScreenCenter.x - ScreenCenter.y;
+            CMenu::DrawArea.h = Height;
+            CMenu::DrawArea.w = Height;
         }else
         {
-            CMenu::DrawArea.left = 0;
-            CMenu::DrawArea.top = ScreenCenter.y - ScreenCenter.x;
-            CMenu::DrawArea.right = Width;
-            CMenu::DrawArea.bottom = CMenu::DrawArea.left + Width;
+            CMenu::DrawArea.x = 0;
+            CMenu::DrawArea.y = ScreenCenter.y - ScreenCenter.x;
+            CMenu::DrawArea.w = Width;
+            CMenu::DrawArea.h = Width;
         }
+        CMenu::RenderMenu(hdc);
+        /*
         //Box - 195, 155
         //Button - 170/60
         //Space - 35
@@ -466,8 +470,9 @@ void RenderScreen()
 
         DeleteObject(bmp);
         DeleteDC(PauseDC);
+        */
     }
-    */
+
     ReleaseDC(Ghwnd, hdc);
 }
 
@@ -487,9 +492,13 @@ void RenderThread()
                 RenderScreen();
             }
         }else
-        if(CBoard::Mode == 2)
+        if(CBoard::Mode == 0)
         {
-            
+            if(CMenu::Redraw)
+            {
+                RenderScreen();
+                CMenu::Redraw = false;
+            }
         }
         WaitForSingleObject(Timer, INFINITE);
     }
@@ -497,13 +506,17 @@ void RenderThread()
     CloseHandle(Timer);
 }
 
-void CMenu::RenderMenu()
+void CMenu::RenderMenu(HDC hdc)
 {
-    HDC hdc = GetDC(Ghwnd);
-    HDC Ghdc = CreateCompatibleDC(hdc);
+    HDC MenuDC = CreateCompatibleDC(hdc);
     HBITMAP DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
-    SelectObject(Ghdc, DCBitmap);
-    ReleaseDC(hwnd, hdc);
+    SelectObject(MenuDC, DCBitmap);
 
-    
+    SelectObject(MenuDC, GetStockObject(DC_BRUSH));
+    SetDCBrushColor(MenuDC, Color);
+    SelectObject(MenuDC, Pens[0]);
+
+    Rectangle(MenuDC, 1, 1, 699, 699);
+
+    StretchBlt(hdc, DrawArea.x, DrawArea.y, DrawArea.w, DrawArea.h, MenuDC, 0, 0, 700, 700, SRCCOPY);
 }
