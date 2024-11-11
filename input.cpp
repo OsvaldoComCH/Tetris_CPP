@@ -13,6 +13,19 @@ void CBoard::Input()
     {
         CurrentTickTime = time_point_cast<milliseconds>(system_clock::now());
 
+        if(GetAsyncKeyState(VK_SPACE) & 0x8000)
+        {
+            if(Phys.HDrop)
+            {
+                HardDrop();
+                Phys.HDrop = false;
+            }
+        }
+        else
+        {
+            Phys.HDrop = true;
+        }
+
         if(GetAsyncKeyState(VK_LEFT) & 0x8000)
         {
             if(Phys.CanLeft)
@@ -141,19 +154,6 @@ void CBoard::Input()
         }
 
         AutoLock();
-
-        if(GetAsyncKeyState(VK_SPACE) & 0x8000)
-        {
-            if(Phys.HDrop)
-            {
-                HardDrop();
-                Phys.HDrop = false;
-            }
-        }
-        else
-        {
-            Phys.HDrop = true;
-        }
 
         if(GetAsyncKeyState(VK_C) & 0x8000 && CanHold)
         {

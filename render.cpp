@@ -441,6 +441,7 @@ void RenderScreen()
         Player1.Ghdc, 0, 0, 700, 700, SRCCOPY);
     }
 
+    /*
     if(CBoard::Mode == 2)
     {
         if(ScreenRatio >= 1)
@@ -466,7 +467,7 @@ void RenderScreen()
         DeleteObject(bmp);
         DeleteDC(PauseDC);
     }
-
+    */
     ReleaseDC(Ghwnd, hdc);
 }
 
@@ -494,4 +495,15 @@ void RenderThread()
     }
     CancelWaitableTimer(Timer);
     CloseHandle(Timer);
+}
+
+void CMenu::RenderMenu()
+{
+    HDC hdc = GetDC(Ghwnd);
+    HDC Ghdc = CreateCompatibleDC(hdc);
+    HBITMAP DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
+    SelectObject(Ghdc, DCBitmap);
+    ReleaseDC(hwnd, hdc);
+
+    
 }

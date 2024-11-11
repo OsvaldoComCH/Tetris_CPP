@@ -167,9 +167,10 @@ class CMenu
             MaxLevel += 5;
         }
     }
-    static RECT DrawArea;
     static void Pause();
     static void Resume();
+
+    static void RenderMenu();
 };
 
 class CBoard
@@ -206,6 +207,7 @@ class CBoard
         milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         Phys.DASDelay += Difference;
         Phys.DropDelay += Difference;
+        Timer += Difference;
     }
 
     int8 SpawnPiece();
