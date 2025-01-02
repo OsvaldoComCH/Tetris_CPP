@@ -1,97 +1,40 @@
-/* Compile:
-g++ main.cpp -o "Tetris_CPP.exe" -static -lpthread -std=c++11 -O2 -l gdi32 -static-libgcc -static-libstdc++
-*/
-#include "game.cpp"
+#ifndef UNICODE
+#define UNICODE
+#endif
+
+#include <Windows.h>
+#include <fstream>
+#include "headers/Config.hpp"
+#include <iostream>
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     switch(Msg)
     {
-        case WM_CREATE:
-        {
-            HDC hdc = GetDC(hwnd);
-            Player1.Ghdc = CreateCompatibleDC(hdc);
-            Player1.DCBitmap = CreateCompatibleBitmap(hdc, 700, 700);
-            SelectObject(Player1.Ghdc, Player1.DCBitmap);
-            ReleaseDC(hwnd, hdc);
-            Player1.RenderBkgd();
-        }
-        break;
-        case WM_KILLFOCUS:
-        {
-            if(Player1.Mode == 1)
-            {
-                Pause();
-            }
-        }
-        break;
-        case WM_SETFOCUS:
-        break;
-        case WM_PAINT:
-        {
-            PAINTSTRUCT PS;
-            HDC hdc = BeginPaint(hwnd, &PS);
-            HBRUSH hb = CreateSolidBrush(RGB(128,128,128));
-            FillRect(hdc, &PS.rcPaint, hb);
-            DeleteObject(hb);
-            EndPaint(hwnd, &PS);
-            Player1.RenderFlags = 255;
-            Player1.Render();
-            RenderScreen();
-        }
-        break;
         case WM_CLOSE:
         {
-            DeleteDC(Player1.Ghdc);
-            DeleteObject(Player1.DCBitmap);
-
-            DeleteObject(Font);
-            DeleteObject(Font2);
-            for(int i = 0; i < 9; ++i)
-            {
-                DeleteObject(Pens[i]);
-            }
             DestroyWindow(hwnd);
         }
         break;
         case WM_DESTROY:
+        {
             PostQuitMessage(0);
-        break;
-        case WM_SIZE:
-        {
-            Ghwnd = hwnd;
-            InvalidateRect(hwnd, NULL, 1);
-        }
-        break;
-        case WM_KEYDOWN:
-        {
-            if(wParam == VK_ESCAPE)
-            {
-                if(Player1.Mode == 1)
-                {
-                    Pause();
-                }else
-                if(Player1.Mode == 2)
-                {
-                    Resume();
-                }
-            }
-            if(wParam == VK_RETURN && Player1.Mode == 0)
-            {
-                std::thread (CBoard::StartGame, &Player1).detach();
-            }
         }
         break;
         default:
+        {
             return DefWindowProc(hwnd, Msg, wParam, lParam);
+        }
     }
     return 0;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    const wchar_t WClassName[]  = L"WindowClass";
-    MSG Msg;
+    TetrisConfig Cfg;
+    ReadConfigFile(&Cfg);
+
+    const wchar_t * WClassName = L"WindowClass";
     WNDCLASS Window = {};
     Window.lpfnWndProc = WndProc;
     Window.hInstance = hInstance;
@@ -103,16 +46,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    //Get window client area
+    int w = 160 * (Cfg.WindowSize + 1);
+    int h = 120 * (Cfg.WindowSize + 1);
+
+    //Center window on screen
+    int x = (GetSystemMetrics(SM_CXSCREEN) - w) >> 1;
+    int y = (GetSystemMetrics(SM_CYSCREEN) - h) >> 1;
+
+    //Adjust window size for desired client area
+    RECT Area = {x, y, x + w, y + h};
+    AdjustWindowRectEx(&Area, (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX), false, 0);
+
     HWND hwnd = CreateWindowEx
     (
         0,
         WClassName,
-        L"Tetris",
-        WS_OVERLAPPEDWINDOW,
-        200, 0, 960, 735,
+        L"Tetris_CPP",
+        (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX),
+        Area.left, Area.top, Area.right - Area.left, Area.bottom - Area.top,
         NULL, NULL, hInstance, NULL
     );
-    Ghwnd = hwnd;
+
     if(hwnd == NULL)
     {
         MessageBox(NULL, L"Window Creation Failed", L"Error", MB_ICONERROR | MB_OK);
@@ -120,14 +75,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
-    
-    std::thread (CBoard::StartGame, &Player1).detach();
 
-    FreeConsole();
+    MSG Msg;
     while(GetMessage(&Msg, NULL, 0, 0))
     {
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
     }
+
     return 0;
 }

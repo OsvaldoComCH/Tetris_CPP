@@ -1,0 +1,1 @@
+g++ main.cpp -o .\bin\Tetris_CPP.exe -O2
