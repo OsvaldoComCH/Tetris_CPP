@@ -6,6 +6,7 @@
 #include <fstream>
 #include "headers/Config.hpp"
 #include <iostream>
+#include "menu/Menus.cpp"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
@@ -31,8 +32,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    TetrisConfig Cfg;
-    ReadConfigFile(&Cfg);
+    //Tetris::Config CFG;
+    ReadConfigFile(&CFG);
 
     const wchar_t * WClassName = L"WindowClass";
     WNDCLASS Window = {};
@@ -47,8 +48,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     //Get window client area
-    int w = 160 * (Cfg.WindowSize + 1);
-    int h = 120 * (Cfg.WindowSize + 1);
+    int w = 160 * (CFG.WindowSize + 1);
+    int h = 120 * (CFG.WindowSize + 1);
 
     //Center window on screen
     int x = (GetSystemMetrics(SM_CXSCREEN) - w) >> 1;

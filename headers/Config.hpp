@@ -1,5 +1,5 @@
-#ifndef TETRISCONFIG
-#define TETRISCONFIG
+#ifndef TETRIS::CONFIG
+#define TETRIS::CONFIG
 
 #include "VirtualKeyCodes.h"
 #include "VirtualKeyParser.hpp"
@@ -7,7 +7,10 @@
 #include <fstream>
 #include <string>
 
-typedef struct
+namespace Tetris
+{
+
+typedef struct Controls
 {
     int Left;
     int Right;
@@ -16,18 +19,20 @@ typedef struct
     int RCW;
     int RCCW;
     int Hold;
-} TetrisControls;
+} Controls;
 
-typedef struct TetrisConfig
+typedef struct Config
 {
     unsigned char WindowSize;
 
-    TetrisControls Controls;
-} TetrisConfig;
+    struct Controls Controls;
+} Config;
 
-static constexpr TetrisConfig DEFAULT_CONFIG = {4, {VK_LEFT, VK_RIGHT, VK_SPACE, VK_DOWN, VK_UP, VK_X, VK_C}};
+}
 
-void WriteConfigFile(const TetrisConfig * cfg)
+static constexpr Tetris::Config DEFAULT_CONFIG = {4, {VK_LEFT, VK_RIGHT, VK_SPACE, VK_DOWN, VK_UP, VK_X, VK_C}};
+
+void WriteConfigFile(const Tetris::Config * cfg)
 {
     using namespace std;
     fstream File("./settings.cfg", fstream::out | fstream::trunc);
@@ -81,7 +86,7 @@ void WriteConfigFile(const TetrisConfig * cfg)
     File << "Hold=" << Key << "\n";
 }
 
-void ReadConfigFile(TetrisConfig * cfg)
+void ReadConfigFile(Tetris::Config * cfg)
 {
     using namespace std;
     *cfg = DEFAULT_CONFIG;
