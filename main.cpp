@@ -10,11 +10,40 @@
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+    if(MenuStack::CurMenu)
+    {
+        MenuStack::CurMenu->EventLoop(hwnd, Msg, wParam, lParam);
+    }
     switch(Msg)
     {
         case WM_CLOSE:
         {
             DestroyWindow(hwnd);
+        }
+        break;
+        case WM_PAINT:
+        {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
+            
+            if(MenuStack::CurMenu)
+            {
+                MenuStack::CurMenu->Render(hdc);
+            }
+
+            EndPaint(hwnd, &ps);
+        }
+        break;
+        case WM_PRINT:
+        {
+            HDC hdc = GetDC(hwnd);
+            
+            if(MenuStack::CurMenu)
+            {
+                MenuStack::CurMenu->Render(hdc);
+            }
+
+            ReleaseDC(hwnd, hdc);
         }
         break;
         case WM_DESTROY:
@@ -48,8 +77,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     //Get window client area
-    int w = 160 * (CFG.WindowSize + 1);
-    int h = 120 * (CFG.WindowSize + 1);
+    int w = 160 * CFG.WindowSize;
+    int h = 120 * CFG.WindowSize;
 
     //Center window on screen
     int x = (GetSystemMetrics(SM_CXSCREEN) - w) >> 1;
@@ -74,6 +103,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         MessageBox(NULL, L"Window Creation Failed", L"Error", MB_ICONERROR | MB_OK);
         return 0;
     }
+
+    MenuStack::OpenMenu(Tetris::MenuType::MainMenu);
+
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
@@ -83,6 +115,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
     }
+
+    MenuStack::CloseMenu();
 
     return 0;
 }

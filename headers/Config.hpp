@@ -1,5 +1,5 @@
-#ifndef TETRIS::CONFIG
-#define TETRIS::CONFIG
+#ifndef TETRISCONFIG
+#define TETRISCONFIG
 
 #include "VirtualKeyCodes.h"
 #include "VirtualKeyParser.hpp"
@@ -30,7 +30,7 @@ typedef struct Config
 
 }
 
-static constexpr Tetris::Config DEFAULT_CONFIG = {4, {VK_LEFT, VK_RIGHT, VK_SPACE, VK_DOWN, VK_UP, VK_X, VK_C}};
+static constexpr Tetris::Config DEFAULT_CONFIG = {5, {VK_LEFT, VK_RIGHT, VK_SPACE, VK_DOWN, VK_UP, VK_X, VK_C}};
 
 void WriteConfigFile(const Tetris::Config * cfg)
 {
@@ -40,7 +40,7 @@ void WriteConfigFile(const Tetris::Config * cfg)
     if(!File.is_open()){return;}
 
     File << "[Window Settings]\n";
-    File << "WindowSize=" << (int)cfg->WindowSize << "\n\n";
+    File << "WindowSize=" << (int)cfg->WindowSize - 1 << "\n\n";
     File << "[Controls]\n";
 
     if(GetVKName(cfg->Controls.Left, &Key))
@@ -107,7 +107,7 @@ void ReadConfigFile(Tetris::Config * cfg)
             string Value = Line.substr(Divider + 1);
             if(Key.compare("WindowSize") == 0)
             {
-                cfg->WindowSize = stoi(Value);
+                cfg->WindowSize = stoi(Value) + 1;
             }else
             {
                 int Vk = GetVKFromString(&Value);
