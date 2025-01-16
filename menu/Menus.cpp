@@ -1,4 +1,5 @@
 #include "Classes.hpp"
+#include "../headers/Config.hpp"
 #include <stack>
 
 class MenuStack
@@ -56,12 +57,20 @@ namespace Tetris
             Label * Lbl = (Label *)Target;
             Lbl->Text.assign(std::to_wstring(Level));
         }
+        void OpenOptionsMenu(void * Target)
+        {
+            MenuStack::OpenMenu(MenuType::OptionsMenu);
+        }
+        void CloseCurrentMenu(void * Target)
+        {
+            MenuStack::CloseMenu();
+        }
     }
 
     Menu * Menu::CreateMainMenu()
     {
         Menu * M = new Menu(280, 100, 240, 390);
-        Label * Label1 = new Label(L"0", 120, 10);
+        Label * Label1 = new Label(L"Tetris_CPP", 120, 15);
 
         M->Labels.push_back(Label1);
 
@@ -81,8 +90,7 @@ namespace Tetris
             M->RenderArea.top,
             30, 120,
             180, 60,
-            BtnFunc::LabelIncrement,
-            Label1
+            BtnFunc::NumberIncrement
         ));
         M->Buttons.push_back(new Button
         (
@@ -91,7 +99,7 @@ namespace Tetris
             M->RenderArea.top,
             30, 210,
             180, 60,
-            BtnFunc::NumberIncrement
+            BtnFunc::OpenOptionsMenu
         ));
         M->Buttons.push_back(new Button
         (
@@ -101,6 +109,35 @@ namespace Tetris
             30, 300,
             180, 60,
             BtnFunc::NumberIncrement
+        ));
+
+        return M;
+    }
+    
+    Menu * Menu::CreateOptionsMenu()
+    {
+        Menu * M = new Menu(150, 50, 500, 500);
+        Label * Label1 = new Label(L"Options", 250, 30);
+
+        M->Labels.push_back(Label1);
+
+        std::wstring Key;
+        GetVKNameW(CFG.Controls.Left, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            50, 60, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        GetVKNameW(CFG.Controls.Right, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            50, 140, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        M->Buttons.push_back(new Button
+        (
+            L"Go Back", M->RenderArea.left, M->RenderArea.top,
+            160, 420, 180, 60, BtnFunc::CloseCurrentMenu
         ));
 
         return M;

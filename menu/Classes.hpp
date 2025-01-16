@@ -150,6 +150,13 @@ class Button : public RenderObject
         this->_OnClick = OnClick;
     }
 
+    Button(const wchar_t * Title, const wchar_t * Value, int ParentX, int ParentY,
+    int x, int y, int w, int h, void (*OnClick)(void *))
+    : Button(Title, ParentX, ParentY, x, y, w, h, OnClick)
+    {
+        this->Value = Value;
+    }
+
     Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
     void (*OnClick)(void *), void (*OnKeyPress)(void *, int))
     : Button(Title, ParentX, ParentY, x, y, w, h, OnClick)
@@ -176,15 +183,15 @@ enum MenuType
 {
     MainMenu,
     PauseMenu,
-    ControlsMenu
+    OptionsMenu
 };
 
 class Menu : public RenderObject
 {
     private:
     static Menu * CreateMainMenu();
-    static Menu * CreatePauseMenu(){return NULL;};
-    static Menu * CreateControlsMenu(){return NULL;};
+    static Menu * CreatePauseMenu(){return NULL;}
+    static Menu * CreateOptionsMenu();
     
     std::wstring Title;
 
@@ -267,8 +274,8 @@ class Menu : public RenderObject
             return CreateMainMenu();
             case PauseMenu:
             return CreatePauseMenu();
-            case ControlsMenu:
-            return CreateControlsMenu();
+            case OptionsMenu:
+            return CreateOptionsMenu();
             default:
             return NULL;
         }
@@ -276,6 +283,10 @@ class Menu : public RenderObject
 
     static void DestroyMenu(Menu * M)
     {
+        for(int i = 0; i < M->Labels.size(); ++i)
+        {
+            delete M->Labels[i];
+        }
         for(int i = 0; i < M->Buttons.size(); ++i)
         {
             delete M->Buttons[i];

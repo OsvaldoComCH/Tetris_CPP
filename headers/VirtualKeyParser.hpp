@@ -152,4 +152,60 @@ int GetVKName(int Vk, std::string * Str)
     return 0;
 }
 
+int GetVKNameW(int Vk, std::wstring * Str)
+{
+    if(Vk == VK_RETURN)
+    {
+        Str->assign(L"ENTER");
+    }else
+    if(Vk == VK_TAB)
+    {
+        Str->assign(L"TAB");
+    }else
+    if(Vk == VK_BACK)
+    {
+        Str->assign(L"BACK");
+    }else
+    if(Vk == VK_SHIFT)
+    {
+        Str->assign(L"SHIFT");
+    }else
+    if(Vk == VK_LEFT)
+    {
+        Str->assign(L"LEFT");
+    }else
+    if(Vk == VK_UP)
+    {
+        Str->assign(L"UP");
+    }else
+    if(Vk == VK_RIGHT)
+    {
+        Str->assign(L"RIGHT");
+    }else
+    if(Vk == VK_DOWN)
+    {
+        Str->assign(L"DOWN");
+    }else
+    if(Vk == VK_SPACE)
+    {
+        Str->assign(L"SPACE");
+    }else
+    if(Vk >= VK_NUMPAD0 && Vk <= VK_NUMPAD9)
+    {
+        wchar_t Text[8];
+        swprintf(Text, L"NUMPAD%i", Vk - VK_NUMPAD0);
+        Str->assign(Text);
+    }else
+    {
+        int Key = MapVirtualKeyEx(Vk, MAPVK_VK_TO_CHAR, GetKeyboardLayout(0));
+        if(Key)
+        {
+            Str->assign((wchar_t *) &Key);
+        }else
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
 #endif

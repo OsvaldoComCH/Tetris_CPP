@@ -25,7 +25,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
-            
+
+            FillRect(hdc, &ps.rcPaint, (HBRUSH)GetStockObject(DC_BRUSH));
+
             if(MenuStack::CurMenu)
             {
                 MenuStack::CurMenu->Render(hdc);
@@ -37,6 +39,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_PRINT:
         {
             HDC hdc = GetDC(hwnd);
+            RECT R;
+            GetClientRect(hwnd, &R);
+
+            FillRect(hdc, &R, (HBRUSH)GetStockObject(DC_BRUSH));
             
             if(MenuStack::CurMenu)
             {
