@@ -116,7 +116,7 @@ namespace Tetris
     
     Menu * Menu::CreateOptionsMenu()
     {
-        Menu * M = new Menu(150, 50, 500, 500);
+        Menu * M = new Menu(90, 50, 620, 500);
         Label * Label1 = new Label(L"Options", 250, 30);
 
         M->Labels.push_back(Label1);
@@ -126,18 +126,44 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            50, 60, 180, 60, BtnFunc::CloseCurrentMenu
+            20, 60, 180, 60, BtnFunc::CloseCurrentMenu
         ));
         GetVKNameW(CFG.Controls.Right, &Key);
         M->Buttons.push_back(new Button
         (
             L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            50, 140, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 60, 180, 60, BtnFunc::CloseCurrentMenu
         ));
+        GetVKNameW(CFG.Controls.SoftDrop, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            420, 60, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        GetVKNameW(CFG.Controls.RCW, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            20, 140, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        GetVKNameW(CFG.Controls.Right, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            220, 140, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        GetVKNameW(CFG.Controls.SoftDrop, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            420, 140, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+
+
         M->Buttons.push_back(new Button
         (
             L"Go Back", M->RenderArea.left, M->RenderArea.top,
-            160, 420, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 420, 180, 60, BtnFunc::CloseCurrentMenu
         ));
 
         return M;

@@ -15,7 +15,7 @@ namespace Tetris
 
 namespace Render
 {
-    HFONT DefFont = CreateFont(28, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+    HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
     OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
     void TetrisBlt(HDC DestDC, HDC SrcDC, RECT TransferArea)
@@ -96,6 +96,9 @@ class Button : public RenderObject
         );
         if(Value.empty())
         {
+            DrawText(hdc, Title.c_str(), Title.size(), &RenderArea,
+            DT_CENTER | DT_NOCLIP | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS);
+            /*
             TextOut
             (
                 hdc,
@@ -104,8 +107,12 @@ class Button : public RenderObject
                 Title.c_str(),
                 Title.size()
             );
+            */
         }else
         {
+            DrawText(hdc, (Title + L" " + Value).c_str(), Title.size() + Value.size() + 1, &RenderArea,
+            DT_CENTER | DT_NOCLIP | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS);
+            /*
             TextOut
             (
                 hdc,
@@ -114,6 +121,7 @@ class Button : public RenderObject
                 (Title + L" " + Value).c_str(),
                 Title.size() + Value.size() + 1
             );
+            */
         }
     }
 
@@ -215,7 +223,7 @@ class Menu : public RenderObject
             RenderArea.bottom - RenderArea.top
         );
         SelectObject(MenuDC, Bmp);
-        SetTextAlign(MenuDC, TA_CENTER);
+        //SetTextAlign(MenuDC, TA_CENTER);
         SelectObject(MenuDC, Render::DefFont);
         SelectObject(MenuDC, GetStockObject(DC_BRUSH));
 
