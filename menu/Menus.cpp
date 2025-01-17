@@ -117,53 +117,78 @@ namespace Tetris
     Menu * Menu::CreateOptionsMenu()
     {
         Menu * M = new Menu(90, 50, 620, 500);
-        Label * Label1 = new Label(L"Options", 250, 30);
+        Label * WndSizeLbl = new Label(std::to_wstring(CFG.WindowSize).c_str(), 310, 385);
 
-        M->Labels.push_back(Label1);
+        M->Labels.push_back(WndSizeLbl);
+        M->Labels.push_back(new Label(L"Options", 310, 30));
+        M->Labels.push_back(new Label(L"Window Size:", 310, 350));
 
         std::wstring Key;
         GetVKNameW(CFG.Controls.Left, &Key);
         M->Buttons.push_back(new Button
         (
             L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 60, 180, 60, BtnFunc::CloseCurrentMenu
+            20, 100, 180, 60, BtnFunc::CloseCurrentMenu
         ));
         GetVKNameW(CFG.Controls.Right, &Key);
         M->Buttons.push_back(new Button
         (
             L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 60, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 100, 180, 60, BtnFunc::CloseCurrentMenu
         ));
         GetVKNameW(CFG.Controls.SoftDrop, &Key);
         M->Buttons.push_back(new Button
         (
             L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 60, 180, 60, BtnFunc::CloseCurrentMenu
+            420, 100, 180, 60, BtnFunc::CloseCurrentMenu
         ));
         GetVKNameW(CFG.Controls.RCW, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 140, 180, 60, BtnFunc::CloseCurrentMenu
+            L"Rotate CW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            20, 180, 180, 60, BtnFunc::CloseCurrentMenu
         ));
-        GetVKNameW(CFG.Controls.Right, &Key);
+        GetVKNameW(CFG.Controls.RCCW, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 140, 180, 60, BtnFunc::CloseCurrentMenu
+            L"Rotate CCW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            220, 180, 180, 60, BtnFunc::CloseCurrentMenu
         ));
-        GetVKNameW(CFG.Controls.SoftDrop, &Key);
+        GetVKNameW(CFG.Controls.HardDrop, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 140, 180, 60, BtnFunc::CloseCurrentMenu
+            L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            420, 180, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+        GetVKNameW(CFG.Controls.Hold, &Key);
+        M->Buttons.push_back(new Button
+        (
+            L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            220, 260, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+
+        M->Buttons.push_back(new Button
+        (
+            L"-", M->RenderArea.left, M->RenderArea.top,
+            250, 370, 30, 30, BtnFunc::CloseCurrentMenu
+        ));
+        M->Buttons.push_back(new Button
+        (
+            L"+", M->RenderArea.left, M->RenderArea.top,
+            340, 370, 30, 30, BtnFunc::CloseCurrentMenu
         ));
 
 
         M->Buttons.push_back(new Button
         (
             L"Go Back", M->RenderArea.left, M->RenderArea.top,
-            220, 420, 180, 60, BtnFunc::CloseCurrentMenu
+            120, 420, 180, 60, BtnFunc::CloseCurrentMenu
+        ));
+
+        M->Buttons.push_back(new Button
+        (
+            L"Save", M->RenderArea.left, M->RenderArea.top,
+            320, 420, 180, 60, BtnFunc::CloseCurrentMenu
         ));
 
         return M;

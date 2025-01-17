@@ -65,7 +65,7 @@ class Label
         (
             hdc,
             Position.x,
-            Position.y - 14,
+            Position.y - 12,
             Text.c_str(),
             Text.size()
         );
@@ -96,32 +96,32 @@ class Button : public RenderObject
         );
         if(Value.empty())
         {
-            DrawText(hdc, Title.c_str(), Title.size(), &RenderArea,
-            DT_CENTER | DT_NOCLIP | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS);
-            /*
             TextOut
             (
                 hdc,
                 RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
-                RenderArea.top + ((RenderArea.bottom - RenderArea.top) >> 1) - 14,
+                RenderArea.top + ((RenderArea.bottom - RenderArea.top) >> 1) - 12,
                 Title.c_str(),
                 Title.size()
             );
-            */
         }else
         {
-            DrawText(hdc, (Title + L" " + Value).c_str(), Title.size() + Value.size() + 1, &RenderArea,
-            DT_CENTER | DT_NOCLIP | DT_SINGLELINE | DT_VCENTER | DT_WORD_ELLIPSIS);
-            /*
             TextOut
             (
                 hdc,
                 RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
-                RenderArea.top + ((RenderArea.bottom - RenderArea.top) >> 1) - 14,
-                (Title + L" " + Value).c_str(),
-                Title.size() + Value.size() + 1
+                RenderArea.top + 6,
+                Title.c_str(),
+                Title.size()
             );
-            */
+            TextOut
+            (
+                hdc,
+                RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
+                RenderArea.top + 30,
+                Value.c_str(),
+                Value.size()
+            );
         }
     }
 
@@ -223,7 +223,7 @@ class Menu : public RenderObject
             RenderArea.bottom - RenderArea.top
         );
         SelectObject(MenuDC, Bmp);
-        //SetTextAlign(MenuDC, TA_CENTER);
+        SetTextAlign(MenuDC, TA_CENTER);
         SelectObject(MenuDC, Render::DefFont);
         SelectObject(MenuDC, GetStockObject(DC_BRUSH));
 
