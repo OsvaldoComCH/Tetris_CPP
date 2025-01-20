@@ -34,8 +34,8 @@ class MenuStack
 };
 
 std::stack<Tetris::MenuType> MenuStack::Menus;
-Tetris::Menu * MenuStack::CurMenu;
-Tetris::Button * Tetris::Button::ActiveBtn;
+Tetris::Menu * MenuStack::CurMenu = NULL;
+Tetris::Button * Tetris::Button::ActiveBtn = NULL;
 
 namespace Tetris
 {
@@ -49,20 +49,37 @@ namespace Tetris
             Button * Btn = (Button *)Target;
             Btn->Value.assign(std::to_wstring(Level));
         }
-        void LabelIncrement(void * Target)
+        void IncreaseWndSize(void * Target)
         {
-            static int Level = 0;
-            ++Level;
-
+            if(CFG.WindowSize < 10)
+            {
+                ++CFG.WindowSize;
+            }
             Label * Lbl = (Label *)Target;
-            Lbl->Text.assign(std::to_wstring(Level));
+            Lbl->Text.assign(std::to_wstring(CFG.WindowSize));
+        }
+        void DecreaseWndSize(void * Target)
+        {
+            if(CFG.WindowSize > 1)
+            {
+                --CFG.WindowSize;
+            }
+            Label * Lbl = (Label *)Target;
+            Lbl->Text.assign(std::to_wstring(CFG.WindowSize));
         }
         void OpenOptionsMenu(void * Target)
         {
             MenuStack::OpenMenu(MenuType::OptionsMenu);
         }
-        void CloseCurrentMenu(void * Target)
+        void CloseOptionsMenu(void * Target)
         {
+            ReadConfigFile(&CFG);
+            MenuStack::CloseMenu();
+        }
+        void SaveOptions(void * Target)
+        {
+            WriteConfigFile(&CFG);
+            ApplyCfgChanges();
             MenuStack::CloseMenu();
         }
     }
@@ -128,67 +145,69 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 100, 180, 60, BtnFunc::CloseCurrentMenu
+            20, 100, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.Right, &Key);
         M->Buttons.push_back(new Button
         (
             L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 100, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 100, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.SoftDrop, &Key);
         M->Buttons.push_back(new Button
         (
             L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 100, 180, 60, BtnFunc::CloseCurrentMenu
+            420, 100, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.RCW, &Key);
         M->Buttons.push_back(new Button
         (
             L"Rotate CW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 180, 180, 60, BtnFunc::CloseCurrentMenu
+            20, 180, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.RCCW, &Key);
         M->Buttons.push_back(new Button
         (
             L"Rotate CCW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 180, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 180, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.HardDrop, &Key);
         M->Buttons.push_back(new Button
         (
             L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 180, 180, 60, BtnFunc::CloseCurrentMenu
+            420, 180, 180, 60, BtnFunc::CloseOptionsMenu
         ));
         GetVKNameW(CFG.Controls.Hold, &Key);
         M->Buttons.push_back(new Button
         (
             L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 260, 180, 60, BtnFunc::CloseCurrentMenu
+            220, 260, 180, 60, BtnFunc::CloseOptionsMenu
         ));
 
         M->Buttons.push_back(new Button
         (
             L"-", M->RenderArea.left, M->RenderArea.top,
-            250, 370, 30, 30, BtnFunc::CloseCurrentMenu
+            250, 370, 30, 30, BtnFunc::DecreaseWndSize,
+            WndSizeLbl
         ));
         M->Buttons.push_back(new Button
         (
             L"+", M->RenderArea.left, M->RenderArea.top,
-            340, 370, 30, 30, BtnFunc::CloseCurrentMenu
+            340, 370, 30, 30, BtnFunc::IncreaseWndSize,
+            WndSizeLbl
         ));
 
 
         M->Buttons.push_back(new Button
         (
             L"Go Back", M->RenderArea.left, M->RenderArea.top,
-            120, 420, 180, 60, BtnFunc::CloseCurrentMenu
+            120, 420, 180, 60, BtnFunc::CloseOptionsMenu
         ));
 
         M->Buttons.push_back(new Button
         (
             L"Save", M->RenderArea.left, M->RenderArea.top,
-            320, 420, 180, 60, BtnFunc::CloseCurrentMenu
+            320, 420, 180, 60, BtnFunc::SaveOptions
         ));
 
         return M;

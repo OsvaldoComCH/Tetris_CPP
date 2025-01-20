@@ -4,7 +4,7 @@
 
 #include <Windows.h>
 #include <fstream>
-#include "headers/Config.hpp"
+#include "headers/Constants.hpp"
 #include <iostream>
 #include "menu/Menus.cpp"
 
@@ -26,11 +26,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hwnd, &ps);
 
-            FillRect(hdc, &ps.rcPaint, (HBRUSH)GetStockObject(DC_BRUSH));
-
             if(MenuStack::CurMenu)
             {
-                MenuStack::CurMenu->Render(hdc);
+                HDC MenuDC = CreateCompatibleDC(hdc);
+                HBITMAP Bmp = CreateCompatibleBitmap
+                (
+                    hdc,
+                    MenuStack::CurMenu->RenderArea.right - MenuStack::CurMenu->RenderArea.left,
+                    MenuStack::CurMenu->RenderArea.bottom - MenuStack::CurMenu->RenderArea.top
+                );
+                SelectObject(MenuDC, Bmp);
+                MenuStack::CurMenu->Render(MenuDC);
+
+                FillRect(hdc, &ps.rcPaint, (HBRUSH)GetStockObject(DC_BRUSH));
+                Tetris::Render::TetrisBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
+
+                DeleteObject(Bmp);
+                DeleteDC(MenuDC);
             }
 
             EndPaint(hwnd, &ps);
@@ -41,12 +53,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             HDC hdc = GetDC(hwnd);
             RECT R;
             GetClientRect(hwnd, &R);
-
-            FillRect(hdc, &R, (HBRUSH)GetStockObject(DC_BRUSH));
             
             if(MenuStack::CurMenu)
             {
-                MenuStack::CurMenu->Render(hdc);
+                HDC MenuDC = CreateCompatibleDC(hdc);
+                HBITMAP Bmp = CreateCompatibleBitmap
+                (
+                    hdc,
+                    MenuStack::CurMenu->RenderArea.right - MenuStack::CurMenu->RenderArea.left,
+                    MenuStack::CurMenu->RenderArea.bottom - MenuStack::CurMenu->RenderArea.top
+                );
+                SelectObject(MenuDC, Bmp);
+                MenuStack::CurMenu->Render(MenuDC);
+
+                FillRect(hdc, &R, (HBRUSH)GetStockObject(DC_BRUSH));
+                Tetris::Render::TetrisBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
+
+                DeleteObject(Bmp);
+                DeleteDC(MenuDC);
             }
 
             ReleaseDC(hwnd, hdc);
@@ -67,7 +91,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    //Tetris::Config CFG;
+    using namespace Tetris;
     ReadConfigFile(&CFG);
 
     const wchar_t * WClassName = L"WindowClass";
@@ -94,7 +118,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RECT Area = {x, y, x + w, y + h};
     AdjustWindowRectEx(&Area, (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX), false, 0);
 
-    HWND hwnd = CreateWindowEx
+    hwnd = CreateWindowEx
     (
         0,
         WClassName,
@@ -110,7 +134,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
-    MenuStack::OpenMenu(Tetris::MenuType::MainMenu);
+    MenuStack::OpenMenu(MenuType::MainMenu);
 
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);

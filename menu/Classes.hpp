@@ -6,38 +6,10 @@
 #include <set>
 #include <string>
 #include <iostream>
-#include "../headers/Config.hpp"
-
-Tetris::Config CFG;
+#include "../headers/Constants.hpp"
 
 namespace Tetris
 {
-
-namespace Render
-{
-    HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
-    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
-
-    void TetrisBlt(HDC DestDC, HDC SrcDC, RECT TransferArea)
-    {
-        SetStretchBltMode(DestDC, HALFTONE);
-
-        float Scale = ((float)CFG.WindowSize) / 5;
-        StretchBlt
-        (
-            DestDC,
-            TransferArea.left * Scale,
-            TransferArea.top * Scale,
-            (TransferArea.right - TransferArea.left) * Scale,
-            (TransferArea.bottom - TransferArea.top) * Scale,
-            SrcDC,
-            0, 0,
-            TransferArea.right - TransferArea.left,
-            TransferArea.bottom - TransferArea.top,
-            SRCCOPY
-        );
-    }
-};
 
 class RenderObject
 {
@@ -200,8 +172,6 @@ class Menu : public RenderObject
     static Menu * CreateMainMenu();
     static Menu * CreatePauseMenu(){return NULL;}
     static Menu * CreateOptionsMenu();
-    
-    std::wstring Title;
 
     public:
     std::vector<Button *> Buttons;
@@ -215,34 +185,21 @@ class Menu : public RenderObject
 
     void Render(HDC hdc)
     {
-        HDC MenuDC = CreateCompatibleDC(hdc);
-        HBITMAP Bmp = CreateCompatibleBitmap
-        (
-            hdc,
-            RenderArea.right - RenderArea.left,
-            RenderArea.bottom - RenderArea.top
-        );
-        SelectObject(MenuDC, Bmp);
-        SetTextAlign(MenuDC, TA_CENTER);
-        SelectObject(MenuDC, Render::DefFont);
-        SelectObject(MenuDC, GetStockObject(DC_BRUSH));
+        SetTextAlign(hdc, TA_CENTER);
+        SelectObject(hdc, Render::DefFont);
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
 
-        Rectangle(MenuDC, 0, 0, RenderArea.right - RenderArea.left, RenderArea.bottom - RenderArea.top);
+        Rectangle(hdc, 0, 0, RenderArea.right - RenderArea.left, RenderArea.bottom - RenderArea.top);
 
         for(int i = 0; i < Labels.size(); ++i)
         {
-            Labels[i]->Render(MenuDC);
+            Labels[i]->Render(hdc);
         }
 
         for(int i = 0; i < Buttons.size(); ++i)
         {
-            Buttons[i]->Render(MenuDC);
+            Buttons[i]->Render(hdc);
         }
-
-        Render::TetrisBlt(hdc, MenuDC, RenderArea);
-
-        DeleteObject(Bmp);
-        DeleteDC(MenuDC);
     }
 
     void EventLoop(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -251,7 +208,7 @@ class Menu : public RenderObject
         {
             case WM_KEYDOWN:
             {
-                Button::ActiveBtn->OnKeyPress(wParam);
+                
             }
             break;
             case WM_LBUTTONDOWN:
@@ -264,10 +221,24 @@ class Menu : public RenderObject
                 {
                     if(PtInRect(&Buttons[i]->RenderArea, Mouse))
                     {
-                        Buttons[i]->OnClick();
-                        PostMessage(hwnd, WM_PRINT, 0, 0);
+                        Button::ActiveBtn = Buttons[i];
                         return;
                     }
+                }
+            }
+            break;
+            case WM_LBUTTONUP:
+            {
+                POINT Mouse = {
+                    LOWORD(lParam) * 5 / CFG.WindowSize - RenderArea.left,
+                    HIWORD(lParam) * 5 / CFG.WindowSize - RenderArea.top
+                };
+                if(PtInRect(&Button::ActiveBtn->RenderArea, Mouse))
+                {
+                    Button::ActiveBtn->OnClick();
+                    Button::ActiveBtn = NULL;
+                    PostMessage(hwnd, WM_PRINT, 0, 0);
+                    return;
                 }
             }
             break;
