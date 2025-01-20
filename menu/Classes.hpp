@@ -48,13 +48,14 @@ class Button : public RenderObject
 {
     private:
     void (*_OnClick)(void *) = [](void * Target){};
-    void (*_OnKeyPress)(void *, int) = NULL;
+    void (*_OnKeyPress)(void *, int) = [](void * Target, int Key){};
 
     public:
     static Button * ActiveBtn;
     std::wstring Title;
     std::wstring Value;
     void * Target = this;
+    bool Toggle = false;
 
     void Render(HDC hdc)
     {
@@ -138,17 +139,39 @@ class Button : public RenderObject
     }
 
     Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
-    void (*OnClick)(void *), void (*OnKeyPress)(void *, int))
-    : Button(Title, ParentX, ParentY, x, y, w, h, OnClick)
-    {
-        this->_OnKeyPress = OnKeyPress;
-    }
-
-    Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
     void (*OnClick)(void *), void * Target)
     : Button(Title, ParentX, ParentY, x, y, w, h, OnClick)
     {
         this->Target = Target;
+    }
+    
+    Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
+    void (*OnKeyPress)(void *, int))
+    {
+        this->Title = Title;
+        RenderArea = {x, y, x+w, y+h};
+        ParentOrigin = {ParentX, ParentY};
+        this->_OnKeyPress = OnKeyPress;
+    }
+    
+    Button(const wchar_t * Title, const wchar_t * Value, int ParentX, int ParentY,
+    int x, int y, int w, int h, void (*OnKeyPress)(void *, int))
+    : Button(Title, ParentX, ParentY, x, y, w, h, OnKeyPress)
+    {
+        this->Value = Value;
+    }
+    Button(const wchar_t * Title, const wchar_t * Value, int ParentX, int ParentY,
+    int x, int y, int w, int h, bool Toggle, void (*OnKeyPress)(void *, int))
+    : Button(Title, Value, ParentX, ParentY, x, y, w, h, OnKeyPress)
+    {
+        this->Toggle = Toggle;
+    }
+
+    Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
+    void (*OnClick)(void *), void (*OnKeyPress)(void *, int))
+    : Button(Title, ParentX, ParentY, x, y, w, h, OnClick)
+    {
+        this->_OnKeyPress = OnKeyPress;
     }
 
     Button(const wchar_t * Title, int ParentX, int ParentY, int x, int y, int w, int h,
@@ -198,7 +221,17 @@ class Menu : public RenderObject
 
         for(int i = 0; i < Buttons.size(); ++i)
         {
-            Buttons[i]->Render(hdc);
+            if(Buttons[i] == Button::ActiveBtn)
+            {
+                int Color = SetDCBrushColor(hdc, RGB(216,216,216));
+                SetBkColor(hdc, RGB(216,216,216));
+                Buttons[i]->Render(hdc);
+                SetDCBrushColor(hdc, Color);
+                SetBkColor(hdc, Color);
+            }else
+            {
+                Buttons[i]->Render(hdc);
+            }
         }
     }
 
@@ -208,7 +241,15 @@ class Menu : public RenderObject
         {
             case WM_KEYDOWN:
             {
-                
+                if(Button::ActiveBtn)
+                {
+                    Button::ActiveBtn->OnKeyPress(wParam);
+                    PostMessage(hwnd, WM_PRINT, 0, 0);
+                    if(Button::ActiveBtn->Toggle)
+                    {
+                        Button::ActiveBtn = NULL;
+                    }
+                }
             }
             break;
             case WM_LBUTTONDOWN:
@@ -217,12 +258,20 @@ class Menu : public RenderObject
                     LOWORD(lParam) * 5 / CFG.WindowSize - RenderArea.left,
                     HIWORD(lParam) * 5 / CFG.WindowSize - RenderArea.top
                 };
-                for(int i = 0; i < Buttons.size(); ++i)
+                if(Button::ActiveBtn && Button::ActiveBtn->Toggle)
                 {
-                    if(PtInRect(&Buttons[i]->RenderArea, Mouse))
+                    Button::ActiveBtn = NULL;
+                    PostMessage(hwnd, WM_PRINT, 0, 0);
+                }else
+                {
+                    for(int i = 0; i < Buttons.size(); ++i)
                     {
-                        Button::ActiveBtn = Buttons[i];
-                        return;
+                        if(PtInRect(&Buttons[i]->RenderArea, Mouse))
+                        {
+                            Button::ActiveBtn = Buttons[i];
+                            PostMessage(hwnd, WM_PRINT, 0, 0);
+                            return;
+                        }
                     }
                 }
             }
@@ -233,12 +282,17 @@ class Menu : public RenderObject
                     LOWORD(lParam) * 5 / CFG.WindowSize - RenderArea.left,
                     HIWORD(lParam) * 5 / CFG.WindowSize - RenderArea.top
                 };
-                if(PtInRect(&Button::ActiveBtn->RenderArea, Mouse))
+                if(Button::ActiveBtn)
                 {
-                    Button::ActiveBtn->OnClick();
-                    Button::ActiveBtn = NULL;
-                    PostMessage(hwnd, WM_PRINT, 0, 0);
-                    return;
+                    if(!Button::ActiveBtn->Toggle)
+                    {
+                        if(PtInRect(&Button::ActiveBtn->RenderArea, Mouse))
+                        {
+                            Button::ActiveBtn->OnClick();
+                        }
+                        Button::ActiveBtn = NULL;
+                        PostMessage(hwnd, WM_PRINT, 0, 0);
+                    }
                 }
             }
             break;

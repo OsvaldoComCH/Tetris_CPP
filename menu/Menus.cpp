@@ -51,21 +51,21 @@ namespace Tetris
         }
         void IncreaseWndSize(void * Target)
         {
-            if(CFG.WindowSize < 10)
+            if(TempCFG.WindowSize < 10)
             {
-                ++CFG.WindowSize;
+                ++TempCFG.WindowSize;
             }
             Label * Lbl = (Label *)Target;
-            Lbl->Text.assign(std::to_wstring(CFG.WindowSize));
+            Lbl->Text.assign(std::to_wstring(TempCFG.WindowSize));
         }
         void DecreaseWndSize(void * Target)
         {
-            if(CFG.WindowSize > 1)
+            if(TempCFG.WindowSize > 1)
             {
-                --CFG.WindowSize;
+                --TempCFG.WindowSize;
             }
             Label * Lbl = (Label *)Target;
-            Lbl->Text.assign(std::to_wstring(CFG.WindowSize));
+            Lbl->Text.assign(std::to_wstring(TempCFG.WindowSize));
         }
         void OpenOptionsMenu(void * Target)
         {
@@ -73,14 +73,19 @@ namespace Tetris
         }
         void CloseOptionsMenu(void * Target)
         {
-            ReadConfigFile(&CFG);
             MenuStack::CloseMenu();
         }
         void SaveOptions(void * Target)
         {
+            CFG = TempCFG;
             WriteConfigFile(&CFG);
             ApplyCfgChanges();
             MenuStack::CloseMenu();
+        }
+        int ReadKey(void * Target, int Key)
+        {
+            Button * Btn = (Button *) Target;
+            return GetVKNameW(Key, &Btn->Value);
         }
     }
 
@@ -133,8 +138,9 @@ namespace Tetris
     
     Menu * Menu::CreateOptionsMenu()
     {
+        TempCFG = CFG;
         Menu * M = new Menu(90, 50, 620, 500);
-        Label * WndSizeLbl = new Label(std::to_wstring(CFG.WindowSize).c_str(), 310, 385);
+        Label * WndSizeLbl = new Label(std::to_wstring(TempCFG.WindowSize).c_str(), 310, 385);
 
         M->Labels.push_back(WndSizeLbl);
         M->Labels.push_back(new Label(L"Options", 310, 30));
@@ -145,43 +151,92 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 100, 180, 60, BtnFunc::CloseOptionsMenu
+            20, 100, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.Left = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.Right, &Key);
         M->Buttons.push_back(new Button
         (
             L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 100, 180, 60, BtnFunc::CloseOptionsMenu
+            220, 100, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.Right = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.SoftDrop, &Key);
         M->Buttons.push_back(new Button
         (
             L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 100, 180, 60, BtnFunc::CloseOptionsMenu
+            420, 100, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.SoftDrop = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.RCW, &Key);
         M->Buttons.push_back(new Button
         (
             L"Rotate CW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            20, 180, 180, 60, BtnFunc::CloseOptionsMenu
+            20, 180, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.RCW = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.RCCW, &Key);
         M->Buttons.push_back(new Button
         (
             L"Rotate CCW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 180, 180, 60, BtnFunc::CloseOptionsMenu
+            220, 180, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.RCCW = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.HardDrop, &Key);
         M->Buttons.push_back(new Button
         (
             L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            420, 180, 180, 60, BtnFunc::CloseOptionsMenu
+            420, 180, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.HardDrop = Key;
+                }
+            }
         ));
         GetVKNameW(CFG.Controls.Hold, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
-            220, 260, 180, 60, BtnFunc::CloseOptionsMenu
+            L"Hold:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            220, 260, 180, 60, true,
+            [](void * Target, int Key)
+            {
+                if(BtnFunc::ReadKey(Target, Key))
+                {
+                    TempCFG.Controls.Hold = Key;
+                }
+            }
         ));
 
         M->Buttons.push_back(new Button

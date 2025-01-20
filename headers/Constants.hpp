@@ -7,11 +7,12 @@
 namespace Tetris
 {
     Config CFG;
+    Config TempCFG;
     HWND hwnd;
 
     namespace Render
     {
-        HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET, 
+        HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
         void TetrisBlt(HDC DestDC, HDC SrcDC, RECT * TransferArea)
@@ -37,15 +38,18 @@ namespace Tetris
 
     void ApplyCfgChanges()
     {
-        RECT R;
-        GetWindowRect(hwnd, &R);
-        int w = 160 * CFG.WindowSize;
-        int h = 120 * CFG.WindowSize;
-        R.right = R.left + w;
-        R.bottom = R.top + h;
+        if(CFG.WindowSize != TempCFG.WindowSize)
+        {
+            RECT R;
+            GetWindowRect(hwnd, &R);
+            int w = 160 * TempCFG.WindowSize;
+            int h = 120 * TempCFG.WindowSize;
+            R.right = R.left + w;
+            R.bottom = R.top + h;
 
-        AdjustWindowRectEx(&R, (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX), false, 0);
-        SetWindowPos(hwnd, NULL, R.left, R.top, R.right - R.left, R.bottom - R.top, SWP_SHOWWINDOW);
+            AdjustWindowRectEx(&R, (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX), false, 0);
+            SetWindowPos(hwnd, NULL, R.left, R.top, R.right - R.left, R.bottom - R.top, SWP_SHOWWINDOW);
+        }
     }
 }
 
