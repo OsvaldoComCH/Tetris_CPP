@@ -89,9 +89,6 @@ namespace Tetris
     Menu * Menu::CreateMainMenu()
     {
         Menu * M = new Menu(280, 100, 240, 390);
-        Label * Label1 = new Label(L"Tetris_CPP", 120, 15);
-
-        M->Labels.push_back(Label1);
 
         M->Buttons.push_back(new Button
         (

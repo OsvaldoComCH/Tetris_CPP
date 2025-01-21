@@ -211,6 +211,7 @@ class Menu : public RenderObject
         SetTextAlign(hdc, TA_CENTER);
         SelectObject(hdc, Render::DefFont);
         SelectObject(hdc, GetStockObject(DC_BRUSH));
+        //SelectObject(hdc, GetStockObject(NULL_PEN));
 
         Rectangle(hdc, 0, 0, RenderArea.right - RenderArea.left, RenderArea.bottom - RenderArea.top);
 

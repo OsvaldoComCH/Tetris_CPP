@@ -38,8 +38,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                 SelectObject(MenuDC, Bmp);
                 MenuStack::CurMenu->Render(MenuDC);
 
-                FillRect(hdc, &ps.rcPaint, (HBRUSH)GetStockObject(DC_BRUSH));
-                Tetris::Render::TetrisBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
+                Tetris::Render::FillWndBkgd(hdc);
+                Tetris::Render::ScaleBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
 
                 DeleteObject(Bmp);
                 DeleteDC(MenuDC);
@@ -51,8 +51,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_PRINT:
         {
             HDC hdc = GetDC(hwnd);
-            RECT R;
-            GetClientRect(hwnd, &R);
             
             if(MenuStack::CurMenu)
             {
@@ -66,8 +64,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                 SelectObject(MenuDC, Bmp);
                 MenuStack::CurMenu->Render(MenuDC);
 
-                FillRect(hdc, &R, (HBRUSH)GetStockObject(DC_BRUSH));
-                Tetris::Render::TetrisBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
+                Tetris::Render::FillWndBkgd(hdc);
+                Tetris::Render::ScaleBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
 
                 DeleteObject(Bmp);
                 DeleteDC(MenuDC);

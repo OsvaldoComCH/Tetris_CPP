@@ -12,10 +12,46 @@ namespace Tetris
 
     namespace Render
     {
-        HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        static const HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
-        void TetrisBlt(HDC DestDC, HDC SrcDC, RECT * TransferArea)
+        static constexpr COLORREF Colors[10] = {
+            RGB(64,64,64),
+            RGB(0,224,224),
+            RGB(224,0,224),
+            RGB(224,224,0),
+            RGB(224,112,0),
+            RGB(0,0,224),
+            RGB(224,0,0),
+            RGB(0,224,0),
+            RGB(128,128,128),
+            RGB(255,255,255)
+        };
+        static constexpr COLORREF ShadowColors[7] = {
+            RGB(64,96,96),
+            RGB(96,64,96),
+            RGB(96,96,64),
+            RGB(128,96,32),
+            RGB(72,72,112),
+            RGB(112,72,72),
+            RGB(72,112,72)
+        };
+        
+        enum Color
+        {
+            DarkGray=Colors[0],
+            Cyan=Colors[1],
+            Purple=Colors[2],
+            Yellow=Colors[3],
+            Orange=Colors[4],
+            Blue=Colors[5],
+            Red=Colors[6],
+            Green=Colors[7],
+            Gray=Colors[8],
+            White=Colors[9]
+        };
+
+        void ScaleBlt(HDC DestDC, HDC SrcDC, RECT * TransferArea)
         {
             SetStretchBltMode(DestDC, HALFTONE);
 
@@ -33,6 +69,17 @@ namespace Tetris
                 TransferArea->bottom - TransferArea->top,
                 SRCCOPY
             );
+        }
+
+        static void FillWndBkgd(HDC hdc)
+        {
+            HGDIOBJ OldBrush = SelectObject(hdc, GetStockObject(DC_BRUSH));
+            SetDCBrushColor(hdc, Color::Gray);
+            SelectObject(hdc, GetStockObject(NULL_PEN));
+            RECT R;
+            GetClientRect(hwnd, &R);
+            Rectangle(hdc, R.left-1, R.top-1, R.right+1, R.bottom+1);
+            SelectObject(hdc, OldBrush);
         }
     };
 
