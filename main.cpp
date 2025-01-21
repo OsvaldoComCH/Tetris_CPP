@@ -118,13 +118,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     RECT Area = {x, y, x + w, y + h};
     AdjustWindowRectEx(&Area, (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX), false, 0);
 
+    w = Area.right - Area.left;
+    h = Area.bottom - Area.top;
+    if(Area.left < 0){Area.left = 0;}
+    if(Area.top < 0){Area.top = 0;}
+
     hwnd = CreateWindowEx
     (
         0,
         WClassName,
         L"Tetris_CPP",
         (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX),
-        Area.left, Area.top, Area.right - Area.left, Area.bottom - Area.top,
+        Area.left, Area.top, w, h,
         NULL, NULL, hInstance, NULL
     );
 

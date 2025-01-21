@@ -77,10 +77,7 @@ namespace Tetris
         }
         void SaveOptions(void * Target)
         {
-            CFG = TempCFG;
-            WriteConfigFile(&CFG);
             ApplyCfgChanges();
-            MenuStack::CloseMenu();
         }
         int ReadKey(void * Target, int Key)
         {
