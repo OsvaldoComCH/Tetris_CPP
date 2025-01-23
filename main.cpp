@@ -4,9 +4,10 @@
 
 #include <Windows.h>
 #include <fstream>
-#include "headers/Constants.hpp"
 #include <iostream>
+#include "headers/Constants.hpp"
 #include "menu/Menus.cpp"
+#include "render/Classes.hpp"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
