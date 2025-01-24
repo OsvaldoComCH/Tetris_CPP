@@ -14,7 +14,13 @@ namespace Tetris::Render
         HBITMAP Bmp;
         struct {int x,y,w,h;} Area;
 
+        Layer(){}
         Layer(HDC ParentDC, int x, int y, int w, int h)
+        {
+            this->Initialize(ParentDC, x, y, w, h);
+        }
+
+        void Initialize(HDC ParentDC, int x, int y, int w, int h)
         {
             hdc = CreateCompatibleDC(ParentDC);
             Bmp = CreateCompatibleBitmap(ParentDC, w, h);
@@ -35,13 +41,19 @@ namespace Tetris::Render
     void InitLayers()
     {
         HDC hdc = GetDC(hwnd);
-        MainLayer = Layer(hdc, 0, 0, 800, 600);
+        MainLayer.Initialize(hdc, 0, 0, 800, 600);
         ReleaseDC(hwnd, hdc);
     }
 
     Layer * GetLayer()
     {
         return _Layers.back();
+    }
+
+    Layer * GetLayer(int Layer)
+    {
+        if(Layer >= _Layers.size()){Layer = _Layers.size() - 1;}
+        return _Layers[Layer];
     }
 
     Layer * CreateLayer(int x, int y, int w, int h)
@@ -89,6 +101,24 @@ namespace Tetris::Render
             Layer * L = _Layers[i];
             BitBlt(MainLayer.hdc, L->Area.x, L->Area.y, L->Area.w, L->Area.h, L->hdc, 0, 0, SRCCOPY);
         }
+    }
+   
+    void RenderBkgd()
+    {
+        Layer * L = GetLayer(0);
+        SelectObject(L->hdc, GetStockObject(DC_BRUSH));
+        SetDCBrushColor(L->hdc, Color::Gray);
+        SelectObject(L->hdc, GetStockObject(NULL_PEN));
+        Rectangle(L->hdc, L->Area.x -1, L->Area.y -1, L->Area.x + L->Area.w + 1, L->Area.y + L->Area.h + 1);
+    }
+
+    void RenderBkgd(int Layer, COLORREF Color)
+    {
+        Render::Layer * L = GetLayer(Layer);
+        SelectObject(L->hdc, GetStockObject(DC_BRUSH));
+        SetDCBrushColor(L->hdc, Color);
+        SelectObject(L->hdc, GetStockObject(NULL_PEN));
+        Rectangle(L->hdc, L->Area.x -1, L->Area.y -1, L->Area.x + L->Area.w + 1, L->Area.y + L->Area.h + 1);
     }
 }
 

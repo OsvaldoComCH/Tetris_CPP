@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include "../headers/Constants.hpp"
+#include "../render/Classes.hpp"
 
 namespace Tetris
 {
@@ -204,34 +205,39 @@ class Menu : public RenderObject
     {
         RenderArea = {x, y, x+w, y+h};
         ParentOrigin = {0, 0};
+        Render::CreateLayer(x, y, w, h);
+    }
+    ~Menu()
+    {
+        Render::DestroyLayer();
     }
 
-    void Render(HDC hdc)
+    void Render()
     {
-        SetTextAlign(hdc, TA_CENTER);
-        SelectObject(hdc, Render::DefFont);
-        SelectObject(hdc, GetStockObject(DC_BRUSH));
-        //SelectObject(hdc, GetStockObject(NULL_PEN));
+        Render::Layer * L = Render::GetLayer();
 
-        Rectangle(hdc, 0, 0, RenderArea.right - RenderArea.left, RenderArea.bottom - RenderArea.top);
+        SetTextAlign(L->hdc, TA_CENTER);
+        SelectObject(L->hdc, Render::DefFont);
+        SelectObject(L->hdc, GetStockObject(DC_BRUSH));
+        SelectObject(L->hdc, GetStockObject(NULL_PEN));
 
         for(int i = 0; i < Labels.size(); ++i)
         {
-            Labels[i]->Render(hdc);
+            Labels[i]->Render(L->hdc);
         }
 
         for(int i = 0; i < Buttons.size(); ++i)
         {
             if(Buttons[i] == Button::ActiveBtn)
             {
-                int Color = SetDCBrushColor(hdc, RGB(216,216,216));
-                SetBkColor(hdc, RGB(216,216,216));
-                Buttons[i]->Render(hdc);
-                SetDCBrushColor(hdc, Color);
-                SetBkColor(hdc, Color);
+                int Color = SetDCBrushColor(L->hdc, RGB(216,216,216));
+                SetBkColor(L->hdc, RGB(216,216,216));
+                Buttons[i]->Render(L->hdc);
+                SetDCBrushColor(L->hdc, Color);
+                SetBkColor(L->hdc, Color);
             }else
             {
-                Buttons[i]->Render(hdc);
+                Buttons[i]->Render(L->hdc);
             }
         }
     }

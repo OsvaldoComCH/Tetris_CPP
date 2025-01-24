@@ -50,37 +50,6 @@ namespace Tetris
             Gray=Colors[8],
             White=Colors[9]
         };
-
-        void ScaleBlt(HDC DestDC, HDC SrcDC, RECT * TransferArea)
-        {
-            SetStretchBltMode(DestDC, HALFTONE);
-
-            float Scale = ((float)CFG.WindowSize) / 5;
-            StretchBlt
-            (
-                DestDC,
-                TransferArea->left * Scale,
-                TransferArea->top * Scale,
-                (TransferArea->right - TransferArea->left) * Scale,
-                (TransferArea->bottom - TransferArea->top) * Scale,
-                SrcDC,
-                0, 0,
-                TransferArea->right - TransferArea->left,
-                TransferArea->bottom - TransferArea->top,
-                SRCCOPY
-            );
-        }
-
-        static void FillWndBkgd(HDC hdc)
-        {
-            HGDIOBJ OldBrush = SelectObject(hdc, GetStockObject(DC_BRUSH));
-            SetDCBrushColor(hdc, Color::Gray);
-            SelectObject(hdc, GetStockObject(NULL_PEN));
-            RECT R;
-            GetClientRect(hwnd, &R);
-            Rectangle(hdc, R.left-1, R.top-1, R.right+1, R.bottom+1);
-            SelectObject(hdc, OldBrush);
-        }
     };
 
     void ApplyCfgChanges()

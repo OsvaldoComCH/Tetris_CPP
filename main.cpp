@@ -24,58 +24,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         break;
         case WM_CREATE:
             Tetris::Render::InitLayers();
+            Tetris::Render::CreateLayer(0, 0, 800, 600); //Background Layer (0)
         break;
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hwnd, &ps);
-
-            if(MenuStack::CurMenu)
-            {
-                HDC MenuDC = CreateCompatibleDC(hdc);
-                HBITMAP Bmp = CreateCompatibleBitmap
-                (
-                    hdc,
-                    MenuStack::CurMenu->RenderArea.right - MenuStack::CurMenu->RenderArea.left,
-                    MenuStack::CurMenu->RenderArea.bottom - MenuStack::CurMenu->RenderArea.top
-                );
-                SelectObject(MenuDC, Bmp);
-                MenuStack::CurMenu->Render(MenuDC);
-
-                Tetris::Render::FillWndBkgd(hdc);
-                Tetris::Render::ScaleBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
-
-                DeleteObject(Bmp);
-                DeleteDC(MenuDC);
-            }
-
+            BeginPaint(hwnd, &ps);
             EndPaint(hwnd, &ps);
+            Tetris::Render::RenderBkgd();
+            MenuStack::CurMenu->Render();
+            Tetris::Render::TransferAllLayers();
+            Tetris::Render::TransferToWindow();
         }
         break;
         case WM_PRINT:
         {
-            HDC hdc = GetDC(hwnd);
-            
-            if(MenuStack::CurMenu)
-            {
-                HDC MenuDC = CreateCompatibleDC(hdc);
-                HBITMAP Bmp = CreateCompatibleBitmap
-                (
-                    hdc,
-                    MenuStack::CurMenu->RenderArea.right - MenuStack::CurMenu->RenderArea.left,
-                    MenuStack::CurMenu->RenderArea.bottom - MenuStack::CurMenu->RenderArea.top
-                );
-                SelectObject(MenuDC, Bmp);
-                MenuStack::CurMenu->Render(MenuDC);
-
-                Tetris::Render::FillWndBkgd(hdc);
-                Tetris::Render::ScaleBlt(hdc, MenuDC, &MenuStack::CurMenu->RenderArea);
-
-                DeleteObject(Bmp);
-                DeleteDC(MenuDC);
-            }
-
-            ReleaseDC(hwnd, hdc);
+            Tetris::Render::RenderBkgd();
+            MenuStack::CurMenu->Render();
+            Tetris::Render::TransferAllLayers();
+            Tetris::Render::TransferToWindow();
         }
         break;
         case WM_DESTROY:
