@@ -22,6 +22,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             DestroyWindow(hwnd);
         }
         break;
+        case WM_CREATE:
+            Tetris::Render::InitLayers();
+        break;
         case WM_PAINT:
         {
             PAINTSTRUCT ps;
