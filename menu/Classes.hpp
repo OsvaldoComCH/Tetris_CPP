@@ -15,7 +15,7 @@ namespace Tetris
 class RenderObject
 {
     public:
-    RECT RenderArea;
+    RECT Area;
     POINT ParentOrigin;
 };
 
@@ -24,16 +24,26 @@ class Label
     public:
     POINT Position;
     std::wstring Text;
+    HFONT Font;
 
     Label(){}
     Label(const wchar_t * Text, int x, int y)
     {
         Position = {x, y};
         this->Text = Text;
+        Font = Render::DefFont;
+    }
+
+    Label(const wchar_t * Text, int x, int y, HFONT Font)
+    {
+        Position = {x, y};
+        this->Text = Text;
+        this->Font = Font;
     }
 
     void Render(HDC hdc)
     {
+        HGDIOBJ OldFont = SelectObject(hdc, Font);
         TextOut
         (
             hdc,
@@ -42,6 +52,7 @@ class Label
             Text.c_str(),
             Text.size()
         );
+        SelectObject(hdc, OldFont);
     }
 };
 
@@ -63,18 +74,36 @@ class Button : public RenderObject
         Rectangle
         (
             hdc,
-            RenderArea.left,
-            RenderArea.top,
-            RenderArea.right,
-            RenderArea.bottom
+            Area.left,
+            Area.top,
+            Area.right,
+            Area.bottom
+        );
+        COLORREF Color, Bk;
+        if(ActiveBtn == this)
+        {
+            Color = SetDCBrushColor(hdc, Render::Color::LightGray);
+            Bk = SetBkColor(hdc, Render::Color::LightGray);
+        }else
+        {
+            Color = SetDCBrushColor(hdc, RGB(160,160,160));
+            Bk = SetBkColor(hdc, RGB(160,160,160));
+        }
+        Rectangle
+        (
+            hdc,
+            Area.left + 5,
+            Area.top + 5,
+            Area.right - 5,
+            Area.bottom - 5
         );
         if(Value.empty())
         {
             TextOut
             (
                 hdc,
-                RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
-                RenderArea.top + ((RenderArea.bottom - RenderArea.top) >> 1) - 12,
+                Area.left + ((Area.right - Area.left) >> 1),
+                Area.top + ((Area.bottom - Area.top) >> 1) - 12,
                 Title.c_str(),
                 Title.size()
             );
@@ -83,20 +112,22 @@ class Button : public RenderObject
             TextOut
             (
                 hdc,
-                RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
-                RenderArea.top + 6,
+                Area.left + ((Area.right - Area.left) >> 1),
+                Area.top + 6,
                 Title.c_str(),
                 Title.size()
             );
             TextOut
             (
                 hdc,
-                RenderArea.left + ((RenderArea.right - RenderArea.left) >> 1),
-                RenderArea.top + 30,
+                Area.left + ((Area.right - Area.left) >> 1),
+                Area.top + 30,
                 Value.c_str(),
                 Value.size()
             );
         }
+        SetDCBrushColor(hdc, Color);
+        SetBkColor(hdc, Bk);
     }
 
     void OnClick()
@@ -127,7 +158,7 @@ class Button : public RenderObject
     : Button()
     {
         this->Title = Title;
-        RenderArea = {x, y, x+w, y+h};
+        Area = {x, y, x+w, y+h};
         ParentOrigin = {ParentX, ParentY};
         this->_OnClick = OnClick;
     }
@@ -150,7 +181,7 @@ class Button : public RenderObject
     void (*OnKeyPress)(void *, int))
     {
         this->Title = Title;
-        RenderArea = {x, y, x+w, y+h};
+        Area = {x, y, x+w, y+h};
         ParentOrigin = {ParentX, ParentY};
         this->_OnKeyPress = OnKeyPress;
     }
@@ -203,7 +234,7 @@ class Menu : public RenderObject
 
     Menu(int x, int y, int w, int h)
     {
-        RenderArea = {x, y, x+w, y+h};
+        Area = {x, y, x+w, y+h};
         ParentOrigin = {0, 0};
         Render::CreateLayer(x, y, w, h);
     }
@@ -221,24 +252,21 @@ class Menu : public RenderObject
         SelectObject(L->hdc, GetStockObject(DC_BRUSH));
         SelectObject(L->hdc, GetStockObject(NULL_PEN));
 
+        Render::RenderBkgd(L, Render::Color::White);
+        SetDCBrushColor(L->hdc, Render::Color::DarkGray);
+        SetBkColor(L->hdc, Render::Color::DarkGray);
+        SetTextColor(L->hdc, Render::Color::White);
+        Rectangle(L->hdc, 5, 5, Area.right - Area.left - 5, Area.bottom - Area.top - 5);
         for(int i = 0; i < Labels.size(); ++i)
         {
             Labels[i]->Render(L->hdc);
         }
 
+        SetTextColor(L->hdc, Render::Color::Black);
+        SetDCBrushColor(L->hdc, Render::Color::White);
         for(int i = 0; i < Buttons.size(); ++i)
         {
-            if(Buttons[i] == Button::ActiveBtn)
-            {
-                int Color = SetDCBrushColor(L->hdc, RGB(216,216,216));
-                SetBkColor(L->hdc, RGB(216,216,216));
-                Buttons[i]->Render(L->hdc);
-                SetDCBrushColor(L->hdc, Color);
-                SetBkColor(L->hdc, Color);
-            }else
-            {
-                Buttons[i]->Render(L->hdc);
-            }
+            Buttons[i]->Render(L->hdc);
         }
     }
 
@@ -262,8 +290,8 @@ class Menu : public RenderObject
             case WM_LBUTTONDOWN:
             {
                 POINT Mouse = {
-                    LOWORD(lParam) * 5 / CFG.WindowSize - RenderArea.left,
-                    HIWORD(lParam) * 5 / CFG.WindowSize - RenderArea.top
+                    LOWORD(lParam) * 5 / CFG.WindowSize - Area.left,
+                    HIWORD(lParam) * 5 / CFG.WindowSize - Area.top
                 };
                 if(Button::ActiveBtn && Button::ActiveBtn->Toggle)
                 {
@@ -273,7 +301,7 @@ class Menu : public RenderObject
                 {
                     for(int i = 0; i < Buttons.size(); ++i)
                     {
-                        if(PtInRect(&Buttons[i]->RenderArea, Mouse))
+                        if(PtInRect(&Buttons[i]->Area, Mouse))
                         {
                             Button::ActiveBtn = Buttons[i];
                             PostMessage(hwnd, WM_PRINT, 0, 0);
@@ -286,14 +314,14 @@ class Menu : public RenderObject
             case WM_LBUTTONUP:
             {
                 POINT Mouse = {
-                    LOWORD(lParam) * 5 / CFG.WindowSize - RenderArea.left,
-                    HIWORD(lParam) * 5 / CFG.WindowSize - RenderArea.top
+                    LOWORD(lParam) * 5 / CFG.WindowSize - Area.left,
+                    HIWORD(lParam) * 5 / CFG.WindowSize - Area.top
                 };
                 if(Button::ActiveBtn)
                 {
                     if(!Button::ActiveBtn->Toggle)
                     {
-                        if(PtInRect(&Button::ActiveBtn->RenderArea, Mouse))
+                        if(PtInRect(&Button::ActiveBtn->Area, Mouse))
                         {
                             Button::ActiveBtn->OnClick();
                         }

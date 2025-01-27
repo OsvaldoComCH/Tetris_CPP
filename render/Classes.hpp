@@ -109,16 +109,19 @@ namespace Tetris::Render
         SelectObject(L->hdc, GetStockObject(DC_BRUSH));
         SetDCBrushColor(L->hdc, Color::Gray);
         SelectObject(L->hdc, GetStockObject(NULL_PEN));
-        Rectangle(L->hdc, L->Area.x -1, L->Area.y -1, L->Area.x + L->Area.w + 1, L->Area.y + L->Area.h + 1);
+        Rectangle(L->hdc, -1, -1, L->Area.w + 1, L->Area.h + 1);
     }
 
-    void RenderBkgd(int Layer, COLORREF Color)
+    void RenderBkgd(Layer * L, COLORREF Color)
     {
-        Render::Layer * L = GetLayer(Layer);
-        SelectObject(L->hdc, GetStockObject(DC_BRUSH));
+        HGDIOBJ OldBrush = SelectObject(L->hdc, GetStockObject(DC_BRUSH));
+        HGDIOBJ OldPen = SelectObject(L->hdc, GetStockObject(NULL_PEN));
+
         SetDCBrushColor(L->hdc, Color);
-        SelectObject(L->hdc, GetStockObject(NULL_PEN));
-        Rectangle(L->hdc, L->Area.x -1, L->Area.y -1, L->Area.x + L->Area.w + 1, L->Area.y + L->Area.h + 1);
+        Rectangle(L->hdc, -1, -1, L->Area.w + 1, L->Area.h + 1);
+
+        SelectObject(L->hdc, OldBrush);
+        SelectObject(L->hdc, OldPen);
     }
 }
 

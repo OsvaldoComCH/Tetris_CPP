@@ -93,8 +93,8 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Start Level:",
-            M->RenderArea.left,
-            M->RenderArea.top,
+            M->Area.left,
+            M->Area.top,
             30, 30,
             180, 60,
             BtnFunc::NumberIncrement
@@ -102,8 +102,8 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Max Level:",
-            M->RenderArea.left,
-            M->RenderArea.top,
+            M->Area.left,
+            M->Area.top,
             30, 120,
             180, 60,
             BtnFunc::NumberIncrement
@@ -111,8 +111,8 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Options",
-            M->RenderArea.left,
-            M->RenderArea.top,
+            M->Area.left,
+            M->Area.top,
             30, 210,
             180, 60,
             BtnFunc::OpenOptionsMenu
@@ -120,8 +120,8 @@ namespace Tetris
         M->Buttons.push_back(new Button
         (
             L"Start Game",
-            M->RenderArea.left,
-            M->RenderArea.top,
+            M->Area.left,
+            M->Area.top,
             30, 300,
             180, 60,
             BtnFunc::NumberIncrement
@@ -137,14 +137,14 @@ namespace Tetris
         Label * WndSizeLbl = new Label(std::to_wstring(TempCFG.WindowSize).c_str(), 310, 385);
 
         M->Labels.push_back(WndSizeLbl);
-        M->Labels.push_back(new Label(L"Options", 310, 30));
+        M->Labels.push_back(new Label(L"Options", 310, 40, Render::BigFont));
         M->Labels.push_back(new Label(L"Window Size:", 310, 350));
 
         std::wstring Key;
         GetVKNameW(CFG.Controls.Left, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Left:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Left:", Key.c_str(), M->Area.left, M->Area.top,
             20, 100, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -157,7 +157,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.Right, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Right:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Right:", Key.c_str(), M->Area.left, M->Area.top,
             220, 100, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -170,7 +170,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.SoftDrop, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Soft Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Soft Drop:", Key.c_str(), M->Area.left, M->Area.top,
             420, 100, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -183,7 +183,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.RCW, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Rotate CW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Rotate CW:", Key.c_str(), M->Area.left, M->Area.top,
             20, 180, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -196,7 +196,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.RCCW, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Rotate CCW:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Rotate CCW:", Key.c_str(), M->Area.left, M->Area.top,
             220, 180, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -209,7 +209,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.HardDrop, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Hard Drop:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Hard Drop:", Key.c_str(), M->Area.left, M->Area.top,
             420, 180, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -222,7 +222,7 @@ namespace Tetris
         GetVKNameW(CFG.Controls.Hold, &Key);
         M->Buttons.push_back(new Button
         (
-            L"Hold:", Key.c_str(), M->RenderArea.left, M->RenderArea.top,
+            L"Hold:", Key.c_str(), M->Area.left, M->Area.top,
             220, 260, 180, 60, true,
             [](void * Target, int Key)
             {
@@ -235,27 +235,27 @@ namespace Tetris
 
         M->Buttons.push_back(new Button
         (
-            L"-", M->RenderArea.left, M->RenderArea.top,
-            250, 370, 30, 30, BtnFunc::DecreaseWndSize,
+            L"-", M->Area.left, M->Area.top,
+            250, 370, 35, 35, BtnFunc::DecreaseWndSize,
             WndSizeLbl
         ));
         M->Buttons.push_back(new Button
         (
-            L"+", M->RenderArea.left, M->RenderArea.top,
-            340, 370, 30, 30, BtnFunc::IncreaseWndSize,
+            L"+", M->Area.left, M->Area.top,
+            335, 370, 35, 35, BtnFunc::IncreaseWndSize,
             WndSizeLbl
         ));
 
 
         M->Buttons.push_back(new Button
         (
-            L"Go Back", M->RenderArea.left, M->RenderArea.top,
+            L"Go Back", M->Area.left, M->Area.top,
             120, 420, 180, 60, BtnFunc::CloseOptionsMenu
         ));
 
         M->Buttons.push_back(new Button
         (
-            L"Save", M->RenderArea.left, M->RenderArea.top,
+            L"Save", M->Area.left, M->Area.top,
             320, 420, 180, 60, BtnFunc::SaveOptions
         ));
 

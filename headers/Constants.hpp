@@ -14,8 +14,10 @@ namespace Tetris
     {
         static const HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+        static const HFONT BigFont = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
-        static constexpr COLORREF Colors[10] = {
+        static constexpr COLORREF PieceColors[8] = {
             RGB(64,64,64),
             RGB(0,224,224),
             RGB(224,0,224),
@@ -24,8 +26,6 @@ namespace Tetris
             RGB(0,0,224),
             RGB(224,0,0),
             RGB(0,224,0),
-            RGB(128,128,128),
-            RGB(255,255,255)
         };
         static constexpr COLORREF ShadowColors[7] = {
             RGB(64,96,96),
@@ -39,16 +39,18 @@ namespace Tetris
         
         enum Color
         {
-            DarkGray=Colors[0],
-            Cyan=Colors[1],
-            Purple=Colors[2],
-            Yellow=Colors[3],
-            Orange=Colors[4],
-            Blue=Colors[5],
-            Red=Colors[6],
-            Green=Colors[7],
-            Gray=Colors[8],
-            White=Colors[9]
+            DarkGray=PieceColors[0],
+            Cyan=PieceColors[1],
+            Purple=PieceColors[2],
+            Yellow=PieceColors[3],
+            Orange=PieceColors[4],
+            Blue=PieceColors[5],
+            Red=PieceColors[6],
+            Green=PieceColors[7],
+            Gray=RGB(128,128,128),
+            White=RGB(255,255,255),
+            Black=RGB(0,0,0),
+            LightGray=RGB(192,192,192)
         };
     };
 
