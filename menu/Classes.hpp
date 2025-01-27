@@ -71,6 +71,7 @@ class Button : public RenderObject
 
     void Render(HDC hdc)
     {
+        using namespace Render;
         Rectangle
         (
             hdc,
@@ -82,8 +83,8 @@ class Button : public RenderObject
         COLORREF Color, Bk;
         if(ActiveBtn == this)
         {
-            Color = SetDCBrushColor(hdc, Render::Color::LightGray);
-            Bk = SetBkColor(hdc, Render::Color::LightGray);
+            Color = SetDCBrushColor(hdc, Color::LightGray);
+            Bk = SetBkColor(hdc, Color::LightGray);
         }else
         {
             Color = SetDCBrushColor(hdc, RGB(160,160,160));
@@ -245,25 +246,26 @@ class Menu : public RenderObject
 
     void Render()
     {
-        Render::Layer * L = Render::GetLayer();
+        using namespace Render;
+        Layer * L = GetLayer();
 
         SetTextAlign(L->hdc, TA_CENTER);
-        SelectObject(L->hdc, Render::DefFont);
+        SelectObject(L->hdc, DefFont);
         SelectObject(L->hdc, GetStockObject(DC_BRUSH));
         SelectObject(L->hdc, GetStockObject(NULL_PEN));
 
-        Render::RenderBkgd(L, Render::Color::White);
-        SetDCBrushColor(L->hdc, Render::Color::DarkGray);
-        SetBkColor(L->hdc, Render::Color::DarkGray);
-        SetTextColor(L->hdc, Render::Color::White);
+        RenderBkgd(L, Color::White);
+        SetDCBrushColor(L->hdc, Color::DarkGray);
+        SetBkColor(L->hdc, Color::DarkGray);
+        SetTextColor(L->hdc, Color::White);
         Rectangle(L->hdc, 5, 5, Area.right - Area.left - 5, Area.bottom - Area.top - 5);
         for(int i = 0; i < Labels.size(); ++i)
         {
             Labels[i]->Render(L->hdc);
         }
 
-        SetTextColor(L->hdc, Render::Color::Black);
-        SetDCBrushColor(L->hdc, Render::Color::White);
+        SetTextColor(L->hdc, Color::Black);
+        SetDCBrushColor(L->hdc, Color::White);
         for(int i = 0; i < Buttons.size(); ++i)
         {
             Buttons[i]->Render(L->hdc);

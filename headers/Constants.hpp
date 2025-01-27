@@ -4,6 +4,8 @@
 #include "Config.hpp"
 #include <Windows.h>
 
+typedef signed char int8;
+
 namespace Tetris
 {
     Config CFG;
