@@ -148,7 +148,17 @@ namespace Tetris
             20, 100, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Right == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.HardDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.Left = Key;
                 }
@@ -161,7 +171,17 @@ namespace Tetris
             220, 100, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.HardDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.Right = Key;
                 }
@@ -174,7 +194,17 @@ namespace Tetris
             420, 100, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.Right == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.HardDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.SoftDrop = Key;
                 }
@@ -187,7 +217,17 @@ namespace Tetris
             20, 180, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.Right == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.HardDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.RCW = Key;
                 }
@@ -200,7 +240,17 @@ namespace Tetris
             220, 180, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.Right == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.HardDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.RCCW = Key;
                 }
@@ -213,7 +263,17 @@ namespace Tetris
             420, 180, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.Right == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.Hold == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.HardDrop = Key;
                 }
@@ -226,7 +286,17 @@ namespace Tetris
             220, 260, 180, 60, true,
             [](void * Target, int Key)
             {
-                if(BtnFunc::ReadKey(Target, Key))
+                if(CFG.Controls.Left == Key ||
+                CFG.Controls.Right == Key ||
+                CFG.Controls.RCW == Key ||
+                CFG.Controls.RCCW == Key ||
+                CFG.Controls.SoftDrop == Key ||
+                CFG.Controls.HardDrop == Key)
+                {
+                    MessageBox(NULL, L"Key is already bound", L"Warning", MB_ICONWARNING | MB_OK);
+                    return;
+                }
+                if(!BtnFunc::ReadKey(Target, Key))
                 {
                     TempCFG.Controls.Hold = Key;
                 }
