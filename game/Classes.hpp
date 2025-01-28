@@ -7,9 +7,19 @@
 #include <vector>
 #include "../headers/Constants.hpp"
 
+#define RF_PIECESPAWN 1
+#define RF_PIECE 2
+#define RF_HOLD 4
+#define RF_NEXT 8
+#define RF_LINES 16
+#define RF_LEVEL 32
+#define RF_POINTS 64
+#define RF_MATRIX 128
+
 namespace Tetris::Game
 {
     std::mt19937 RNG (system_clock::now().time_since_epoch().count());
+
     //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
     static constexpr int SpeedTable[25] =
     {
@@ -82,6 +92,13 @@ namespace Tetris::Game
             return Data[Rotation][Direction][Kick];
         }
     } KickData;
+
+    typedef struct RenderData
+    {
+        short Flags;//Bkgd,Matrix,Points,Level,Lines,Next,Hold,Piece,PieceSpawn
+        Block Block;
+        int8 X, Y, R, Shadow;
+    } RenderData;
     
     using namespace std::chrono;
     typedef struct Phys
@@ -195,16 +212,18 @@ namespace Tetris::Game
     {
         public:
         static std::vector<Board *> AllBoards;
-        int Lines;
-        Piece Piece;
-        Phys Phys;
-        AutolockPhys LockPhys;
-        int8 Matrix[40][10];
-        int8 NextPieces[14];
+
+        Phys Phys;// 48 !Aligns on 8-byte intervals
+        Piece Piece;// 76
+        int Lines;// 4
+        int8 Matrix[40][10];// 400
+        RenderData RenderData;// 14 !Aligns on 2-byte intervals
+        int8 NextPieces[14];// 14
         int8 NextPointer;
         int8 Level;
         int8 HeldPiece;
         bool CanHold;
+        AutolockPhys LockPhys;// 13 !Aligns on 8-byte intervals
 
         Board()
         {
@@ -301,12 +320,25 @@ namespace Tetris::Game
         int8 SpawnPiece();
         int8 Hold();
 
+        void Input();
+        void StartGame();
+
+        void RenderMatrix();
+        void RenderLines();
+        void RenderLevel();
+        void RenderBkgd();
+        void RenderPiece(bool Spawn);
+        void RenderNext();
+        void RenderHold();
+        //void FlashPiece();
+        //void FlashLine(int8 Line);
+
+
         void GetSpeed()
         {
             Phys.DropSpeed[0] = SpeedTable[Level - 1];
             Phys.DropSpeed[1] = SpeedTable[Level - 1] / 20 + 1;
         }
-
 
         void AutoLock()
         {
@@ -351,6 +383,23 @@ namespace Tetris::Game
             }
         };
     };
+    
+    time_point<system_clock, milliseconds> PauseTime;
+
+    void Pause()
+    {
+        PauseTime = time_point_cast<milliseconds>(system_clock::now());
+    }
+
+    void Resume()
+    {
+        milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
+        for(int i = 0; i < Board::AllBoards.size(); ++i)
+        {
+            Board::AllBoards[i]->Phys.DASDelay += Difference;
+            Board::AllBoards[i]->Phys.DropDelay += Difference;
+        }
+    }
 }
 
 #endif
