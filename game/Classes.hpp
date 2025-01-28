@@ -4,11 +4,12 @@
 #include <Windows.h>
 #include <chrono>
 #include <random>
+#include <vector>
 #include "../headers/Constants.hpp"
 
 namespace Tetris::Game
 {
-    std::mt19937 RNG (std::chrono::system_clock::now().time_since_epoch().count());
+    std::mt19937 RNG (system_clock::now().time_since_epoch().count());
     //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
     static constexpr int SpeedTable[25] =
     {
@@ -81,6 +82,24 @@ namespace Tetris::Game
             return Data[Rotation][Direction][Kick];
         }
     } KickData;
+    
+    using namespace std::chrono;
+    typedef struct Phys
+    {
+        time_point<system_clock, milliseconds> DASDelay, DropDelay;
+        int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
+        int DropMult;
+        int DASLag, DropLag;
+        bool HDrop, RCW, RCCW, Drop;
+        bool LDAS, RDAS, LeftHeld, RightHeld;
+        bool CanLeft, CanRight, Left, Right;
+    } Phys;
+
+    typedef struct AutolockPhys
+    {
+        time_point<system_clock, milliseconds> Timer;
+        int8 X, Y, R, MoveCount, TimerSet;
+    } AutolockPhys;
 
     class Piece
     {
@@ -172,17 +191,37 @@ namespace Tetris::Game
         }
     };
 
-    class CBoard
+    class Board
     {
         public:
+        static std::vector<Board *> AllBoards;
+        int Lines;
+        Piece Piece;
+        Phys Phys;
+        AutolockPhys LockPhys;
         int8 Matrix[40][10];
         int8 NextPieces[14];
         int8 NextPointer;
-        int Lines;
         int8 Level;
         int8 HeldPiece;
         bool CanHold;
-        Piece Piece;
+
+        Board()
+        {
+            AllBoards.push_back(this);
+            Init();
+        }
+
+        ~Board()
+        {
+            for(int i = 0; i < AllBoards.size(); ++i)
+            {
+                if(AllBoards[i] == this)
+                {
+                    AllBoards.erase(AllBoards.begin() + i);
+                }
+            }
+        }
 
         void Init()
         {
@@ -251,6 +290,66 @@ namespace Tetris::Game
             }
             return 0;
         }
+        
+        int8 RotatePiece(bool Dir);//Direction: 0=CW, 1=CCW
+        bool MoveDown();
+        void MoveLeft();
+        void MoveRight();
+        void HardDrop();
+        void LockPiece();
+        void ClearLines();
+        int8 SpawnPiece();
+        int8 Hold();
+
+        void GetSpeed()
+        {
+            Phys.DropSpeed[0] = SpeedTable[Level - 1];
+            Phys.DropSpeed[1] = SpeedTable[Level - 1] / 20 + 1;
+        }
+
+
+        void AutoLock()
+        {
+            if(LockPhys.Y > Piece.Position[1])
+            {
+                LockPhys.MoveCount = 15;
+                LockPhys.Y = Piece.Position[1];
+                LockPhys.TimerSet = 0;
+            }
+            if(CollisionDown(Piece.Blocks, Piece.Position[0], Piece.Position[1]-1))
+            {
+                if(!LockPhys.TimerSet)
+                {
+                    LockPhys.Timer = time_point_cast<milliseconds>(system_clock::now());
+                    LockPhys.TimerSet = 1;
+                }
+                if(LockPhys.X != Piece.Position[0] || LockPhys.R != Piece.Rotation)
+                {
+                    LockPhys.X = Piece.Position[0];
+                    LockPhys.R = Piece.Rotation;
+                    if(LockPhys.MoveCount)
+                    {
+                        --LockPhys.MoveCount;
+                        LockPhys.Timer = time_point_cast<milliseconds>(system_clock::now());
+                    }else
+                    {
+                        LockPiece();
+                    }
+                }else
+                if(LockPhys.Timer + (milliseconds) 500 <= time_point_cast<milliseconds>(system_clock::now()))
+                {
+                    LockPiece();
+                }
+            }else
+            {
+                if(LockPhys.X != Piece.Position[0] || LockPhys.R != Piece.Rotation)
+                {
+                    LockPhys.X = Piece.Position[0];
+                    LockPhys.R = Piece.Rotation;
+                }
+                if(LockPhys.TimerSet){LockPhys.TimerSet = 0;}
+            }
+        };
     };
 }
 
