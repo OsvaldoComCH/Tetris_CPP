@@ -339,7 +339,6 @@ void Board::StartGame()
     Lines = 0;
     Level = StartLevel;
     HeldPiece = 0;
-    Phys.DropMult = 1;
     Phys.DropLag = 0;
     Phys.DASLag = 0;
     Phys.LDAS = false;

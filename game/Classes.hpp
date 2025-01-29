@@ -100,16 +100,63 @@ namespace Tetris::Game
         int8 X, Y, R, Shadow;
     } RenderData;
     
+    class PhysFlags 
+    {
+        short Flags;
+
+        inline short Left(){return Flags & 0x0001;}
+        inline void Left(bool Value){if(Value){Flags |= 0x0001;}else{Flags &= ~0x0001;}}
+
+        inline short Right(){return Flags & 0x0002;}
+        inline void Right(bool Value){if(Value){Flags |= 0x0002;}else{Flags &= ~0x0002;}}
+
+        inline short CanLeft(){return Flags & 0x0004;}
+        inline void CanLeft(bool Value){if(Value){Flags |= 0x0004;}else{Flags &= ~0x0004;}}
+
+        inline short CanRight(){return Flags & 0x0008;}
+        inline void CanRight(bool Value){if(Value){Flags |= 0x0008;}else{Flags &= ~0x0008;}}
+        
+        inline short LDAS(){return Flags & 0x0010;}
+        inline void LDAS(bool Value){if(Value){Flags |= 0x0010;}else{Flags &= ~0x0010;}}
+
+        inline short RDAS(){return Flags & 0x0020;}
+        inline void RDAS(bool Value){if(Value){Flags |= 0x0020;}else{Flags &= ~0x0020;}}
+
+        inline short LeftHeld(){return Flags & 0x0040;}
+        inline void LeftHeld(bool Value){if(Value){Flags |= 0x0040;}else{Flags &= ~0x0040;}}
+
+        inline short RightHeld(){return Flags & 0x0080;}
+        inline void RightHeld(bool Value){if(Value){Flags |= 0x0080;}else{Flags &= ~0x0080;}}
+        
+        inline short PrevDown(){return Flags & 0x0100;}
+        inline void PrevDown(bool Value){if(Value){Flags |= 0x0100;}else{Flags &= ~0x0100;}}
+
+        inline short DownHeld(){return Flags & 0x0200;}
+        inline void DownHeld(bool Value){if(Value){Flags |= 0x0200;}else{Flags &= ~0x0200;}}
+
+        inline short Drop(){return Flags & 0x0400;}
+        inline void Drop(bool Value){if(Value){Flags |= 0x0400;}else{Flags &= ~0x0400;}}
+
+        inline short HardDrop(){return Flags & 0x0800;}
+        inline void HardDrop(bool Value){if(Value){Flags |= 0x0800;}else{Flags &= ~0x0800;}}
+
+        inline short RCW(){return Flags & 0x1000;}
+        inline void RCW(bool Value){if(Value){Flags |= 0x1000;}else{Flags &= ~0x1000;}}
+
+        inline short RCCW(){return Flags & 0x2000;}
+        inline void RCCW(bool Value){if(Value){Flags |= 0x2000;}else{Flags &= ~0x2000;}}
+    };
+
     using namespace std::chrono;
     typedef struct Phys
     {
         time_point<system_clock, milliseconds> DASDelay, DropDelay;
         int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
-        int DropMult;
         int DASLag, DropLag;
         bool HDrop, RCW, RCCW, Drop;
         bool LDAS, RDAS, LeftHeld, RightHeld;
         bool CanLeft, CanRight, Left, Right;
+        bool DownHeld, PrevDown;
     } Phys;
 
     typedef struct AutolockPhys
@@ -213,7 +260,7 @@ namespace Tetris::Game
         public:
         static std::vector<Board *> AllBoards;
 
-        Phys Phys;// 48 !Aligns on 8-byte intervals
+        Phys Phys;// 46 !Aligns on 8-byte intervals
         Piece Piece;// 76
         int Lines;// 4
         int8 Matrix[40][10];// 400
