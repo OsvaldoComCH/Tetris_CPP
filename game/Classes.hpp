@@ -124,6 +124,16 @@ namespace Tetris::Game
         inline short Get(short Flag){return Flags & Flag;}
         inline void Set(short Flag){Flags |= Flag;}
         inline void Unset(short Flag){Flags &= ~Flag;}
+        inline void SetState(short Flag, bool State)
+        {
+            if(State)
+            {
+                Set(Flag);
+            }else
+            {
+                Unset(Flag);
+            }
+        }
     };
 
     typedef struct Phys
@@ -131,7 +141,6 @@ namespace Tetris::Game
         time_milli DASDelay, DropDelay;
         int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
         int DASLag, DropLag;
-        PhysFlags Flags;
     } Phys;
 
     typedef struct AutolockPhys
@@ -236,6 +245,7 @@ namespace Tetris::Game
         static std::vector<Board *> AllBoards;
 
         Phys Phys;
+        PhysFlags PFlags;
         Piece Piece;
         int8 NextPieces[14];
         int8 NextPointer;
@@ -342,7 +352,7 @@ namespace Tetris::Game
         int8 SpawnPiece();
         int8 Hold();
 
-        void Input();
+        void Input(time_milli TickTime);
         void StartGame();
 
         void RenderMatrix();
