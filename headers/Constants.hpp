@@ -3,8 +3,10 @@
 
 #include "Config.hpp"
 #include <Windows.h>
+#include <chrono>
 
 typedef signed char int8;
+typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> time_milli;
 
 namespace Tetris
 {

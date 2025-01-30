@@ -18,7 +18,7 @@
 
 namespace Tetris::Game
 {
-    std::mt19937 RNG (system_clock::now().time_since_epoch().count());
+    std::mt19937 RNG (std::chrono::system_clock::now().time_since_epoch().count());
 
     //Formula: pow(0.8 - ((Level-1)*0.007), Level-1);
     static constexpr int SpeedTable[25] =
@@ -102,66 +102,41 @@ namespace Tetris::Game
     
     class PhysFlags 
     {
+        private:
         short Flags;
 
-        inline short Left(){return Flags & 0x0001;}
-        inline void Left(bool Value){if(Value){Flags |= 0x0001;}else{Flags &= ~0x0001;}}
+        public:
+        static const short Left = 0x0001,
+        Right = 0x0002,
+        CanLeft = 0x0004,
+        CanRight = 0x0008,
+        LDAS = 0x0010,
+        RDAS = 0x0020,
+        LeftHeld = 0x0040,
+        RightHeld = 0x0080,
+        PrevDown = 0x0100,
+        DownHeld = 0x0200,
+        Drop = 0x0400,
+        HardDrop = 0x0800,
+        RCW = 0x1000,
+        RCCW = 0x2000;
 
-        inline short Right(){return Flags & 0x0002;}
-        inline void Right(bool Value){if(Value){Flags |= 0x0002;}else{Flags &= ~0x0002;}}
-
-        inline short CanLeft(){return Flags & 0x0004;}
-        inline void CanLeft(bool Value){if(Value){Flags |= 0x0004;}else{Flags &= ~0x0004;}}
-
-        inline short CanRight(){return Flags & 0x0008;}
-        inline void CanRight(bool Value){if(Value){Flags |= 0x0008;}else{Flags &= ~0x0008;}}
-        
-        inline short LDAS(){return Flags & 0x0010;}
-        inline void LDAS(bool Value){if(Value){Flags |= 0x0010;}else{Flags &= ~0x0010;}}
-
-        inline short RDAS(){return Flags & 0x0020;}
-        inline void RDAS(bool Value){if(Value){Flags |= 0x0020;}else{Flags &= ~0x0020;}}
-
-        inline short LeftHeld(){return Flags & 0x0040;}
-        inline void LeftHeld(bool Value){if(Value){Flags |= 0x0040;}else{Flags &= ~0x0040;}}
-
-        inline short RightHeld(){return Flags & 0x0080;}
-        inline void RightHeld(bool Value){if(Value){Flags |= 0x0080;}else{Flags &= ~0x0080;}}
-        
-        inline short PrevDown(){return Flags & 0x0100;}
-        inline void PrevDown(bool Value){if(Value){Flags |= 0x0100;}else{Flags &= ~0x0100;}}
-
-        inline short DownHeld(){return Flags & 0x0200;}
-        inline void DownHeld(bool Value){if(Value){Flags |= 0x0200;}else{Flags &= ~0x0200;}}
-
-        inline short Drop(){return Flags & 0x0400;}
-        inline void Drop(bool Value){if(Value){Flags |= 0x0400;}else{Flags &= ~0x0400;}}
-
-        inline short HardDrop(){return Flags & 0x0800;}
-        inline void HardDrop(bool Value){if(Value){Flags |= 0x0800;}else{Flags &= ~0x0800;}}
-
-        inline short RCW(){return Flags & 0x1000;}
-        inline void RCW(bool Value){if(Value){Flags |= 0x1000;}else{Flags &= ~0x1000;}}
-
-        inline short RCCW(){return Flags & 0x2000;}
-        inline void RCCW(bool Value){if(Value){Flags |= 0x2000;}else{Flags &= ~0x2000;}}
+        inline short Get(short Flag){return Flags & Flag;}
+        inline void Set(short Flag){Flags |= Flag;}
+        inline void Unset(short Flag){Flags &= ~Flag;}
     };
 
-    using namespace std::chrono;
     typedef struct Phys
     {
-        time_point<system_clock, milliseconds> DASDelay, DropDelay;
+        time_milli DASDelay, DropDelay;
         int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
         int DASLag, DropLag;
-        bool HDrop, RCW, RCCW, Drop;
-        bool LDAS, RDAS, LeftHeld, RightHeld;
-        bool CanLeft, CanRight, Left, Right;
-        bool DownHeld, PrevDown;
+        PhysFlags Flags;
     } Phys;
 
     typedef struct AutolockPhys
     {
-        time_point<system_clock, milliseconds> Timer;
+        time_milli Timer;
         int8 X, Y, R, MoveCount, TimerSet;
     } AutolockPhys;
 
@@ -260,17 +235,17 @@ namespace Tetris::Game
         public:
         static std::vector<Board *> AllBoards;
 
-        Phys Phys;// 46 !Aligns on 8-byte intervals
-        Piece Piece;// 76
-        int Lines;// 4
-        int8 Matrix[40][10];// 400
-        RenderData RenderData;// 14 !Aligns on 2-byte intervals
-        int8 NextPieces[14];// 14
+        Phys Phys;
+        Piece Piece;
+        int8 NextPieces[14];
         int8 NextPointer;
         int8 Level;
         int8 HeldPiece;
         bool CanHold;
-        AutolockPhys LockPhys;// 13 !Aligns on 8-byte intervals
+        int8 Matrix[40][10];
+        RenderData RenderData;
+        short Lines;
+        AutolockPhys LockPhys;
 
         Board()
         {
@@ -377,9 +352,6 @@ namespace Tetris::Game
         void RenderPiece(bool Spawn);
         void RenderNext();
         void RenderHold();
-        //void FlashPiece();
-        //void FlashLine(int8 Line);
-
 
         void GetSpeed()
         {
@@ -387,8 +359,9 @@ namespace Tetris::Game
             Phys.DropSpeed[1] = SpeedTable[Level - 1] / 20 + 1;
         }
 
-        void AutoLock()
+        void AutoLock(time_milli TickTime)
         {
+            using namespace std::chrono;
             if(LockPhys.Y > Piece.Position[1])
             {
                 LockPhys.MoveCount = 15;
@@ -399,7 +372,7 @@ namespace Tetris::Game
             {
                 if(!LockPhys.TimerSet)
                 {
-                    LockPhys.Timer = time_point_cast<milliseconds>(system_clock::now());
+                    LockPhys.Timer = TickTime;
                     LockPhys.TimerSet = 1;
                 }
                 if(LockPhys.X != Piece.Position[0] || LockPhys.R != Piece.Rotation)
@@ -409,13 +382,13 @@ namespace Tetris::Game
                     if(LockPhys.MoveCount)
                     {
                         --LockPhys.MoveCount;
-                        LockPhys.Timer = time_point_cast<milliseconds>(system_clock::now());
+                        LockPhys.Timer = TickTime;
                     }else
                     {
                         LockPiece();
                     }
                 }else
-                if(LockPhys.Timer + (milliseconds) 500 <= time_point_cast<milliseconds>(system_clock::now()))
+                if(LockPhys.Timer + (milliseconds) 500 <= TickTime)
                 {
                     LockPiece();
                 }
@@ -431,15 +404,17 @@ namespace Tetris::Game
         };
     };
     
-    time_point<system_clock, milliseconds> PauseTime;
+    time_milli PauseTime;
 
     void Pause()
     {
+        using namespace std::chrono;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
     }
 
     void Resume()
     {
+        using namespace std::chrono;
         milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         for(int i = 0; i < Board::AllBoards.size(); ++i)
         {

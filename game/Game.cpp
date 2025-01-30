@@ -281,10 +281,11 @@ int8 Board::SpawnPiece()
     }
 
     CanHold = true;
-    Phys.HDrop = false;
-    Phys.RCW = false;
-    Phys.RCCW = false;
-    Phys.Drop = true;
+
+    Phys.Flags.Unset(PhysFlags::HardDrop);
+    Phys.Flags.Unset(PhysFlags::RCW);
+    Phys.Flags.Unset(PhysFlags::RCCW);
+    Phys.Flags.Set(PhysFlags::Drop);
 
     RenderData.Flags |= RF_NEXT;
     RenderData.Flags |= RF_PIECESPAWN;
@@ -341,14 +342,16 @@ void Board::StartGame()
     HeldPiece = 0;
     Phys.DropLag = 0;
     Phys.DASLag = 0;
-    Phys.LDAS = false;
-    Phys.RDAS = false;
-    Phys.LeftHeld = false;
-    Phys.RightHeld = false;
-    Phys.CanLeft = true;
-    Phys.CanRight = true;
-    Phys.Left = true;
-    Phys.Right = true;
+
+    Phys.Flags.Unset(PhysFlags::LDAS);
+    Phys.Flags.Unset(PhysFlags::RDAS);
+    Phys.Flags.Unset(PhysFlags::LeftHeld);
+    Phys.Flags.Unset(PhysFlags::RightHeld);
+    Phys.Flags.Set(PhysFlags::CanLeft);
+    Phys.Flags.Set(PhysFlags::CanRight);
+    Phys.Flags.Set(PhysFlags::Left);
+    Phys.Flags.Set(PhysFlags::Right);
+
     RenderData.Flags = 255;
     Init();
     GenerateBags(0);
