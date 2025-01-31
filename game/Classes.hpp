@@ -114,12 +114,10 @@ namespace Tetris::Game
         RDAS = 0x0020,
         LeftHeld = 0x0040,
         RightHeld = 0x0080,
-        PrevDown = 0x0100,
-        DownHeld = 0x0200,
-        Drop = 0x0400,
-        HardDrop = 0x0800,
-        RCW = 0x1000,
-        RCCW = 0x2000;
+        Drop = 0x0100,
+        HardDrop = 0x0200,
+        RCW = 0x0400,
+        RCCW = 0x0800;
 
         inline short Get(short Flag){return Flags & Flag;}
         inline void Set(short Flag){Flags |= Flag;}
@@ -141,6 +139,7 @@ namespace Tetris::Game
         time_milli DASDelay, DropDelay;
         int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
         int DASLag, DropLag;
+        bool DownHeld, PrevDown;
     } Phys;
 
     typedef struct AutolockPhys
@@ -249,12 +248,13 @@ namespace Tetris::Game
         Piece Piece;
         int8 NextPieces[14];
         int8 NextPointer;
-        int8 Level;
-        int8 HeldPiece;
         bool CanHold;
         int8 Matrix[40][10];
         RenderData RenderData;
-        short Lines;
+        int8 HeldPiece;
+        int8 Level;
+        int Lines;
+        unsigned Points;
         AutolockPhys LockPhys;
 
         Board()
@@ -362,6 +362,7 @@ namespace Tetris::Game
         void RenderPiece(bool Spawn);
         void RenderNext();
         void RenderHold();
+        void Render();
 
         void GetSpeed()
         {

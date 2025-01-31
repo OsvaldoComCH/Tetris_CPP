@@ -8,6 +8,8 @@ namespace Tetris::Game
 
 void Board::Input(time_milli TickTime)
 {
+    using namespace std::chrono;
+
     if(GetAsyncKeyState(CFG.Controls.HardDrop) & 0x8000)
     {
         if(PFlags.Get(PhysFlags::HardDrop))
@@ -117,21 +119,70 @@ void Board::Input(time_milli TickTime)
     if(PFlags.Get(PhysFlags::Drop))
     {
         MoveDown();
-        bool DownHeld = PFlags.Get(PhysFlags::DownHeld);
-        while(Phys.DropLag >= Phys.DropSpeed[DownHeld])
+        while(Phys.DropLag >= Phys.DownHeld)
         {
             if(MoveDown())
             {
-                Phys.DropLag %= Phys.DropSpeed[DownHeld];
+                Phys.DropLag %= Phys.DownHeld;
                 break;
             }
-            Phys.DropLag -= Phys.DropSpeed[DownHeld];
+            Phys.DropLag -= Phys.DownHeld;
         }
     }else
     {
-        PFlags.SetState(PhysFlags::DownHeld, GetAsyncKeyState(CFG.Controls.SoftDrop) & 0x8000);
-        
+        Phys.DownHeld = GetAsyncKeyState(CFG.Controls.SoftDrop) & 0x8000;
+        if(Phys.DownHeld ^ Phys.PrevDown)
+        {
+            Phys.PrevDown = Phys.DownHeld;
+            Phys.DropLag = 0;
+            PFlags.Set(PhysFlags::Drop);
+        }else
+        {
+            if(duration_cast<microseconds>(TickTime - Phys.DropDelay).count()
+            >= Phys.DropSpeed[Phys.DownHeld] - Phys.DropLag)
+            {
+                Phys.DropLag = duration_cast<microseconds>(TickTime - Phys.DropDelay).count()
+                - Phys.DropSpeed[Phys.DownHeld] + Phys.DropLag;
+                PFlags.Set(PhysFlags::Drop);
+                if(Phys.DropLag < 0){Phys.DropLag = 0;}
+            }
+        }
     }
+
+    AutoLock(TickTime);
+
+    if(GetAsyncKeyState(CFG.Controls.Hold) & 0x8000 && CanHold)
+    {
+        Hold();
+    }
+
+    if(GetAsyncKeyState(VK_UP) & 0x8000)
+    {
+        if(PFlags.Get(PhysFlags::RCW))
+        {
+            RotatePiece(0);
+            PFlags.Unset(PhysFlags::RCW);
+        }
+    }
+    else
+    {
+        PFlags.Set(PhysFlags::RCW);
+    }
+
+    if(GetAsyncKeyState(VK_X) & 0x8000)
+    {
+        if(PFlags.Get(PhysFlags::RCCW))
+        {
+            RotatePiece(1);
+            PFlags.Unset(PhysFlags::RCCW);
+        }    
+    }
+    else
+    {
+        PFlags.Set(PhysFlags::RCCW);
+    }
+    
+    Render();
 }
 
 void Input()
