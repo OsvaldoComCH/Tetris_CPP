@@ -93,6 +93,11 @@ namespace Tetris::Render
         Render::Layer * L = _Layers[Layer];
         BitBlt(MainLayer.hdc, L->Area.x, L->Area.y, L->Area.w, L->Area.h, L->hdc, 0, 0, SRCCOPY);
     }
+
+    void TransferLayer(Layer * L)
+    {
+        BitBlt(MainLayer.hdc, L->Area.x, L->Area.y, L->Area.w, L->Area.h, L->hdc, 0, 0, SRCCOPY);
+    }
     
     void TransferAllLayers()
     {

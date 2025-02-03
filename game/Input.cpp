@@ -1,6 +1,6 @@
 #include <thread>
 
-#include "Game.cpp"
+#include "Classes.hpp"
 #include "../menu/Menus.cpp"
 
 namespace Tetris::Game

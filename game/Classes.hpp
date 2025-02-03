@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 #include "../headers/Constants.hpp"
+#include "../render/Classes.hpp"
 
 #define RF_PIECESPAWN 1
 #define RF_PIECE 2
@@ -255,6 +256,7 @@ namespace Tetris::Game
         int8 Level;
         int Lines;
         unsigned Points;
+        Render::Layer * Layer;
         AutolockPhys LockPhys;
 
         Board()
