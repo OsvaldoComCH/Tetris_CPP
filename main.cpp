@@ -8,12 +8,19 @@
 #include "headers/Constants.hpp"
 #include "menu/Menus.cpp"
 #include "render/Classes.hpp"
+#include "game/Classes.hpp"
+#include "game/Game.cpp"
+#include "game/Input.cpp"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+    using namespace Tetris;
     if(MenuStack::CurMenu)
     {
         MenuStack::CurMenu->EventLoop(hwnd, Msg, wParam, lParam);
+    }else
+    {
+        Game::EventLoop(hwnd, Msg, wParam, lParam);
     }
     switch(Msg)
     {

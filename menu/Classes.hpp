@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <stack>
 #include <iostream>
 #include "../headers/Constants.hpp"
 #include "../render/Classes.hpp"
@@ -226,7 +227,7 @@ class Menu : public RenderObject
 {
     private:
     static Menu * CreateMainMenu();
-    static Menu * CreatePauseMenu(){return NULL;}
+    static Menu * CreatePauseMenu();
     static Menu * CreateOptionsMenu();
 
     public:
@@ -364,5 +365,44 @@ class Menu : public RenderObject
         delete M;
     }
 };
+
+class MenuStack
+{
+    public:
+    static std::stack<Tetris::MenuType> Menus;
+    static Tetris::Menu * CurMenu;
+    static void Begin(){CurMenu = NULL;}
+    static void OpenMenu(Tetris::MenuType Type)
+    {
+        Menus.push(Type);
+        if(CurMenu)
+        {
+            Tetris::Menu::DestroyMenu(CurMenu);
+        }
+        CurMenu = Tetris::Menu::CreateMenu(Type);
+    }
+    static void CloseMenu()
+    {
+        if(CurMenu)
+        {
+            Tetris::Menu::DestroyMenu(CurMenu);
+            Menus.pop();
+            if(Menus.empty())
+            {
+                CurMenu = NULL;
+                return;
+            }
+            CurMenu = Tetris::Menu::CreateMenu(Menus.top());
+        }
+    }
+    static void CloseAll()
+    {
+        Tetris::Menu::DestroyMenu(CurMenu);
+        CurMenu = NULL;
+        Menus.empty();
+    }
+};
+
 }
+
 #endif

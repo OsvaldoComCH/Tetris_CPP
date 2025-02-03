@@ -3,6 +3,24 @@
 namespace Tetris::Game
 {
 
+void EventLoop(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+    switch(Msg)
+    {
+        case WM_KILLFOCUS:
+        {
+            Pause();
+        }
+        case WM_KEYDOWN:
+        {
+            if(wParam == VK_ESCAPE)
+            {
+                Pause();
+            }
+        }
+    }
+}
+
 bool Board::MoveDown()
 {
     if(!CollisionDown(Piece.Blocks, Piece.Position.x, Piece.Position.y - 1))

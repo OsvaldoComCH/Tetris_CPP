@@ -7,6 +7,7 @@
 #include <vector>
 #include "../headers/Constants.hpp"
 #include "../render/Classes.hpp"
+#include "../menu/Classes.hpp"
 
 #define RF_PIECESPAWN 1
 #define RF_PIECE 2
@@ -316,6 +317,7 @@ namespace Tetris::Game
                     return 1;
                 }
             }
+            return 0;
         }
 
         int8 CollisionDown(Block& Blk, int8 XPos, int8 YPos)
@@ -416,6 +418,8 @@ namespace Tetris::Game
             }
         };
     };
+
+    std::vector<Board *> Board::AllBoards;
     
     time_milli PauseTime;
 
@@ -423,6 +427,7 @@ namespace Tetris::Game
     {
         using namespace std::chrono;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
+        MenuStack::OpenMenu(PauseMenu);
     }
 
     void Resume()

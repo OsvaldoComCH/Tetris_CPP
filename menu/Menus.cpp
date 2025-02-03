@@ -3,52 +3,17 @@
 #include "../game/Classes.hpp" 
 #include <stack>
 
-class MenuStack
-{
-    public:
-    static std::stack<Tetris::MenuType> Menus;
-    static Tetris::Menu * CurMenu;
-    static void Begin(){CurMenu = NULL;}
-    static void OpenMenu(Tetris::MenuType Type)
-    {
-        Menus.push(Type);
-        if(CurMenu)
-        {
-            Tetris::Menu::DestroyMenu(CurMenu);
-        }
-        CurMenu = Tetris::Menu::CreateMenu(Type);
-    }
-    static void CloseMenu()
-    {
-        if(CurMenu)
-        {
-            Tetris::Menu::DestroyMenu(CurMenu);
-            Menus.pop();
-            if(Menus.empty())
-            {
-                CurMenu = NULL;
-                return;
-            }
-            CurMenu = Tetris::Menu::CreateMenu(Menus.top());
-        }
-    }
-};
-
-std::stack<Tetris::MenuType> MenuStack::Menus;
-Tetris::Menu * MenuStack::CurMenu = NULL;
+std::stack<Tetris::MenuType> Tetris::MenuStack::Menus;
+Tetris::Menu * Tetris::MenuStack::CurMenu = NULL;
 Tetris::Button * Tetris::Button::ActiveBtn = NULL;
 
 namespace Tetris
 {
     namespace BtnFunc
     {
-        void NumberIncrement(void * Target)
+        void StartGame(void * Target)
         {
-            static int Level = 0;
-            ++Level;
-
-            Button * Btn = (Button *)Target;
-            Btn->Value.assign(std::to_wstring(Level));
+            MenuStack::CloseAll();
         }
         void IncreaseWndSize(void * Target)
         {
@@ -151,7 +116,7 @@ namespace Tetris
             L"Start Game",
             M->Area.left, M->Area.top,
             30, 300, 180, 60,
-            BtnFunc::NumberIncrement
+            BtnFunc::StartGame
         ));
 
         return M;
@@ -357,5 +322,10 @@ namespace Tetris
         ));
 
         return M;
+    }
+
+    Menu * Menu::CreatePauseMenu()
+    {
+        return CreateMainMenu();
     }
 };

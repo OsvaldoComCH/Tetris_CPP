@@ -1,7 +1,7 @@
 #include <thread>
 
 #include "Classes.hpp"
-#include "../menu/Menus.cpp"
+#include "../menu/Classes.hpp"
 
 namespace Tetris::Game
 {
@@ -182,7 +182,7 @@ void Board::Input(time_milli TickTime)
         PFlags.Set(PhysFlags::RCCW);
     }
     
-    Render();
+    //Render();
 }
 
 void Input()
