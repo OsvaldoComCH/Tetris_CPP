@@ -27,7 +27,7 @@ bool Board::MoveDown()
     if(!CollisionDown(Piece.Blocks, Piece.Position.x, Piece.Position.y - 1))
     {
         --Piece.Position.y;
-        RenderData.Flags |= RF_PIECE;
+        RenderData.Flags.Set(RenderFlags::PIECE);
         return 0;
     }
     return 1;
@@ -38,7 +38,7 @@ void Board::MoveLeft()
     if(!CollisionSides(Piece.Blocks, Piece.Position.x - 1, Piece.Position.y))
     {
         --Piece.Position.x;
-        RenderData.Flags |= RF_PIECE;
+        RenderData.Flags.Set(RenderFlags::PIECE);
     }
 }
 
@@ -47,7 +47,7 @@ void Board::MoveRight()
     if(!CollisionSides(Piece.Blocks, Piece.Position.x + 1, Piece.Position.y))
     {
         ++Piece.Position.x;
-        RenderData.Flags |= RF_PIECE;
+        RenderData.Flags.Set(RenderFlags::PIECE);
     }
 }
 
@@ -209,7 +209,7 @@ int8 Board::RotatePiece(bool Dir)
     if(ValidPos)
     {
         Piece.Blocks = TempBlock;
-        RenderData.Flags |= RF_PIECE;
+        RenderData.Flags.Set(RenderFlags::PIECE);
         return 0;
     }
     Piece.Rotation = OldRotation;
@@ -238,7 +238,7 @@ void Board::HardDrop()
         }
     }
     Piece.Position.y -= i - 1;
-    RenderData.Flags |= RF_PIECE;
+    RenderData.Flags.Set(RenderFlags::PIECE);
     LockPiece();
 }
 
@@ -270,13 +270,13 @@ void Board::ClearLines()
             }
         }
     }
-    RenderData.Flags |= RF_LINES;
-    RenderData.Flags |= RF_MATRIX;
+    RenderData.Flags.Set(RenderFlags::LINES);
+    RenderData.Flags.Set(RenderFlags::MATRIX);
 
     if(Level < MaxLevel)
     {
         Level = Lines / 10 + StartLevel;
-        RenderData.Flags |= RF_LEVEL;
+        RenderData.Flags.Set(RenderFlags::LEVEL);
     }
     GetSpeed();
 }
@@ -306,8 +306,8 @@ int8 Board::SpawnPiece()
     PFlags.Unset(PhysFlags::RCCW);
     PFlags.Set(PhysFlags::Drop);
 
-    RenderData.Flags |= RF_NEXT;
-    RenderData.Flags |= RF_PIECESPAWN;
+    RenderData.Flags.Set(RenderFlags::NEXT);
+    RenderData.Flags.Set(RenderFlags::PIECESPAWN);
     if(Collision(Piece.Blocks, Piece.Position.x, Piece.Position.y))
     {
         return 1;
@@ -322,16 +322,16 @@ int8 Board::SpawnPiece()
 }
 int8 Board::Hold()
 {
-    RenderData.Flags |= RF_MATRIX;
+    RenderData.Flags.Set(RenderFlags::MATRIX);
     if(HeldPiece)
     {
         int8 Temp;
         Temp = HeldPiece;
         HeldPiece = Piece.Type;
-        RenderData.Flags |= RF_HOLD;
+        RenderData.Flags.Set(RenderFlags::HOLD);
 
         Piece.Spawn(Temp);
-        RenderData.Flags |= RF_PIECESPAWN;
+        RenderData.Flags.Set(RenderFlags::PIECESPAWN);
         if(Collision(Piece.Blocks, Piece.Position.x, Piece.Position.y))
         {
             return 1;
@@ -346,7 +346,7 @@ int8 Board::Hold()
     }else
     {
         HeldPiece = Piece.Type;
-        RenderData.Flags |= RF_HOLD;
+        RenderData.Flags.Set(RenderFlags::HOLD);
         SpawnPiece();
         CanHold = false;
     }
@@ -371,7 +371,7 @@ void Board::StartGame()
     PFlags.Set(PhysFlags::Left);
     PFlags.Set(PhysFlags::Right);
 
-    RenderData.Flags = 255;
+    RenderData.Flags.Set(0xffff);
     Init();
     GenerateBags(0);
     GenerateBags(1);

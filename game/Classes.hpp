@@ -9,15 +9,6 @@
 #include "../render/Classes.hpp"
 #include "../menu/Classes.hpp"
 
-#define RF_PIECESPAWN 1
-#define RF_PIECE 2
-#define RF_HOLD 4
-#define RF_NEXT 8
-#define RF_LINES 16
-#define RF_LEVEL 32
-#define RF_POINTS 64
-#define RF_MATRIX 128
-
 namespace Tetris::Game
 {
     std::mt19937 RNG (std::chrono::system_clock::now().time_since_epoch().count());
@@ -97,18 +88,26 @@ namespace Tetris::Game
 
     typedef struct RenderData
     {
-        short Flags;//Bkgd,Matrix,Points,Level,Lines,Next,Hold,Piece,PieceSpawn
+        Flags Flags;
         Block Block;
         int8 X, Y, R, Shadow;
     } RenderData;
-    
-    class PhysFlags 
+
+    class Flags
     {
         private:
         short Flags;
 
         public:
-        static const short Left = 0x0001,
+        inline short Get(short Flag){return Flags & Flag;}
+        inline void Set(short Flag){Flags |= Flag;}
+        inline void Unset(short Flag){Flags &= ~Flag;}
+        inline void Clear(){Flags = 0;}
+    }; 
+    
+    enum PhysFlags
+    {
+        Left = 0x0001,
         Right = 0x0002,
         CanLeft = 0x0004,
         CanRight = 0x0008,
@@ -119,21 +118,19 @@ namespace Tetris::Game
         Drop = 0x0100,
         HardDrop = 0x0200,
         RCW = 0x0400,
-        RCCW = 0x0800;
+        RCCW = 0x0800
+    };
 
-        inline short Get(short Flag){return Flags & Flag;}
-        inline void Set(short Flag){Flags |= Flag;}
-        inline void Unset(short Flag){Flags &= ~Flag;}
-        inline void SetState(short Flag, bool State)
-        {
-            if(State)
-            {
-                Set(Flag);
-            }else
-            {
-                Unset(Flag);
-            }
-        }
+    enum RenderFlags
+    {
+        PIECESPAWN = 0x0001,
+        PIECE = 0x0002,
+        HOLD = 0x0004,
+        NEXT = 0x0008,
+        LINES = 0x0010,
+        LEVEL = 0x0020,
+        POINTS = 0x0040,
+        MATRIX = 0x0080
     };
 
     typedef struct Phys
@@ -246,7 +243,7 @@ namespace Tetris::Game
         static std::vector<Board *> AllBoards;
 
         Phys Phys;
-        PhysFlags PFlags;
+        Flags PFlags;
         Piece Piece;
         int8 NextPieces[14];
         int8 NextPointer;
@@ -264,6 +261,7 @@ namespace Tetris::Game
         {
             AllBoards.push_back(this);
             Init();
+            Layer = Render::CreateLayer(0,0,800,600);
         }
 
         ~Board()
@@ -275,6 +273,7 @@ namespace Tetris::Game
                     AllBoards.erase(AllBoards.begin() + i);
                 }
             }
+            Render::DestroyLayer(Layer);
         }
 
         void Init()

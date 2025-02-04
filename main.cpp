@@ -27,11 +27,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_CLOSE:
         {
             DestroyWindow(hwnd);
+            Game::JoinInputThread();
         }
         break;
         case WM_CREATE:
             Tetris::Render::InitLayers();
             Tetris::Render::CreateLayer(0, 0, 800, 600); //Background Layer (0)
+            Game::LaunchInputThread();
         break;
         case WM_PAINT:
         {

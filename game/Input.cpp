@@ -182,8 +182,10 @@ void Board::Input(time_milli TickTime)
         PFlags.Set(PhysFlags::RCCW);
     }
     
-    //Render();
+    Render();
 }
+
+bool RunInputThread = true;
 
 void Input()
 {
@@ -194,7 +196,7 @@ void Input()
     DueTime.QuadPart = -160000;
     SetWaitableTimerEx(Timer, &DueTime, 15, NULL, NULL, NULL, 0);
 
-    while(1)
+    while(RunInputThread)
     {
         if(!MenuStack::CurMenu)
         {
@@ -203,11 +205,26 @@ void Input()
             {
                 Board::AllBoards[i]->Input(CurrentTick);
             }
+            Render::TransferToWindow();
         }
         WaitForSingleObject(Timer, INFINITE);
     }
 }
 
-std::thread InputThread(Input);
+std::thread * InputThread = NULL;
+
+void LaunchInputThread()
+{
+    if(InputThread){return;}
+    InputThread = new std::thread(Input);
+}
+
+void JoinInputThread()
+{
+    RunInputThread = false;
+    InputThread->join();
+    delete InputThread;
+    InputThread = NULL;
+}
 
 }

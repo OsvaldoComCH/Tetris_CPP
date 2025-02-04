@@ -69,6 +69,17 @@ namespace Tetris::Render
         _Layers.pop_back();
     }
 
+    void DestroyLayer(Layer * L)
+    {
+        for(int i = 0; i < _Layers.size(); ++i)
+        {
+            if(_Layers[i] == L)
+            {
+                _Layers.erase(_Layers.begin() + i);
+            }
+        }
+    }
+
     void TransferToWindow()
     {
         HDC WndDC = GetDC(hwnd);
