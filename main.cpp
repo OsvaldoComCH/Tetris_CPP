@@ -39,7 +39,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             BeginPaint(hwnd, &ps);
             EndPaint(hwnd, &ps);
             Tetris::Render::RenderBkgd();
-            MenuStack::CurMenu->Render();
+            if(MenuStack::CurMenu)
+            {
+                MenuStack::CurMenu->Render();
+            }
             Tetris::Render::TransferAllLayers();
             Tetris::Render::TransferToWindow();
         }
@@ -47,7 +50,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_PRINT:
         {
             Tetris::Render::RenderBkgd();
-            MenuStack::CurMenu->Render();
+            if(MenuStack::CurMenu)
+            {
+                MenuStack::CurMenu->Render();
+            }
             Tetris::Render::TransferAllLayers();
             Tetris::Render::TransferToWindow();
         }

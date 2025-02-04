@@ -16,6 +16,7 @@ void EventLoop(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             if(wParam == VK_ESCAPE)
             {
                 Pause();
+                PostMessage(hwnd, WM_PRINT, 0, 0);
             }
         }
     }

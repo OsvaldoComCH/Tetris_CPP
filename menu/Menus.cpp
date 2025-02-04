@@ -118,6 +118,8 @@ namespace Tetris
             30, 300, 180, 60,
             BtnFunc::StartGame
         ));
+        
+        M->SelectedButton = M->Buttons.size() - 1;
 
         return M;
     }
@@ -314,6 +316,8 @@ namespace Tetris
             L"Go Back", M->Area.left, M->Area.top,
             120, 420, 180, 60, BtnFunc::CloseOptionsMenu
         ));
+
+        M->SelectedButton = M->Buttons.size() - 1;
 
         M->Buttons.push_back(new Button
         (

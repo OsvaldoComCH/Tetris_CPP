@@ -233,6 +233,7 @@ class Menu : public RenderObject
     public:
     std::vector<Button *> Buttons;
     std::vector<Label *> Labels;
+    int SelectedButton = 0;
 
     Menu(int x, int y, int w, int h)
     {
@@ -255,7 +256,7 @@ class Menu : public RenderObject
         SelectObject(L->hdc, GetStockObject(DC_BRUSH));
         SelectObject(L->hdc, GetStockObject(NULL_PEN));
 
-        RenderBkgd(L, Color::White);
+        RenderBkgd(L, RGB(96,96,96));
         SetDCBrushColor(L->hdc, Color::DarkGray);
         SetBkColor(L->hdc, Color::DarkGray);
         SetTextColor(L->hdc, Color::White);
@@ -266,10 +267,18 @@ class Menu : public RenderObject
         }
 
         SetTextColor(L->hdc, Color::Black);
-        SetDCBrushColor(L->hdc, Color::White);
+        SetDCBrushColor(L->hdc, RGB(112,112,112));
         for(int i = 0; i < Buttons.size(); ++i)
         {
-            Buttons[i]->Render(L->hdc);
+            if(i == SelectedButton)
+            {
+                COLORREF Color = SetDCBrushColor(L->hdc, Color::White);
+                Buttons[i]->Render(L->hdc);
+                SetDCBrushColor(L->hdc, Color);
+            }else
+            {
+                Buttons[i]->Render(L->hdc);
+            }
         }
     }
 
@@ -286,6 +295,45 @@ class Menu : public RenderObject
                     if(Button::ActiveBtn->Toggle)
                     {
                         Button::ActiveBtn = NULL;
+                    }
+                }else
+                {
+                    switch(wParam)
+                    {
+                        case VK_RETURN:
+                        {
+                            if(Buttons[SelectedButton]->Toggle) 
+                            {
+                                Button::ActiveBtn = Buttons[SelectedButton];
+                            }else
+                            {
+                                Buttons[SelectedButton]->OnClick();
+                            }
+                            PostMessage(hwnd, WM_PRINT, 0, 0);
+                        }
+                        break;
+                        case VK_RIGHT:
+                        case VK_DOWN:
+                        {
+                            ++SelectedButton;
+                            if(SelectedButton >= Buttons.size())
+                            {
+                                SelectedButton = 0;
+                            }
+                            PostMessage(hwnd, WM_PRINT, 0, 0);
+                        }
+                        break;
+                        case VK_LEFT:
+                        case VK_UP:
+                        {
+                            --SelectedButton;
+                            if(SelectedButton < 0)
+                            {
+                                SelectedButton = Buttons.size() - 1;
+                            }
+                            PostMessage(hwnd, WM_PRINT, 0, 0);
+                        }
+                        break;
                     }
                 }
             }
