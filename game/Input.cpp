@@ -205,7 +205,7 @@ void Input()
             {
                 Board::AllBoards[i]->Input(CurrentTick);
             }
-            Render::TransferToWindow();
+            PostMessage(hwnd, WM_PRINT, 0, 0);
         }
         WaitForSingleObject(Timer, INFINITE);
     }

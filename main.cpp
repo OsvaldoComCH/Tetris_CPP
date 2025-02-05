@@ -11,6 +11,7 @@
 #include "game/Classes.hpp"
 #include "game/Game.cpp"
 #include "game/Input.cpp"
+#include "game/Render.cpp"
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {

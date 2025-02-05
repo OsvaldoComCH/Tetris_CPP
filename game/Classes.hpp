@@ -46,6 +46,18 @@ namespace Tetris::Game
     int8 StartLevel = 1;
     int8 MaxLevel = 25;
 
+    class CFlags
+    {
+        private:
+        short Flags;
+
+        public:
+        inline short Get(short Flag){return Flags & Flag;}
+        inline void Set(short Flag){Flags |= Flag;}
+        inline void Unset(short Flag){Flags &= ~Flag;}
+        inline void Clear(){Flags = 0;}
+    };
+
     typedef struct Point
     {
         int8 x, y;
@@ -88,23 +100,11 @@ namespace Tetris::Game
 
     typedef struct RenderData
     {
-        Flags Flags;
+        CFlags Flags;
         Block Block;
         int8 X, Y, R, Shadow;
     } RenderData;
 
-    class Flags
-    {
-        private:
-        short Flags;
-
-        public:
-        inline short Get(short Flag){return Flags & Flag;}
-        inline void Set(short Flag){Flags |= Flag;}
-        inline void Unset(short Flag){Flags &= ~Flag;}
-        inline void Clear(){Flags = 0;}
-    }; 
-    
     enum PhysFlags
     {
         Left = 0x0001,
@@ -243,7 +243,7 @@ namespace Tetris::Game
         static std::vector<Board *> AllBoards;
 
         Phys Phys;
-        Flags PFlags;
+        CFlags PFlags;
         Piece Piece;
         int8 NextPieces[14];
         int8 NextPointer;

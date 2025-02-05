@@ -10,7 +10,9 @@ void EventLoop(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         case WM_KILLFOCUS:
         {
             Pause();
+            PostMessage(hwnd, WM_PRINT, 0, 0);
         }
+        break;
         case WM_KEYDOWN:
         {
             if(wParam == VK_ESCAPE)
@@ -19,6 +21,7 @@ void EventLoop(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
                 PostMessage(hwnd, WM_PRINT, 0, 0);
             }
         }
+        break;
     }
 }
 
