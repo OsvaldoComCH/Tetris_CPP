@@ -41,6 +41,13 @@ namespace Tetris::Game
     void Board::RenderMatrix()
     {
         using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        SelectObject(hdc, GetStockObject(NULL_PEN));
+
+        SetDCBrushColor(hdc, RGB(96,96,96));
+        Rectangle(hdc, 270, 35, 530, 570);
     }
 
     void Board::RenderBkgd()

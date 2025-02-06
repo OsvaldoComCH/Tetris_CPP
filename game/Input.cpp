@@ -1,4 +1,5 @@
 #include <thread>
+#include <iostream>
 
 #include "Classes.hpp"
 #include "../menu/Classes.hpp"
@@ -156,7 +157,7 @@ void Board::Input(time_milli TickTime)
         Hold();
     }
 
-    if(GetAsyncKeyState(VK_UP) & 0x8000)
+    if(GetAsyncKeyState(CFG.Controls.RCW) & 0x8000)
     {
         if(PFlags.Get(PhysFlags::RCW))
         {
@@ -169,7 +170,7 @@ void Board::Input(time_milli TickTime)
         PFlags.Set(PhysFlags::RCW);
     }
 
-    if(GetAsyncKeyState(VK_X) & 0x8000)
+    if(GetAsyncKeyState(CFG.Controls.RCCW) & 0x8000)
     {
         if(PFlags.Get(PhysFlags::RCCW))
         {
@@ -181,7 +182,7 @@ void Board::Input(time_milli TickTime)
     {
         PFlags.Set(PhysFlags::RCCW);
     }
-    
+
     Render();
 }
 
@@ -216,6 +217,7 @@ std::thread * InputThread = NULL;
 void LaunchInputThread()
 {
     if(InputThread){return;}
+    RunInputThread = true;
     InputThread = new std::thread(Input);
 }
 

@@ -124,6 +124,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
+    Tetris::Game::Board * Board1 = new Tetris::Game::Board();
+
     MenuStack::OpenMenu(MenuType::MainMenu);
 
     ShowWindow(hwnd, nCmdShow);
@@ -135,6 +137,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         TranslateMessage(&Msg);
         DispatchMessage(&Msg);
     }
+
+    delete Board1;
 
     MenuStack::CloseMenu();
 

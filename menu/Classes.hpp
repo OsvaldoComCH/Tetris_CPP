@@ -261,6 +261,7 @@ class Menu : public RenderObject
         SetBkColor(L->hdc, Color::DarkGray);
         SetTextColor(L->hdc, Color::White);
         Rectangle(L->hdc, 5, 5, Area.right - Area.left - 5, Area.bottom - Area.top - 5);
+
         for(int i = 0; i < Labels.size(); ++i)
         {
             Labels[i]->Render(L->hdc);

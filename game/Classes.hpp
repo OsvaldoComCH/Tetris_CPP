@@ -262,6 +262,7 @@ namespace Tetris::Game
             AllBoards.push_back(this);
             Init();
             Layer = Render::CreateLayer(0,0,800,600);
+            Render::RenderBkgd(Layer, Render::Color::Gray);
         }
 
         ~Board()

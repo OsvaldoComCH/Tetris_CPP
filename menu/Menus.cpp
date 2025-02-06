@@ -13,7 +13,12 @@ namespace Tetris
     {
         void StartGame(void * Target)
         {
+            using namespace Tetris::Game;
             MenuStack::CloseAll();
+            for(int i = 0; i < Board::AllBoards.size(); ++i)
+            {
+                Board::AllBoards[i]->StartGame();
+            }
         }
         void IncreaseWndSize(void * Target)
         {
