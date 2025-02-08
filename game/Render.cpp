@@ -4,6 +4,10 @@ namespace Tetris::Game
 {
     void Board::Render()
     {
+        if(RenderData.Flags.Get(RenderFlags::LAYOUT))
+        {
+            RenderLayout();
+        }
         if(RenderData.Flags.Get(RenderFlags::MATRIX))
         {
             RenderMatrix();
@@ -38,7 +42,7 @@ namespace Tetris::Game
         RenderData.Flags.Clear();
     }
 
-    void Board::RenderMatrix()
+    void Board::RenderLayout()
     {
         using namespace Render;
         HDC hdc = Layer->hdc;
@@ -48,6 +52,45 @@ namespace Tetris::Game
 
         SetDCBrushColor(hdc, RGB(96,96,96));
         Rectangle(hdc, 270, 35, 530, 570);
+        Rectangle(hdc, 140, 45, 260, 165);
+        Rectangle(hdc, 540, 45, 660, 165);
+        Rectangle(hdc, 550, 170, 650, 500);
+
+        SetDCBrushColor(hdc, Color::DarkGray);
+        Rectangle(hdc, 275, 40, 525, 565);
+        Rectangle(hdc, 145, 50, 255, 160);
+        Rectangle(hdc, 545, 50, 655, 160);
+        Rectangle(hdc, 555, 175, 645, 495);
+    }
+
+    void Board::RenderMatrix()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        for(int y = 0; y < 21; ++y)
+        {
+            for(int x = 0; x < 10; ++x)
+            {
+                int8 Blk = Matrix[y][x];
+                if(Blk){SelectObject(hdc, PiecePen);}
+                else{SelectObject(hdc, BkgdPen);}
+
+                short DeslocX = (25*x), DeslocY = (25*y);
+
+                SetDCBrushColor(hdc, PieceColors[Blk]);
+
+                Rectangle
+                (
+                    hdc,
+                    275 + DeslocX,
+                    540 - DeslocY,
+                    300 + DeslocX,
+                    565 - DeslocY
+                );
+            }
+        }
     }
 
     void Board::RenderBkgd()

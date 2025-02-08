@@ -130,7 +130,8 @@ namespace Tetris::Game
         LINES = 0x0010,
         LEVEL = 0x0020,
         POINTS = 0x0040,
-        MATRIX = 0x0080
+        MATRIX = 0x0080,
+        LAYOUT = 0x0100
     };
 
     typedef struct Phys
@@ -359,6 +360,7 @@ namespace Tetris::Game
         void Input(time_milli TickTime);
         void StartGame();
 
+        void RenderLayout();
         void RenderMatrix();
         void RenderLines();
         void RenderLevel();

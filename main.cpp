@@ -32,6 +32,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         }
         break;
         case WM_CREATE:
+            Tetris::Render::InitResources();
             Tetris::Render::InitLayers();
             Tetris::Render::CreateLayer(0, 0, 800, 600); //Background Layer (0)
             Game::LaunchInputThread();
@@ -63,6 +64,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
         break;
         case WM_DESTROY:
         {
+            Render::FreeResources();
             PostQuitMessage(0);
         }
         break;

@@ -16,20 +16,20 @@ namespace Tetris
 
     namespace Render
     {
-        static const HFONT DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
-        static const HFONT BigFont = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+        HFONT DefFont;
+        HFONT BigFont;
+        HPEN BkgdPen;
+        HPEN PiecePen;
 
         static constexpr COLORREF PieceColors[8] = {
             RGB(64,64,64),
-            RGB(0,224,224),
-            RGB(224,0,224),
-            RGB(224,224,0),
-            RGB(224,112,0),
-            RGB(0,0,224),
-            RGB(224,0,0),
-            RGB(0,224,0),
+            RGB(16,192,192),
+            RGB(192,16,192),
+            RGB(192,192,16),
+            RGB(192,96,16),
+            RGB(32,32,192),
+            RGB(192,32,32),
+            RGB(32,192,32),
         };
         static constexpr COLORREF ShadowColors[7] = {
             RGB(64,96,96),
@@ -56,6 +56,26 @@ namespace Tetris
             Black=RGB(0,0,0),
             LightGray=RGB(192,192,192)
         };
+
+        void InitResources()
+        {
+            DefFont = CreateFont(24, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+
+            BigFont = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+
+            PiecePen = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, Color::Black);
+            BkgdPen = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, Color::Gray);
+        }
+
+        void FreeResources()
+        {
+            DeleteObject(DefFont);
+            DeleteObject(BigFont);
+            DeleteObject(PiecePen);
+            DeleteObject(BkgdPen);
+        }
     };
 
     void ApplyCfgChanges()

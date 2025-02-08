@@ -120,14 +120,14 @@ void Board::Input(time_milli TickTime)
     if(PFlags.Get(PhysFlags::Drop))
     {
         MoveDown();
-        while(Phys.DropLag >= Phys.DownHeld)
+        while(Phys.DropLag >= Phys.DropSpeed[Phys.DownHeld])
         {
             if(MoveDown())
             {
-                Phys.DropLag %= Phys.DownHeld;
+                Phys.DropLag %= Phys.DropSpeed[Phys.DownHeld];
                 break;
             }
-            Phys.DropLag -= Phys.DownHeld;
+            Phys.DropLag -= Phys.DropSpeed[Phys.DownHeld];
         }
     }else
     {
