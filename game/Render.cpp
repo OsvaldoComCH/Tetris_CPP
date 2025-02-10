@@ -12,7 +12,6 @@ namespace Tetris::Game
         {
             RenderMatrix();
         }
-        /*
         if(RenderData.Flags.Get(RenderFlags::PIECESPAWN))
         {
             RenderPiece(1);
@@ -21,6 +20,7 @@ namespace Tetris::Game
         {
             RenderPiece(0);
         }
+        /*
         if(RenderData.Flags.Get(RenderFlags::HOLD))
         {
             RenderHold();
@@ -77,19 +77,61 @@ namespace Tetris::Game
                 if(Blk){SelectObject(hdc, PiecePen);}
                 else{SelectObject(hdc, BkgdPen);}
 
-                short DeslocX = (25*x), DeslocY = (25*y);
-
                 SetDCBrushColor(hdc, PieceColors[Blk]);
 
-                Rectangle
-                (
-                    hdc,
-                    275 + DeslocX,
-                    540 - DeslocY,
-                    300 + DeslocX,
-                    565 - DeslocY
-                );
+                DrawBlock(hdc, x, y);
             }
+        }
+    }
+
+    void Board::RenderPiece(bool Spawn)
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+        
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        if(!Spawn)
+        {
+            SetDCBrushColor(hdc, PieceColors[0]);
+            SelectObject(hdc, BkgdPen);
+            for(int8 i = 0; i < 4; ++i)
+            {
+                if(RenderData.Y + RenderData.Block[i][1] > 20){continue;}
+                DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Y + RenderData.Block[i][1]);
+            }
+            for(int8 i = 0; i < 4; ++i)
+            {
+                if(RenderData.Shadow + RenderData.Block[i][1] > 20){continue;}
+                DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Shadow + RenderData.Block[i][1]);
+            }
+        }
+
+        RenderData.Block = Piece.Blocks;
+        RenderData.X = Piece.Position.x;
+        RenderData.Y = Piece.Position.y;
+
+        int8 i = 0;
+        while(++i)
+        {
+            if(CollisionDown(Piece.Blocks, Piece.Position.x, Piece.Position.y - i))
+            {
+                break;
+            }
+        }
+        RenderData.Shadow = Piece.Position.y - i + 1;
+        //SelectObject(hdc, ShadowPens[Piece.Type + 1]);
+        SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
+        for(int8 i = 0; i < 4; ++i)
+        {
+            if(RenderData.Shadow + RenderData.Block[i][1] > 20){continue;}
+            DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Shadow + RenderData.Block[i][1]);
+        }
+        SelectObject(hdc, PiecePen);
+        SetDCBrushColor(hdc, PieceColors[Piece.Type]);
+        for(int8 i = 0; i < 4; ++i)
+        {
+            if(RenderData.Y + RenderData.Block[i][1] > 20){continue;}
+            DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Y + RenderData.Block[i][1]);
         }
     }
 

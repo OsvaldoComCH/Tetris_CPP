@@ -139,6 +139,12 @@ namespace Tetris::Render
         SelectObject(L->hdc, OldBrush);
         SelectObject(L->hdc, OldPen);
     }
+
+    void DrawBlock(HDC hdc, int8 x, int8 y)
+    {
+        short DeslocX = (25*x), DeslocY = (25*y);
+        Rectangle(hdc, 275 + DeslocX, 540 - DeslocY, 300 + DeslocX, 565 - DeslocY);
+    }
 }
 
 #endif
