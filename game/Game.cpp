@@ -199,7 +199,7 @@ int8 Board::RotatePiece(bool Dir)
         for(int i = 0; i < 4; ++i)
         {
             Point Offset = Piece.Kicks(OldRotation, Dir, i);
-            if(!Collision(TempBlock, Offset.x, Piece.Position.y + Offset.y))
+            if(!Collision(TempBlock, Piece.Position.x + Offset.x, Piece.Position.y + Offset.y))
             {
                 Piece.Position.x += Offset.x;
                 Piece.Position.y += Offset.y;
@@ -244,7 +244,6 @@ void Board::HardDrop()
     RenderData.Flags.Set(RenderFlags::PIECE);
     LockPiece();
 }
-
 
 void Board::ClearLines()
 {
@@ -323,6 +322,7 @@ int8 Board::SpawnPiece()
     LockPhys.TimerSet = 0;
     return 0;
 }
+
 int8 Board::Hold()
 {
     RenderData.Flags.Set(RenderFlags::MATRIX);

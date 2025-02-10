@@ -129,6 +129,8 @@ void Board::Input(time_milli TickTime)
             }
             Phys.DropLag -= Phys.DropSpeed[Phys.DownHeld];
         }
+        PFlags.Unset(PhysFlags::Drop);
+        Phys.DropDelay = TickTime;
     }else
     {
         Phys.DownHeld = GetAsyncKeyState(CFG.Controls.SoftDrop) & 0x8000;

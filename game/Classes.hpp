@@ -442,6 +442,37 @@ namespace Tetris::Game
             Board::AllBoards[i]->Phys.DropDelay += Difference;
         }
     }
+
+    void GetPieceBlocks(int8 Type, Block& Blocks)
+    {
+        switch(Type)
+        {
+            case 1:
+                Blocks = {{{0,2},{1,2},{2,2},{3,2}}};
+            break;
+            case 2:
+                Blocks = {{{0,2},{1,2},{2,2},{1,3}}};
+            break;
+            case 3:
+                Blocks = {{{1,3},{2,3},{2,2},{1,2}}};
+            break;
+            case 4:
+                Blocks = {{{0,2},{1,2},{2,2},{2,3}}};
+            break;
+            case 5:
+                Blocks = {{{0,3},{0,2},{1,2},{2,2}}};
+            break;
+            case 6:
+                Blocks = {{{0,3},{1,3},{1,2},{2,2}}};
+            break;
+            case 7:
+                Blocks = {{{0,2},{1,2},{1,3},{2,3}}};
+            break;
+            default:
+                Blocks = {{{0,2},{1,2},{2,2},{1,3}}};
+            break;
+        }
+    }
 }
 
 #endif

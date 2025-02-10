@@ -20,7 +20,6 @@ namespace Tetris::Game
         {
             RenderPiece(0);
         }
-        /*
         if(RenderData.Flags.Get(RenderFlags::HOLD))
         {
             RenderHold();
@@ -29,6 +28,7 @@ namespace Tetris::Game
         {
             RenderNext();
         }
+        /*
         if(RenderData.Flags.Get(RenderFlags::LINES))
         {
             RenderLines();
@@ -119,7 +119,7 @@ namespace Tetris::Game
             }
         }
         RenderData.Shadow = Piece.Position.y - i + 1;
-        //SelectObject(hdc, ShadowPens[Piece.Type + 1]);
+        //SelectObject(hdc, ShadowPens[Piece.Type - 1]);
         SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
         for(int8 i = 0; i < 4; ++i)
         {
@@ -132,6 +132,106 @@ namespace Tetris::Game
         {
             if(RenderData.Y + RenderData.Block[i][1] > 20){continue;}
             DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Y + RenderData.Block[i][1]);
+        }
+    }
+
+    void Board::RenderHold()
+    {
+        using namespace Render;
+        if(!HeldPiece){return;}
+
+        HDC hdc = Layer->hdc;
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        SelectObject(hdc, GetStockObject(NULL_PEN));
+
+        SetDCBrushColor(hdc, Color::DarkGray);
+        Rectangle(hdc, 145, 50, 255, 160);
+
+        Block Blk;
+        GetPieceBlocks(HeldPiece, Blk);
+        short OriginX, OriginY;
+
+        if(HeldPiece == 1)
+        {
+            OriginX = 150;
+            OriginY = 167;
+        }else
+        if(HeldPiece == 3)
+        {
+            OriginX = 150;
+            OriginY = 180;
+        }else
+        {
+            OriginX = 162;
+            OriginY = 180;
+        }
+
+        SelectObject(hdc, PiecePen);
+        SetDCBrushColor(hdc, PieceColors[HeldPiece]);
+
+        for(int i = 0; i < 4; ++i)
+        {
+            short DeslocX = Blk[i].x * 25;
+            short DeslocY = Blk[i].y * 25;
+
+            Rectangle
+            (
+                hdc,
+                OriginX + DeslocX,
+                OriginY - DeslocY,
+                OriginX + DeslocX + 25,
+                OriginY - DeslocY - 25
+            );
+        }
+    }
+
+    void Board::RenderNext()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        SelectObject(hdc, GetStockObject(NULL_PEN));
+
+        SetDCBrushColor(hdc, Color::DarkGray);
+        Rectangle(hdc, 545, 50, 655, 160);
+
+        int8 Piece = NextPieces[NextPointer];
+
+        Block Blk;
+        GetPieceBlocks(Piece, Blk);
+        short OriginX, OriginY;
+
+        if(Piece == 1)
+        {
+            OriginX = 550;
+            OriginY = 167;
+        }else
+        if(Piece == 3)
+        {
+            OriginX = 550;
+            OriginY = 180;
+        }else
+        {
+            OriginX = 562;
+            OriginY = 180;
+        }
+
+        SelectObject(hdc, PiecePen);
+        SetDCBrushColor(hdc, PieceColors[Piece]);
+
+        for(int i = 0; i < 4; ++i)
+        {
+            short DeslocX = Blk[i].x * 25;
+            short DeslocY = Blk[i].y * 25;
+
+            Rectangle
+            (
+                hdc,
+                OriginX + DeslocX,
+                OriginY - DeslocY,
+                OriginX + DeslocX + 25,
+                OriginY - DeslocY - 25
+            );
         }
     }
 
