@@ -44,6 +44,7 @@ namespace Tetris
         }
         void CloseOptionsMenu(void * Target)
         {
+            ReadConfigFile(&CFG);
             MenuStack::CloseMenu();
         }
         void SaveOptions(void * Target)
@@ -88,6 +89,16 @@ namespace Tetris
             }
             Button * Btn = (Button *)Target;
             Btn->Value = std::to_wstring(MaxLevel);
+        }
+        void ResumeGame(void * Target)
+        {
+            MenuStack::CloseAll();
+            Game::Resume();
+        }
+        void ReturnToMainMenu(void * Target)
+        {
+            MenuStack::CloseAll();
+            MenuStack::OpenMenu(MenuType::MainMenu);
         }
     }
 
@@ -308,13 +319,13 @@ namespace Tetris
             250, 370, 35, 35, BtnFunc::DecreaseWndSize,
             WndSizeLbl
         ));
+
         M->Buttons.push_back(new Button
         (
             L"+", M->Area.left, M->Area.top,
             335, 370, 35, 35, BtnFunc::IncreaseWndSize,
             WndSizeLbl
         ));
-
 
         M->Buttons.push_back(new Button
         (
@@ -335,6 +346,40 @@ namespace Tetris
 
     Menu * Menu::CreatePauseMenu()
     {
-        return CreateMainMenu();
+        Menu * M = new Menu(90, 50, 620, 500);
+
+        M->Buttons.push_back(new Button
+        (
+            L"Resume",
+            M->Area.left, M->Area.top,
+            30, 30, 180, 60,
+            BtnFunc::ResumeGame
+        ));
+
+        M->SelectedButton = M->Buttons.size() - 1;
+
+        M->Buttons.push_back(new Button
+        (
+            L"Restart Game",
+            M->Area.left, M->Area.top,
+            30, 120, 180, 60,
+            BtnFunc::StartGame
+        ));
+        M->Buttons.push_back(new Button
+        (
+            L"Options",
+            M->Area.left, M->Area.top,
+            30, 210, 180, 60,
+            BtnFunc::OpenOptionsMenu
+        ));
+        M->Buttons.push_back(new Button
+        (
+            L"Main Menu",
+            M->Area.left, M->Area.top,
+            30, 300, 180, 60,
+            BtnFunc::ReturnToMainMenu
+        ));
+
+        return M;
     }
 };
