@@ -137,8 +137,8 @@ namespace Tetris::Game
     typedef struct Phys
     {
         time_milli DASDelay, DropDelay;
-        int DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
-        int DASLag, DropLag;
+        unsigned DropSpeed[2];//Interval between drops in microseconds (0-normal, 1-soft drop)
+        unsigned DASLag, DropLag;
         bool DownHeld, PrevDown;
     } Phys;
 
@@ -311,9 +311,9 @@ namespace Tetris::Game
         {
             for(int8 i = 0; i < 4; ++i)
             {
-                if(this->Matrix[YPos + Blk[i][1]][XPos + Blk[i][0]]
-                || (unsigned) (XPos + Blk[i][0]) > 9
-                || (YPos + Blk[i][1]) < 0)
+                if(this->Matrix[YPos + Blk[i].y][XPos + Blk[i].x]
+                || (unsigned) (XPos + Blk[i].x) > 9
+                || (YPos + Blk[i].y) < 0)
                 {
                     return 1;
                 }
@@ -325,8 +325,8 @@ namespace Tetris::Game
         {
             for(int8 i = 0; i < 4; ++i)
             {
-                if(this->Matrix[YPos + Blk[i][1]][XPos + Blk[i][0]]
-                || (YPos + Blk[i][1]) < 0)
+                if(this->Matrix[YPos + Blk[i].y][XPos + Blk[i].x]
+                || (YPos + Blk[i].y) < 0)
                 {
                     return 1;
                 }
@@ -338,8 +338,8 @@ namespace Tetris::Game
         {
             for(int8 i = 0; i < 4; ++i)
             {
-                if(this->Matrix[YPos + Blk[i][1]][XPos + Blk[i][0]]
-                || (unsigned) (XPos + Blk[i][0]) > 9)
+                if(this->Matrix[YPos + Blk[i].y][XPos + Blk[i].x]
+                || (unsigned) (XPos + Blk[i].x) > 9)
                 {
                     return 1;
                 }
@@ -379,22 +379,22 @@ namespace Tetris::Game
         void AutoLock(time_milli TickTime)
         {
             using namespace std::chrono;
-            if(LockPhys.Y > Piece.Position[1])
+            if(LockPhys.Y > Piece.Position.y)
             {
                 LockPhys.MoveCount = 15;
-                LockPhys.Y = Piece.Position[1];
+                LockPhys.Y = Piece.Position.y;
                 LockPhys.TimerSet = 0;
             }
-            if(CollisionDown(Piece.Blocks, Piece.Position[0], Piece.Position[1]-1))
+            if(CollisionDown(Piece.Blocks, Piece.Position.x, Piece.Position.y-1))
             {
                 if(!LockPhys.TimerSet)
                 {
                     LockPhys.Timer = TickTime;
                     LockPhys.TimerSet = 1;
                 }
-                if(LockPhys.X != Piece.Position[0] || LockPhys.R != Piece.Rotation)
+                if(LockPhys.X != Piece.Position.x || LockPhys.R != Piece.Rotation)
                 {
-                    LockPhys.X = Piece.Position[0];
+                    LockPhys.X = Piece.Position.x;
                     LockPhys.R = Piece.Rotation;
                     if(LockPhys.MoveCount)
                     {
@@ -411,9 +411,9 @@ namespace Tetris::Game
                 }
             }else
             {
-                if(LockPhys.X != Piece.Position[0] || LockPhys.R != Piece.Rotation)
+                if(LockPhys.X != Piece.Position.x || LockPhys.R != Piece.Rotation)
                 {
-                    LockPhys.X = Piece.Position[0];
+                    LockPhys.X = Piece.Position.x;
                     LockPhys.R = Piece.Rotation;
                 }
                 if(LockPhys.TimerSet){LockPhys.TimerSet = 0;}
@@ -440,6 +440,7 @@ namespace Tetris::Game
         {
             Board::AllBoards[i]->Phys.DASDelay += Difference;
             Board::AllBoards[i]->Phys.DropDelay += Difference;
+            Board::AllBoards[i]->LockPhys.Timer += Difference;
         }
     }
 

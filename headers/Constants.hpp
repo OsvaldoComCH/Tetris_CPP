@@ -41,6 +41,8 @@ namespace Tetris
             RGB(72,112,72)
         };
         
+        static HPEN ShadowPens[7];
+
         enum Color
         {
             DarkGray=PieceColors[0],
@@ -67,6 +69,11 @@ namespace Tetris
 
             PiecePen = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, Color::Black);
             BkgdPen = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, Color::Gray);
+
+            for(int i = 0; i < 7; ++i)
+            {
+                ShadowPens[i] = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, PieceColors[i + 1]);
+            }
         }
 
         void FreeResources()
@@ -75,6 +82,10 @@ namespace Tetris
             DeleteObject(BigFont);
             DeleteObject(PiecePen);
             DeleteObject(BkgdPen);
+            for(int i = 0; i < 7; ++i)
+            {
+                DeleteObject(ShadowPens[i]);
+            }
         }
     };
 

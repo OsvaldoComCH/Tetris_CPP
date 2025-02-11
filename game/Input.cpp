@@ -119,14 +119,19 @@ void Board::Input(time_milli TickTime)
 
     if(PFlags.Get(PhysFlags::Drop))
     {
+        std::cout << "Drop";
         MoveDown();
         while(Phys.DropLag >= Phys.DropSpeed[Phys.DownHeld])
         {
+            std::cout << Phys.DropLag << "," << Phys.DropSpeed[0], "\t";
             if(MoveDown())
             {
+                std::cout << "div";
                 Phys.DropLag %= Phys.DropSpeed[Phys.DownHeld];
+                std::cout << "aaaa";
                 break;
             }
+            std::cout << "sub";
             Phys.DropLag -= Phys.DropSpeed[Phys.DownHeld];
         }
         PFlags.Unset(PhysFlags::Drop);

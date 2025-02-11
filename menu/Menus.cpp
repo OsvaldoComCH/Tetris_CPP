@@ -14,11 +14,11 @@ namespace Tetris
         void StartGame(void * Target)
         {
             using namespace Tetris::Game;
-            MenuStack::CloseAll();
             for(int i = 0; i < Board::AllBoards.size(); ++i)
             {
                 Board::AllBoards[i]->StartGame();
             }
+            MenuStack::CloseAll();
         }
         void IncreaseWndSize(void * Target)
         {
@@ -346,7 +346,7 @@ namespace Tetris
 
     Menu * Menu::CreatePauseMenu()
     {
-        Menu * M = new Menu(90, 50, 620, 500);
+        Menu * M = new Menu(280, 100, 240, 390);
 
         M->Buttons.push_back(new Button
         (

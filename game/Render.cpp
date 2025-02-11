@@ -119,7 +119,7 @@ namespace Tetris::Game
             }
         }
         RenderData.Shadow = Piece.Position.y - i + 1;
-        //SelectObject(hdc, ShadowPens[Piece.Type - 1]);
+        SelectObject(hdc, ShadowPens[Piece.Type - 1]);
         SetDCBrushColor(hdc, ShadowColors[Piece.Type - 1]);
         for(int8 i = 0; i < 4; ++i)
         {
