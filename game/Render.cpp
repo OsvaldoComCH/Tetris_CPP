@@ -28,7 +28,6 @@ namespace Tetris::Game
         {
             RenderNext();
         }
-        /*
         if(RenderData.Flags.Get(RenderFlags::LINES))
         {
             RenderLines();
@@ -37,7 +36,6 @@ namespace Tetris::Game
         {
             RenderLevel();
         }
-        */
 
         RenderData.Flags.Clear();
     }
@@ -49,18 +47,40 @@ namespace Tetris::Game
 
         SelectObject(hdc, GetStockObject(DC_BRUSH));
         SelectObject(hdc, GetStockObject(NULL_PEN));
+        SelectObject(hdc, DefFont);
 
         SetDCBrushColor(hdc, RGB(96,96,96));
         Rectangle(hdc, 270, 35, 530, 570);
         Rectangle(hdc, 140, 45, 260, 165);
+        Rectangle(hdc, 140, 340, 260, 550);
         Rectangle(hdc, 540, 45, 660, 165);
-        Rectangle(hdc, 550, 170, 650, 500);
+        Rectangle(hdc, 550, 170, 650, 440);
 
         SetDCBrushColor(hdc, Color::DarkGray);
         Rectangle(hdc, 275, 40, 525, 565);
         Rectangle(hdc, 145, 50, 255, 160);
+        Rectangle(hdc, 145, 345, 255, 545);
         Rectangle(hdc, 545, 50, 655, 160);
-        Rectangle(hdc, 555, 175, 645, 495);
+        Rectangle(hdc, 555, 175, 645, 435);
+        
+        SetDCBrushColor(hdc, RGB(96,96,96));
+        Rectangle(hdc, 150, 385, 250, 415);
+        Rectangle(hdc, 150, 445, 250, 475);
+        Rectangle(hdc, 150, 505, 250, 535);
+
+        SetTextColor(hdc, Color::Black);
+        SetBkColor(hdc, Color::Gray);
+        SetTextAlign(hdc, TA_CENTER);
+        TextOut(hdc, 200, 20, L"HOLD", 4);
+        TextOut(hdc, 600, 20, L"NEXT", 4);
+
+        SelectObject(hdc, StatsFont);
+        SetTextColor(hdc, Color::LightGray);
+        SetBkColor(hdc, Color::DarkGray);
+        SetTextAlign(hdc, TA_LEFT);
+        TextOut(hdc, 150, 360, L"Level", 5);
+        TextOut(hdc, 150, 420, L"Lines", 5);
+        TextOut(hdc, 150, 480, L"Points", 6);
     }
 
     void Board::RenderMatrix()
@@ -214,7 +234,7 @@ namespace Tetris::Game
 
         SetDCBrushColor(hdc, Color::DarkGray);
         Rectangle(hdc, 545, 50, 655, 160);
-        Rectangle(hdc, 555, 175, 645, 495);
+        Rectangle(hdc, 555, 175, 645, 435);
 
         int8 Piece = NextPieces[NextPointer];
 
@@ -269,16 +289,16 @@ namespace Tetris::Game
             if(Piece == 1)
             {
                 OriginX = 560;
-                OriginY = 265 + 80 * i;
+                OriginY = 265 + 60 * i;
             }else
             if(Piece == 3)
             {
                 OriginX = 560;
-                OriginY = 275 + 80 * i;
+                OriginY = 275 + 60 * i;
             }else
             {
                 OriginX = 570;
-                OriginY = 275 + 80 * i;
+                OriginY = 275 + 60 * i;
             }
     
             SelectObject(hdc, PiecePen);
@@ -299,6 +319,45 @@ namespace Tetris::Game
                 );
             }            
         }
+    }
+
+    void Board::RenderLines()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, StatsFont);
+        SetTextColor(hdc, Color::White);
+        SetBkColor(hdc, RGB(96,96,96));
+        SetTextAlign(hdc, TA_CENTER);
+        std::wstring Str = std::to_wstring(Lines);
+        TextOut(hdc, 200, 450, Str.c_str(), Str.length());
+    }
+
+    void Board::RenderLevel()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, StatsFont);
+        SetTextColor(hdc, Color::White);
+        SetBkColor(hdc, RGB(96,96,96));
+        SetTextAlign(hdc, TA_CENTER);
+        std::wstring Str = std::to_wstring(Level);
+        TextOut(hdc, 200, 390, Str.c_str(), Str.length());
+    }
+
+    void Board::RenderPoints()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, StatsFont);
+        SetTextColor(hdc, Color::White);
+        SetBkColor(hdc, RGB(96,96,96));
+        SetTextAlign(hdc, TA_CENTER);
+        std::wstring Str = std::to_wstring(Points);
+        TextOut(hdc, 200, 510, Str.c_str(), Str.length());
     }
 
     void Board::RenderBkgd()

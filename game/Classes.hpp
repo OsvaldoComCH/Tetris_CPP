@@ -386,6 +386,7 @@ namespace Tetris::Game
         void RenderPiece(bool Spawn);
         void RenderNext();
         void RenderHold();
+        void RenderPoints();
         void Render();
 
         void GetSpeed()

@@ -18,6 +18,7 @@ namespace Tetris
     {
         HFONT DefFont;
         HFONT BigFont;
+        HFONT StatsFont;
         HPEN BkgdPen;
         HPEN PiecePen;
 
@@ -65,6 +66,9 @@ namespace Tetris
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
             BigFont = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+            
+            StatsFont = CreateFont(20, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
 
             PiecePen = CreatePen(PS_SOLID | PS_INSIDEFRAME, 2, Color::Black);
