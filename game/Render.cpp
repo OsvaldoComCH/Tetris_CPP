@@ -97,12 +97,22 @@ namespace Tetris::Game
             for(int8 i = 0; i < 4; ++i)
             {
                 if(RenderData.Y + RenderData.Block[i][1] > 20){continue;}
-                DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Y + RenderData.Block[i][1]);
+                DrawBlock
+                (
+                    hdc,
+                    RenderData.X + RenderData.Block[i][0],
+                    RenderData.Y + RenderData.Block[i][1]
+                );
             }
             for(int8 i = 0; i < 4; ++i)
             {
                 if(RenderData.Shadow + RenderData.Block[i][1] > 20){continue;}
-                DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Shadow + RenderData.Block[i][1]);
+                DrawBlock
+                (
+                    hdc,
+                    RenderData.X + RenderData.Block[i][0],
+                    RenderData.Shadow + RenderData.Block[i][1]
+                );
             }
         }
 
@@ -124,14 +134,24 @@ namespace Tetris::Game
         for(int8 i = 0; i < 4; ++i)
         {
             if(RenderData.Shadow + RenderData.Block[i][1] > 20){continue;}
-            DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Shadow + RenderData.Block[i][1]);
+            DrawBlock
+            (
+                hdc,
+                RenderData.X + RenderData.Block[i][0],
+                RenderData.Shadow + RenderData.Block[i][1]
+            );
         }
         SelectObject(hdc, PiecePen);
         SetDCBrushColor(hdc, PieceColors[Piece.Type]);
         for(int8 i = 0; i < 4; ++i)
         {
             if(RenderData.Y + RenderData.Block[i][1] > 20){continue;}
-            DrawBlock(hdc, RenderData.X + RenderData.Block[i][0], RenderData.Y + RenderData.Block[i][1]);
+            DrawBlock
+            (
+                hdc,
+                RenderData.X + RenderData.Block[i][0],
+                RenderData.Y + RenderData.Block[i][1]
+            );
         }
     }
 
@@ -194,6 +214,7 @@ namespace Tetris::Game
 
         SetDCBrushColor(hdc, Color::DarkGray);
         Rectangle(hdc, 545, 50, 655, 160);
+        Rectangle(hdc, 555, 175, 645, 495);
 
         int8 Piece = NextPieces[NextPointer];
 
@@ -232,6 +253,51 @@ namespace Tetris::Game
                 OriginX + DeslocX + 25,
                 OriginY - DeslocY - 25
             );
+        }
+
+        
+        int8 Next = NextPointer;
+        for(int i = 0; i < 4; ++i)
+        {
+            ++Next;
+            if(Next >= 14){Next -= 14;}
+            int8 Piece = NextPieces[Next];
+
+            GetPieceBlocks(Piece, Blk);
+            short OriginX, OriginY;
+
+            if(Piece == 1)
+            {
+                OriginX = 560;
+                OriginY = 265 + 80 * i;
+            }else
+            if(Piece == 3)
+            {
+                OriginX = 560;
+                OriginY = 275 + 80 * i;
+            }else
+            {
+                OriginX = 570;
+                OriginY = 275 + 80 * i;
+            }
+    
+            SelectObject(hdc, PiecePen);
+            SetDCBrushColor(hdc, PieceColors[Piece]);
+    
+            for(int i = 0; i < 4; ++i)
+            {
+                short DeslocX = Blk[i].x * 20;
+                short DeslocY = Blk[i].y * 20;
+    
+                Rectangle
+                (
+                    hdc,
+                    OriginX + DeslocX,
+                    OriginY - DeslocY,
+                    OriginX + DeslocX + 20,
+                    OriginY - DeslocY - 20
+                );
+            }            
         }
     }
 

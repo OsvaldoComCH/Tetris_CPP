@@ -358,22 +358,6 @@ int8 Board::Hold()
 
 void Board::StartGame()
 {
-    NextPointer = 0;
-    Lines = 0;
-    Level = StartLevel;
-    HeldPiece = 0;
-    Phys.DropLag = 0;
-    Phys.DASLag = 0;
-
-    PFlags.Unset(PhysFlags::LDAS);
-    PFlags.Unset(PhysFlags::RDAS);
-    PFlags.Unset(PhysFlags::LeftHeld);
-    PFlags.Unset(PhysFlags::RightHeld);
-    PFlags.Set(PhysFlags::CanLeft);
-    PFlags.Set(PhysFlags::CanRight);
-    PFlags.Set(PhysFlags::Left);
-    PFlags.Set(PhysFlags::Right);
-
     RenderData.Flags.Set(0xffff);
     Init();
     GenerateBags(0);
