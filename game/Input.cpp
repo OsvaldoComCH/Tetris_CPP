@@ -190,6 +190,22 @@ void Board::Input(time_milli TickTime)
 
 bool RunInputThread = true;
 
+void Input1Player()
+{
+    using namespace std::chrono;
+    time_milli CurrentTick = time_point_cast<milliseconds>(system_clock::now());
+
+    Board::AllBoards[0]->Input(CurrentTick);
+
+    if(!Board::AllBoards[0]->Alive)
+    {
+        MenuStack::OpenMenu(GameOverMenu);
+    }
+    PostMessage(hwnd, WM_PRINT, 0, 0);
+}
+
+void (*InputFunc)() = Input1Player;
+
 void Input()
 {
     using namespace std::chrono;
@@ -203,21 +219,7 @@ void Input()
     {
         if(!MenuStack::CurMenu)
         {
-            int8 OK = 0;
-            time_milli CurrentTick = time_point_cast<milliseconds>(system_clock::now());
-            for(int i = 0; i < Board::AllBoards.size(); ++i)
-            {
-                if(Board::AllBoards[i]->Alive)
-                {
-                    Board::AllBoards[i]->Input(CurrentTick);
-                }
-                OK |= Board::AllBoards[i]->Alive;
-            }
-            if(!OK)
-            {
-                MenuStack::OpenMenu(GameOverMenu);
-            }
-            PostMessage(hwnd, WM_PRINT, 0, 0);
+            InputFunc();
         }
         WaitForSingleObject(Timer, INFINITE);
     }
