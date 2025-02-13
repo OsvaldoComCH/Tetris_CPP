@@ -359,7 +359,7 @@ int8 Board::Hold()
 
 void Board::StartGame()
 {
-    RenderData.Flags.Set(0xffff);
+    RenderData.Flags.Set(0x7fff);
     Init();
     GenerateBags(0);
     GenerateBags(1);

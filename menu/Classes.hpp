@@ -221,7 +221,8 @@ enum MenuType
     MainMenu,
     PauseMenu,
     OptionsMenu,
-    GameOverMenu
+    GameOverMenu,
+    TimerMenu
 };
 
 class Menu : public RenderObject
@@ -231,6 +232,7 @@ class Menu : public RenderObject
     static Menu * CreatePauseMenu();
     static Menu * CreateOptionsMenu();
     static Menu * CreateGameOverMenu();
+    static Menu * CreateTimerMenu();
 
     public:
     std::vector<Button *> Buttons;
@@ -400,6 +402,8 @@ class Menu : public RenderObject
             return CreateOptionsMenu();
             case GameOverMenu:
             return CreateGameOverMenu();
+            case TimerMenu:
+            return CreateTimerMenu();
             default:
             return NULL;
         }

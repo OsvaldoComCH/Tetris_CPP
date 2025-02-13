@@ -36,6 +36,10 @@ namespace Tetris::Game
         {
             RenderLevel();
         }
+        if(RenderData.Flags.Get(RenderFlags::COVER))
+        {
+            RenderCover();
+        }
 
         RenderData.Flags.Clear();
     }
@@ -81,6 +85,23 @@ namespace Tetris::Game
         TextOut(hdc, 150, 360, L"Level", 5);
         TextOut(hdc, 150, 420, L"Lines", 5);
         TextOut(hdc, 150, 480, L"Points", 6);
+    }
+
+    void Board::RenderCover()
+    {
+        using namespace Render;
+        HDC hdc = Layer->hdc;
+
+        SelectObject(hdc, GetStockObject(DC_BRUSH));
+        SelectObject(hdc, GetStockObject(NULL_PEN));
+        SelectObject(hdc, DefFont);
+
+
+        SetDCBrushColor(hdc, Color::DarkGray);
+        Rectangle(hdc, 275, 40, 526, 566);
+        Rectangle(hdc, 145, 50, 255, 160);
+        Rectangle(hdc, 545, 50, 655, 160);
+        Rectangle(hdc, 555, 175, 645, 435);
     }
 
     void Board::RenderMatrix()

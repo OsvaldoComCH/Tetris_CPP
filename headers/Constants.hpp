@@ -19,6 +19,7 @@ namespace Tetris
         HFONT DefFont;
         HFONT BigFont;
         HFONT StatsFont;
+        HFONT TimerFont;
         HPEN BkgdPen;
         HPEN PiecePen;
 
@@ -67,6 +68,9 @@ namespace Tetris
 
             BigFont = CreateFont(36, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
+
+            TimerFont = CreateFont(60, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
             
             StatsFont = CreateFont(20, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, NULL);
@@ -84,6 +88,8 @@ namespace Tetris
         {
             DeleteObject(DefFont);
             DeleteObject(BigFont);
+            DeleteObject(TimerFont);
+            DeleteObject(StatsFont);
             DeleteObject(PiecePen);
             DeleteObject(BkgdPen);
             for(int i = 0; i < 7; ++i)

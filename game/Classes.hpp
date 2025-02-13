@@ -131,7 +131,8 @@ namespace Tetris::Game
         LEVEL = 0x0020,
         POINTS = 0x0040,
         MATRIX = 0x0080,
-        LAYOUT = 0x0100
+        LAYOUT = 0x0100,
+        COVER = 0x8000
     };
 
     typedef struct Phys
@@ -398,6 +399,7 @@ namespace Tetris::Game
         void RenderNext();
         void RenderHold();
         void RenderPoints();
+        void RenderCover();
         void Render();
 
         void GetSpeed()
@@ -459,6 +461,11 @@ namespace Tetris::Game
     {
         using namespace std::chrono;
         PauseTime = time_point_cast<milliseconds>(system_clock::now());
+        for(int i = 0; i < Board::AllBoards.size(); ++i)
+        {
+            Board::AllBoards[i]->RenderData.Flags.Set(RenderFlags::COVER);
+            Board::AllBoards[i]->Render();
+        }
         MenuStack::OpenMenu(PauseMenu);
     }
 
@@ -468,6 +475,7 @@ namespace Tetris::Game
         milliseconds Difference = (time_point_cast<milliseconds>(system_clock::now()) - PauseTime);
         for(int i = 0; i < Board::AllBoards.size(); ++i)
         {
+            Board::AllBoards[i]->RenderData.Flags.Set(0x7fff);
             Board::AllBoards[i]->Phys.DASDelay += Difference;
             Board::AllBoards[i]->Phys.DropDelay += Difference;
             Board::AllBoards[i]->LockPhys.Timer += Difference;

@@ -11,6 +11,19 @@ namespace Tetris
 {
     namespace BtnFunc
     {
+        void ResumeTimer()
+        {
+            MenuStack::OpenMenu(TimerMenu);
+            SendMessage(hwnd, WM_PRINT, 0, 0);
+            Sleep(500);
+            MenuStack::CurMenu->Labels[0]->Text.assign(L"2");
+            SendMessage(hwnd, WM_PRINT, 0, 0);
+            Sleep(500);
+            MenuStack::CurMenu->Labels[0]->Text.assign(L"1");
+            SendMessage(hwnd, WM_PRINT, 0, 0);
+            Sleep(500);
+            MenuStack::CloseAll();
+        }
         void StartGame(void * Target)
         {
             using namespace Tetris::Game;
@@ -102,7 +115,7 @@ namespace Tetris
         }
         void ResumeGame(void * Target)
         {
-            MenuStack::CloseAll();
+            ResumeTimer();
             Game::Resume();
         }
         void ReturnToMainMenu(void * Target)
@@ -427,6 +440,15 @@ namespace Tetris
             BtnFunc::ReturnToMainMenu
         ));
 
+        return M;
+    }
+
+    Menu * Menu::CreateTimerMenu()
+    {
+        Menu * M = new Menu(370, 255, 60, 90);
+
+        M->Labels.push_back(new Label(L"3", 30, 25, Render::TimerFont));
+        
         return M;
     }
 };
