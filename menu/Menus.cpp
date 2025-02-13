@@ -14,11 +14,21 @@ namespace Tetris
         void StartGame(void * Target)
         {
             using namespace Tetris::Game;
+            MenuStack::CloseAll();
+            Board::CreateBoard();
             for(int i = 0; i < Board::AllBoards.size(); ++i)
             {
                 Board::AllBoards[i]->StartGame();
             }
+        }
+        void RestartGame(void * Target)
+        {
+            using namespace Tetris::Game;
             MenuStack::CloseAll();
+            for(int i = 0; i < Board::AllBoards.size(); ++i)
+            {
+                Board::AllBoards[i]->StartGame();
+            }
         }
         void IncreaseWndSize(void * Target)
         {
@@ -98,6 +108,7 @@ namespace Tetris
         void ReturnToMainMenu(void * Target)
         {
             MenuStack::CloseAll();
+            Game::Board::DestroyAllBoards();
             MenuStack::OpenMenu(MenuType::MainMenu);
         }
     }
@@ -363,8 +374,44 @@ namespace Tetris
             L"Restart Game",
             M->Area.left, M->Area.top,
             30, 120, 180, 60,
-            BtnFunc::StartGame
+            BtnFunc::RestartGame
         ));
+        M->Buttons.push_back(new Button
+        (
+            L"Options",
+            M->Area.left, M->Area.top,
+            30, 210, 180, 60,
+            BtnFunc::OpenOptionsMenu
+        ));
+        M->Buttons.push_back(new Button
+        (
+            L"Main Menu",
+            M->Area.left, M->Area.top,
+            30, 300, 180, 60,
+            BtnFunc::ReturnToMainMenu
+        ));
+
+        return M;
+    }
+
+    Menu * Menu::CreateGameOverMenu()
+    {
+        Menu * M = new Menu(280, 100, 240, 390);
+
+        M->Labels.push_back(new Label
+        (
+            L"Game Over", 120, 50, Render::BigFont
+        ));
+        
+        M->Buttons.push_back(new Button
+        (
+            L"Restart Game",
+            M->Area.left, M->Area.top,
+            30, 120, 180, 60,
+            BtnFunc::RestartGame
+        ));
+        M->SelectedButton = M->Buttons.size() - 1;
+
         M->Buttons.push_back(new Button
         (
             L"Options",

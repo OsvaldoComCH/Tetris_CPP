@@ -312,6 +312,7 @@ int8 Board::SpawnPiece()
     RenderData.Flags.Set(RenderFlags::PIECESPAWN);
     if(Collision(Piece.Blocks, Piece.Position.x, Piece.Position.y))
     {
+        Alive = false;
         return 1;
     }
 

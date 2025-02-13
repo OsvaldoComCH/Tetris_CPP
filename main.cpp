@@ -13,8 +13,6 @@
 #include "game/Input.cpp"
 #include "game/Render.cpp"
 
-Tetris::Game::Board * Board1;
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     using namespace Tetris;
@@ -32,14 +30,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             DestroyWindow(hwnd);
             Game::JoinInputThread();
             MenuStack::CloseMenu();
-            delete Board1;
         }
         break;
         case WM_CREATE:
             Tetris::Render::InitResources();
             Tetris::Render::InitLayers();
             Tetris::Render::CreateLayer(0, 0, 800, 600); //Background Layer (0)
-            Board1 = new Tetris::Game::Board();
             MenuStack::OpenMenu(MenuType::MainMenu);
             Game::LaunchInputThread();
         break;

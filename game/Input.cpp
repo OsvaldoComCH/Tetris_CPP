@@ -203,10 +203,19 @@ void Input()
     {
         if(!MenuStack::CurMenu)
         {
+            int8 OK = 0;
             time_milli CurrentTick = time_point_cast<milliseconds>(system_clock::now());
             for(int i = 0; i < Board::AllBoards.size(); ++i)
             {
-                Board::AllBoards[i]->Input(CurrentTick);
+                if(Board::AllBoards[i]->Alive)
+                {
+                    Board::AllBoards[i]->Input(CurrentTick);
+                }
+                OK |= Board::AllBoards[i]->Alive;
+            }
+            if(!OK)
+            {
+                MenuStack::OpenMenu(GameOverMenu);
             }
             PostMessage(hwnd, WM_PRINT, 0, 0);
         }

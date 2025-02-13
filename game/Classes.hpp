@@ -243,6 +243,15 @@ namespace Tetris::Game
         public:
         static std::vector<Board *> AllBoards;
 
+        static Board * CreateBoard(){return new Board();}
+        static void DestroyAllBoards()
+        {
+            for(int i = 0; i < AllBoards.size(); ++i)
+            {
+                delete AllBoards[i];
+            }
+        }
+
         Phys Phys;
         CFlags PFlags;
         Piece Piece;
@@ -257,6 +266,7 @@ namespace Tetris::Game
         unsigned Points;
         Render::Layer * Layer;
         AutolockPhys LockPhys;
+        bool Alive;
 
         Board()
         {
@@ -288,6 +298,7 @@ namespace Tetris::Game
             Phys.DASLag = 0;
             Phys.DownHeld = false;
             Phys.PrevDown = false;
+            Alive = true;
 
             PFlags.Unset(PhysFlags::LDAS);
             PFlags.Unset(PhysFlags::RDAS);
