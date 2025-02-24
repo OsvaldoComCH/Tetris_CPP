@@ -1,2 +1,5 @@
 /.vscode/*
-/Tetris_CPP.exe
+/bin/*
+/compile.ps1
+/run.ps1
+/settings.cfg
