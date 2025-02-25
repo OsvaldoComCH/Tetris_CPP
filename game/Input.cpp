@@ -39,7 +39,7 @@ void Board::Input(time_milli TickTime)
             if(PFlags.Get(PhysFlags::Left))
             {
                 MoveLeft();
-                PFlags.Unset(PhysFlags::Left | PhysFlags::TSpin | PhysFlags::TSpinMini);
+                PFlags.Unset(PhysFlags::Left);
                 Phys.DASDelay = TickTime;
             }else
             {
@@ -86,7 +86,7 @@ void Board::Input(time_milli TickTime)
             if(PFlags.Get(PhysFlags::Right))
             {
                 MoveRight();
-                PFlags.Unset(PhysFlags::Right | PhysFlags::TSpin | PhysFlags::TSpinMini);
+                PFlags.Unset(PhysFlags::Right);
                 Phys.DASDelay = TickTime;
             }else
             {
@@ -129,7 +129,7 @@ void Board::Input(time_milli TickTime)
             }
             Phys.DropLag -= Phys.DropSpeed[Phys.DownHeld];
         }
-        PFlags.Unset(PhysFlags::Drop | PhysFlags::TSpin | PhysFlags::TSpinMini);
+        PFlags.Unset(PhysFlags::Drop);
         Phys.DropDelay = TickTime;
     }else
     {

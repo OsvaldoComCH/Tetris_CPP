@@ -31,6 +31,7 @@ bool Board::MoveDown()
     {
         --Piece.Position.y;
         RenderData.Flags.Set(RenderFlags::PIECE);
+        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
         return 0;
     }
     return 1;
@@ -42,6 +43,7 @@ void Board::MoveLeft()
     {
         --Piece.Position.x;
         RenderData.Flags.Set(RenderFlags::PIECE);
+        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
     }
 }
 
@@ -51,6 +53,7 @@ void Board::MoveRight()
     {
         ++Piece.Position.x;
         RenderData.Flags.Set(RenderFlags::PIECE);
+        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
     }
 }
 
@@ -216,6 +219,7 @@ int8 Board::RotatePiece(bool Dir)
     {
         Piece.Blocks = TempBlock;
         RenderData.Flags.Set(RenderFlags::PIECE);
+        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
         if(Piece.Type == 2)
         {
             if(Kick == 4)
@@ -223,16 +227,30 @@ int8 Board::RotatePiece(bool Dir)
                 PFlags.Set(PhysFlags::TSpin);
             }else
             {
-                int8 Corners[4];
+                int8 CornerA, CornerB;
                 int8 Total = 0;
-                for(int i = 0; i < 4; ++i)
-                {
-                    Corners[i] = Collision(&SpinTable[(i + Piece.Rotation) & 0b11], &Piece.Position);
-                    Total += Corners[i];
-                }
+                int8 Count = Piece.Rotation;
+                
+                int8 Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+                CornerA = Res;
+                Total += Res;
+                ++Count;
+
+                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+                CornerB = Res;
+                Total += Res;
+                ++Count;
+
+                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+                Total += Res;
+                ++Count;
+
+                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+                Total += Res;
+
                 if(Total >= 3)
                 {
-                    if(Corners[0] & Corners[1]){PFlags.Set(PhysFlags::TSpin);}
+                    if(CornerA & CornerB){PFlags.Set(PhysFlags::TSpin);}
                     else{PFlags.Set(PhysFlags::TSpinMini);}
                 }
             }
@@ -250,6 +268,14 @@ void Board::LockPiece()
         Matrix[Piece.Position.y + Piece.Blocks[i].y][Piece.Position.x + Piece.Blocks[i].x] = Piece.Type;
     }
     Piece.Type = 0;
+    if(PFlags.Get(PhysFlags::TSpin))
+    {
+        std::cout << "T-Spin\n";
+    }
+    if(PFlags.Get(PhysFlags::TSpinMini))
+    {
+        std::cout << "T-Spin Mini\n";
+    }
     ClearLines();
     SpawnPiece();
 }
@@ -266,6 +292,7 @@ void Board::HardDrop()
     }
     Piece.Position.y -= i - 1;
     RenderData.Flags.Set(RenderFlags::PIECE);
+    PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
     LockPiece();
 }
 

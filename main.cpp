@@ -129,7 +129,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         return 0;
     }
 
-    FreeConsole();
+    //FreeConsole();
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
 
