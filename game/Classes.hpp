@@ -58,22 +58,6 @@ namespace Tetris::Game
         inline void Clear(){Flags = 0;}
     };
 
-    typedef struct Point
-    {
-        int8 x, y;
-
-        int8& operator[] (int index)
-        {
-            if(index){return y;}
-            return x;
-        }
-        int8& operator[] (int8 index)
-        {
-            if(index){return y;}
-            return x;
-        }
-    } Point;
-
     typedef struct Block
     {
         Point Positions[4];
@@ -118,7 +102,9 @@ namespace Tetris::Game
         Drop = 0x0100,
         HardDrop = 0x0200,
         RCW = 0x0400,
-        RCCW = 0x0800
+        RCCW = 0x0800,
+        TSpin = 0x1000,
+        TSpinMini = 0x2000
     };
 
     enum RenderFlags
@@ -301,14 +287,22 @@ namespace Tetris::Game
             Phys.PrevDown = false;
             Alive = true;
 
-            PFlags.Unset(PhysFlags::LDAS);
-            PFlags.Unset(PhysFlags::RDAS);
-            PFlags.Unset(PhysFlags::LeftHeld);
-            PFlags.Unset(PhysFlags::RightHeld);
-            PFlags.Set(PhysFlags::CanLeft);
-            PFlags.Set(PhysFlags::CanRight);
-            PFlags.Set(PhysFlags::Left);
-            PFlags.Set(PhysFlags::Right);
+            PFlags.Unset
+            (
+                PhysFlags::LDAS |
+                PhysFlags::RDAS |
+                PhysFlags::LeftHeld |
+                PhysFlags::RightHeld |
+                PhysFlags::TSpin |
+                PhysFlags::TSpinMini
+            );
+            PFlags.Set
+            (
+                PhysFlags::CanLeft |
+                PhysFlags::CanRight |
+                PhysFlags::Left |
+                PhysFlags::Right
+            );
 
             for(int8 i = 39; i >= 0; i--)
             {
@@ -335,6 +329,17 @@ namespace Tetris::Game
                     }
                 } 
             }
+        }
+
+        int8 Collision(const Point * BlockPos, const Point * PiecePos)
+        {
+            if(this->Matrix[BlockPos->y + PiecePos->y][BlockPos->x + PiecePos->x]
+            || (unsigned) (BlockPos->x + PiecePos->x) > 9
+            || (BlockPos->y + PiecePos->y) < 0)
+            {
+                return 1;
+            }
+            return 0;
         }
 
         int8 Collision(Block& Blk, int8 XPos, int8 YPos)

@@ -10,9 +10,27 @@ typedef std::chrono::time_point<std::chrono::system_clock, std::chrono::millisec
 
 namespace Tetris
 {
+    typedef struct Point
+    {
+        int8 x, y;
+
+        int8& operator[] (int index)
+        {
+            if(index){return y;}
+            return x;
+        }
+        int8& operator[] (int8 index)
+        {
+            if(index){return y;}
+            return x;
+        }
+    } Point;
+
     Config CFG;
     Config TempCFG;
     HWND hwnd;
+
+    static constexpr Point SpinTable[4] = {{0,3},{2,3},{0,1},{2,1}};
 
     namespace Render
     {

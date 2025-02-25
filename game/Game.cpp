@@ -193,6 +193,8 @@ int8 Board::RotatePiece(bool Dir)
         break;
     }
 
+    int8 Kick = 0;
+
     bool ValidPos = !Collision(TempBlock, Piece.Position.x, Piece.Position.y);
     if(!ValidPos)
     {
@@ -204,6 +206,7 @@ int8 Board::RotatePiece(bool Dir)
                 Piece.Position.x += Offset.x;
                 Piece.Position.y += Offset.y;
                 ValidPos = true;
+                Kick = i + 1;
                 break;
             }
         }
@@ -213,6 +216,27 @@ int8 Board::RotatePiece(bool Dir)
     {
         Piece.Blocks = TempBlock;
         RenderData.Flags.Set(RenderFlags::PIECE);
+        if(Piece.Type == 2)
+        {
+            if(Kick == 4)
+            {
+                PFlags.Set(PhysFlags::TSpin);
+            }else
+            {
+                int8 Corners[4];
+                int8 Total = 0;
+                for(int i = 0; i < 4; ++i)
+                {
+                    Corners[i] = Collision(&SpinTable[(i + Piece.Rotation) & 0b11], &Piece.Position);
+                    Total += Corners[i];
+                }
+                if(Total >= 3)
+                {
+                    if(Corners[0] & Corners[1]){PFlags.Set(PhysFlags::TSpin);}
+                    else{PFlags.Set(PhysFlags::TSpinMini);}
+                }
+            }
+        }
         return 0;
     }
     Piece.Rotation = OldRotation;
@@ -249,7 +273,8 @@ void Board::ClearLines()
 {
     for(int8 Line = 3; Line >= 0; Line--)
     {
-        if((Piece.Position.y + Line) >= 0){
+        if((Piece.Position.y + Line) >= 0)
+        {
             if(
             Matrix[Piece.Position.y + Line][0] && Matrix[Piece.Position.y + Line][1] &&
             Matrix[Piece.Position.y + Line][2] && Matrix[Piece.Position.y + Line][3] &&
@@ -303,9 +328,14 @@ int8 Board::SpawnPiece()
 
     CanHold = true;
 
-    PFlags.Unset(PhysFlags::HardDrop);
-    PFlags.Unset(PhysFlags::RCW);
-    PFlags.Unset(PhysFlags::RCCW);
+    PFlags.Unset
+    (
+        PhysFlags::HardDrop |
+        PhysFlags::RCW |
+        PhysFlags::RCCW |
+        PhysFlags::TSpin |
+        PhysFlags::TSpinMini
+    );
     PFlags.Set(PhysFlags::Drop);
 
     RenderData.Flags.Set(RenderFlags::NEXT);
@@ -341,6 +371,17 @@ int8 Board::Hold()
             return 1;
         }
 
+        PFlags.Unset
+        (
+            PhysFlags::HardDrop |
+            PhysFlags::RCW |
+            PhysFlags::RCCW |
+            PhysFlags::TSpin |
+            PhysFlags::TSpinMini
+        );
+        PFlags.Set(PhysFlags::Drop);
+
+        Phys.DropLag = 0;
         LockPhys.X = Piece.Position.x;
         LockPhys.Y = Piece.Position.y;
         LockPhys.R = Piece.Rotation;
