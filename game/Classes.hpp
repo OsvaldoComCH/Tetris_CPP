@@ -103,8 +103,8 @@ namespace Tetris::Game
         HardDrop = 0x0200,
         RCW = 0x0400,
         RCCW = 0x0800,
-        TSpin = 0x1000,
-        TSpinMini = 0x2000
+        TSpin = 0x1000, // A T-Spin has ocurred
+        TSpinMini = 0x2000 // 0 -> Full T-Spin; !0 T-Spin Mini
     };
 
     enum RenderFlags
@@ -279,6 +279,7 @@ namespace Tetris::Game
         {
             NextPointer = 0;
             Lines = 0;
+            Points = 0;
             Level = StartLevel;
             HeldPiece = 0;
             Phys.DropLag = 0;

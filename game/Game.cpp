@@ -31,7 +31,7 @@ bool Board::MoveDown()
     {
         --Piece.Position.y;
         RenderData.Flags.Set(RenderFlags::PIECE);
-        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
+        PFlags.Unset(PhysFlags::TSpin);
         return 0;
     }
     return 1;
@@ -43,7 +43,7 @@ void Board::MoveLeft()
     {
         --Piece.Position.x;
         RenderData.Flags.Set(RenderFlags::PIECE);
-        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
+        PFlags.Unset(PhysFlags::TSpin);
     }
 }
 
@@ -53,7 +53,7 @@ void Board::MoveRight()
     {
         ++Piece.Position.x;
         RenderData.Flags.Set(RenderFlags::PIECE);
-        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
+        PFlags.Unset(PhysFlags::TSpin);
     }
 }
 
@@ -219,40 +219,35 @@ int8 Board::RotatePiece(bool Dir)
     {
         Piece.Blocks = TempBlock;
         RenderData.Flags.Set(RenderFlags::PIECE);
-        PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
+        PFlags.Unset(PhysFlags::TSpin);
         if(Piece.Type == 2)
         {
-            if(Kick == 4)
+            int8 CornerA, CornerB;
+            int8 Total = 0;
+            int8 Count = Piece.Rotation;
+            
+            int8 Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+            CornerA = Res;
+            Total += Res;
+            ++Count;
+
+            Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+            CornerB = Res;
+            Total += Res;
+            ++Count;
+
+            Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+            Total += Res;
+            ++Count;
+
+            Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
+            Total += Res;
+
+            if(Total >= 3)
             {
                 PFlags.Set(PhysFlags::TSpin);
-            }else
-            {
-                int8 CornerA, CornerB;
-                int8 Total = 0;
-                int8 Count = Piece.Rotation;
-                
-                int8 Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
-                CornerA = Res;
-                Total += Res;
-                ++Count;
-
-                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
-                CornerB = Res;
-                Total += Res;
-                ++Count;
-
-                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
-                Total += Res;
-                ++Count;
-
-                Res = Collision(&SpinTable[Count & 0b11], &Piece.Position);
-                Total += Res;
-
-                if(Total >= 3)
-                {
-                    if(CornerA & CornerB){PFlags.Set(PhysFlags::TSpin);}
-                    else{PFlags.Set(PhysFlags::TSpinMini);}
-                }
+                if(CornerA & CornerB || Kick == 4){PFlags.Unset(PhysFlags::TSpinMini);}
+                else{PFlags.Set(PhysFlags::TSpinMini);}
             }
         }
         return 0;
@@ -268,14 +263,6 @@ void Board::LockPiece()
         Matrix[Piece.Position.y + Piece.Blocks[i].y][Piece.Position.x + Piece.Blocks[i].x] = Piece.Type;
     }
     Piece.Type = 0;
-    if(PFlags.Get(PhysFlags::TSpin))
-    {
-        std::cout << "T-Spin\n";
-    }
-    if(PFlags.Get(PhysFlags::TSpinMini))
-    {
-        std::cout << "T-Spin Mini\n";
-    }
     ClearLines();
     SpawnPiece();
 }
@@ -298,6 +285,7 @@ void Board::HardDrop()
 
 void Board::ClearLines()
 {
+    int8 LinesCleared = 0;
     for(int8 Line = 3; Line >= 0; Line--)
     {
         if((Piece.Position.y + Line) >= 0)
@@ -309,7 +297,7 @@ void Board::ClearLines()
             Matrix[Piece.Position.y + Line][6] && Matrix[Piece.Position.y + Line][7] &&
             Matrix[Piece.Position.y + Line][8] && Matrix[Piece.Position.y + Line][9])
             {
-                ++Lines;
+                ++LinesCleared;
                 for(int8 i = (Piece.Position.y + Line); i < 39; ++i)
                 {
                     for(int8 j = 0; j < 10; ++j)
@@ -324,7 +312,42 @@ void Board::ClearLines()
             }
         }
     }
+
+    int AddedPoints = 0;
+    if(PFlags.Get(PhysFlags::TSpin) && !PFlags.Get(PhysFlags::TSpinMini))
+    {
+        AddedPoints = 400 * (LinesCleared + 1);
+    }else
+    {
+        if(PFlags.Get(PhysFlags::TSpin))
+        {
+            AddedPoints += 100;
+        }
+
+        switch (LinesCleared)
+        {
+            case 1:
+                AddedPoints += 100;
+            break;
+            case 2:
+                AddedPoints += 300;
+            break;
+            case 3:
+                AddedPoints += 500;
+            break;
+            case 4:
+                AddedPoints += 800;
+            break;
+            default:
+            break;
+        }
+    }
+
+    Points += AddedPoints * Level;
+    Lines += LinesCleared;
+
     RenderData.Flags.Set(RenderFlags::LINES);
+    RenderData.Flags.Set(RenderFlags::POINTS);
     RenderData.Flags.Set(RenderFlags::MATRIX);
 
     if(Level < MaxLevel)
@@ -360,8 +383,7 @@ int8 Board::SpawnPiece()
         PhysFlags::HardDrop |
         PhysFlags::RCW |
         PhysFlags::RCCW |
-        PhysFlags::TSpin |
-        PhysFlags::TSpinMini
+        PhysFlags::TSpin
     );
     PFlags.Set(PhysFlags::Drop);
 
@@ -403,8 +425,7 @@ int8 Board::Hold()
             PhysFlags::HardDrop |
             PhysFlags::RCW |
             PhysFlags::RCCW |
-            PhysFlags::TSpin |
-            PhysFlags::TSpinMini
+            PhysFlags::TSpin
         );
         PFlags.Set(PhysFlags::Drop);
 

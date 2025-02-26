@@ -36,6 +36,10 @@ namespace Tetris::Game
         {
             RenderLevel();
         }
+        if(RenderData.Flags.Get(RenderFlags::POINTS))
+        {
+            RenderPoints();
+        }
         if(RenderData.Flags.Get(RenderFlags::COVER))
         {
             RenderCover();

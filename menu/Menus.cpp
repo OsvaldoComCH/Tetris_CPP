@@ -1,6 +1,6 @@
 #include "Classes.hpp"
 #include "../headers/Config.hpp"
-#include "../game/Classes.hpp" 
+#include "../game/Classes.hpp"
 #include <stack>
 
 std::stack<Tetris::MenuType> Tetris::MenuStack::Menus;
