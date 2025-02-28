@@ -63,11 +63,8 @@ void Board::Input(time_milli TickTime)
         }
     }else
     {
-        PFlags.Set(PhysFlags::Left);
-        PFlags.Unset(PhysFlags::LDAS);
-        PFlags.Unset(PhysFlags::LeftHeld);
-        PFlags.Set(PhysFlags::CanRight);
-        PFlags.Set(PhysFlags::CanLeft);
+        PFlags.Unset(PhysFlags::LDAS | PhysFlags::LeftHeld);
+        PFlags.Set(PhysFlags::Left | PhysFlags::CanRight | PhysFlags::CanLeft);
     }
     
     if(GetAsyncKeyState(CFG.Controls.Right) & 0x8000)
@@ -110,11 +107,8 @@ void Board::Input(time_milli TickTime)
         }
     }else
     {
-        PFlags.Set(PhysFlags::Right);
-        PFlags.Unset(PhysFlags::RDAS);
-        PFlags.Unset(PhysFlags::RightHeld);
-        PFlags.Set(PhysFlags::CanLeft);
-        PFlags.Set(PhysFlags::CanRight);
+        PFlags.Unset(PhysFlags::RDAS | PhysFlags::RightHeld);
+        PFlags.Set(PhysFlags::Right | PhysFlags::CanLeft | PhysFlags::CanRight);
     }
 
     if(PFlags.Get(PhysFlags::Drop))
@@ -201,7 +195,6 @@ void Input1Player()
     {
         MenuStack::OpenMenu(GameOverMenu);
     }
-    PostMessage(hwnd, WM_PRINT, 0, 0);
 }
 
 void (*InputFunc)() = Input1Player;
@@ -220,6 +213,10 @@ void Input()
         if(!MenuStack::CurMenu)
         {
             InputFunc();
+            if(RunInputThread)
+            {
+                PostMessage(hwnd, WM_PRINT, 0, 0);
+            }
         }
         WaitForSingleObject(Timer, INFINITE);
     }
@@ -236,6 +233,7 @@ void LaunchInputThread()
 
 void JoinInputThread()
 {
+    if(!InputThread){return;}
     RunInputThread = false;
     InputThread->join();
     delete InputThread;

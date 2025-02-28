@@ -30,7 +30,8 @@ bool Board::MoveDown()
     if(!CollisionDown(Piece.Blocks, Piece.Position.x, Piece.Position.y - 1))
     {
         --Piece.Position.y;
-        RenderData.Flags.Set(RenderFlags::PIECE);
+        Points += Phys.DownHeld;
+        RenderData.Flags.Set(RenderFlags::PIECE | RenderFlags::POINTS);
         PFlags.Unset(PhysFlags::TSpin);
         return 0;
     }
@@ -278,7 +279,8 @@ void Board::HardDrop()
         }
     }
     Piece.Position.y -= i - 1;
-    RenderData.Flags.Set(RenderFlags::PIECE);
+    Points += (i - 1) << 1;
+    RenderData.Flags.Set(RenderFlags::PIECE | RenderFlags::POINTS);
     PFlags.Unset(PhysFlags::TSpin | PhysFlags::TSpinMini);
     LockPiece();
 }
@@ -314,41 +316,94 @@ void Board::ClearLines()
     }
 
     int AddedPoints = 0;
-    if(PFlags.Get(PhysFlags::TSpin) && !PFlags.Get(PhysFlags::TSpinMini))
+    if(LinesCleared)
     {
-        AddedPoints = 400 * (LinesCleared + 1);
+        ++Combo;
+        AddedPoints += 50 * (Combo-1);
+        // This technique for checking for a perfect clear relies on the fact that it is
+        // impossible for a block to exist in a line without blocks existing in the line
+        // below. If the bottom line is empty, so is the rest of the matrix.
+        int8 PerfectClear = 1;
+        for(int x = 0; x < 10; ++x)
+        {
+            if(Matrix[0][x])
+            {
+                PerfectClear = 0;
+                break;
+            }
+        }
+        if(PerfectClear)
+        {
+            switch(LinesCleared)
+            {
+                case 1:
+                    AddedPoints += 800;
+                break;
+                case 2:
+                    AddedPoints += 1200;
+                break;
+                case 3:
+                    AddedPoints += 1800;
+                break;
+                case 4:
+                    AddedPoints += 2000;
+                break;
+            }
+        }
     }else
     {
-        if(PFlags.Get(PhysFlags::TSpin))
-        {
-            AddedPoints += 100;
-        }
+        Combo = 0;
+    }
 
+    bool B2B = PFlags.Get(PhysFlags::Back2Back);
+
+    int LineClearPoints = 0;
+    if(PFlags.Get(PhysFlags::TSpin) && !PFlags.Get(PhysFlags::TSpinMini))
+    {
+        LineClearPoints = 400 * (LinesCleared + 1);
+        PFlags.Set(PhysFlags::Back2Back);
+    }else
+    {
         switch (LinesCleared)
         {
             case 1:
-                AddedPoints += 100;
+                LineClearPoints += 100;
+                PFlags.Unset(PhysFlags::Back2Back);
             break;
             case 2:
-                AddedPoints += 300;
+                LineClearPoints += 300;
+                PFlags.Unset(PhysFlags::Back2Back);
             break;
             case 3:
-                AddedPoints += 500;
+                LineClearPoints += 500;
+                PFlags.Unset(PhysFlags::Back2Back);
             break;
             case 4:
-                AddedPoints += 800;
+                LineClearPoints += 800;
+                PFlags.Set(PhysFlags::Back2Back);
             break;
             default:
             break;
         }
+
+        if(PFlags.Get(PhysFlags::TSpin))
+        {
+            LineClearPoints += 100;
+            PFlags.Set(PhysFlags::Back2Back);
+        }
     }
 
-    Points += AddedPoints * Level;
+    if(B2B && PFlags.Get(PhysFlags::Back2Back) && LinesCleared)
+    {
+        Points += (LineClearPoints * 1.5 + AddedPoints) * Level;
+    }else
+    {
+        Points += (LineClearPoints + AddedPoints) * Level;
+    }
+
     Lines += LinesCleared;
 
-    RenderData.Flags.Set(RenderFlags::LINES);
-    RenderData.Flags.Set(RenderFlags::POINTS);
-    RenderData.Flags.Set(RenderFlags::MATRIX);
+    RenderData.Flags.Set(RenderFlags::LINES | RenderFlags::POINTS | RenderFlags::MATRIX);
 
     if(Level < MaxLevel)
     {
@@ -387,8 +442,7 @@ int8 Board::SpawnPiece()
     );
     PFlags.Set(PhysFlags::Drop);
 
-    RenderData.Flags.Set(RenderFlags::NEXT);
-    RenderData.Flags.Set(RenderFlags::PIECESPAWN);
+    RenderData.Flags.Set(RenderFlags::NEXT | RenderFlags::PIECESPAWN);
     if(Collision(Piece.Blocks, Piece.Position.x, Piece.Position.y))
     {
         Alive = false;
@@ -411,10 +465,9 @@ int8 Board::Hold()
         int8 Temp;
         Temp = HeldPiece;
         HeldPiece = Piece.Type;
-        RenderData.Flags.Set(RenderFlags::HOLD);
 
         Piece.Spawn(Temp);
-        RenderData.Flags.Set(RenderFlags::PIECESPAWN);
+        RenderData.Flags.Set(RenderFlags::PIECESPAWN | RenderFlags::HOLD);
         if(Collision(Piece.Blocks, Piece.Position.x, Piece.Position.y))
         {
             return 1;

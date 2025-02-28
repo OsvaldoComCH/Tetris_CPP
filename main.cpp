@@ -37,7 +37,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
             Tetris::Render::InitLayers();
             Tetris::Render::CreateLayer(0, 0, 800, 600); //Background Layer (0)
             MenuStack::OpenMenu(MenuType::MainMenu);
-            Game::LaunchInputThread();
+            //Game::LaunchInputThread();
         break;
         case WM_PAINT:
         {

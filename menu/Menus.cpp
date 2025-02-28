@@ -33,6 +33,7 @@ namespace Tetris
             {
                 Board::AllBoards[i]->StartGame();
             }
+            Game::LaunchInputThread();
         }
         void RestartGame(void * Target)
         {
@@ -121,6 +122,7 @@ namespace Tetris
         void ReturnToMainMenu(void * Target)
         {
             MenuStack::CloseAll();
+            Game::JoinInputThread();
             Game::Board::DestroyAllBoards();
             MenuStack::OpenMenu(MenuType::MainMenu);
         }

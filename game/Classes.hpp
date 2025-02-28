@@ -104,7 +104,8 @@ namespace Tetris::Game
         RCW = 0x0400,
         RCCW = 0x0800,
         TSpin = 0x1000, // A T-Spin has ocurred
-        TSpinMini = 0x2000 // 0 -> Full T-Spin; !0 T-Spin Mini
+        TSpinMini = 0x2000, // 0 -> Full T-Spin; !0 T-Spin Mini
+        Back2Back = 0x4000
     };
 
     enum RenderFlags
@@ -254,6 +255,7 @@ namespace Tetris::Game
         Render::Layer * Layer;
         AutolockPhys LockPhys;
         bool Alive;
+        int8 Combo;
 
         Board()
         {
@@ -287,6 +289,7 @@ namespace Tetris::Game
             Phys.DownHeld = false;
             Phys.PrevDown = false;
             Alive = true;
+            Combo = 0;
 
             PFlags.Unset
             (
@@ -295,7 +298,7 @@ namespace Tetris::Game
                 PhysFlags::LeftHeld |
                 PhysFlags::RightHeld |
                 PhysFlags::TSpin |
-                PhysFlags::TSpinMini
+                PhysFlags::Back2Back
             );
             PFlags.Set
             (
@@ -518,6 +521,9 @@ namespace Tetris::Game
             break;
         }
     }
+
+    void LaunchInputThread();
+    void JoinInputThread();
 }
 
 #endif
