@@ -89,6 +89,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Window.lpfnWndProc = WndProc;
     Window.hInstance = hInstance;
     Window.lpszClassName = WClassName;
+    Window.hCursor = LoadCursor(GetModuleHandle(NULL), L"cursor");
 
     if(!RegisterClass(&Window))
     {
